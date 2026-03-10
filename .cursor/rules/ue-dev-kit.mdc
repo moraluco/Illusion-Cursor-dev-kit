@@ -17,9 +17,16 @@ alwaysApply: true
 ## 方法论定义
 
 - 完整方法论（文档结构、knowledge 与 dev 边界、编写约定、与 AI 协作约定、初始化步骤）见**本 Kit 根目录**下的 `METHODOLOGY.md`。
-- **「总结经验」**：用户说总结经验时，根据当前上下文自动做「方法论回顾（METHODOLOGY.md）+ 知识沉淀回顾（content/knowledge/、content/dev/ 及 plan/design 中相关部分）」，给出经验小结与可写回 knowledge 或 dev 的建议；若长时间未触发总结经验，应**主动询问**是否要总结并沉淀。
+- **「总结经验」是写回动作**：用户说总结经验时，必须执行「回顾 → 沉淀 → 索引更新」闭环，而不仅是口头总结。
+  - **回顾**：先读 `METHODOLOGY.md` 与 `content/knowledge/README.md`，并快速检索 `content/knowledge/`、`content/dev/` 是否已有同主题文档，避免重复或口径漂移。
+  - **沉淀**：将本次对话形成的可复用经验写入 **Kit** 的 `content/knowledge/NN-*.md`（概念/模式/清单）或 `content/dev/`（流程/工具/操作步骤），必要时补充到 `04-decisions.md`（决策）或 `05-gotchas.md`（排错）。
+  - **索引更新**：更新 `content/knowledge/README.md`（以及需要时的 dev/README）以纳入新文档；回答中引用新增文档路径，便于后续 @ 引用。
+  - **命名约定**：新增 knowledge 文档用递增编号 `NN-主题.md`，标题与内容围绕“可复用经验 + 约定 + 清单 + 扩展模板”，避免只记录临时过程。
 - 对文档与知识库的读/写均在 **Kit 根下的 content/**：`content/plan.md`、`content/design/`、`content/dev/`、`content/knowledge/`、`content/reference/`。不写项目路径下的文档目录。
 - 回答与代码相关问题时，引用**项目根**下的代码与资源。具体技术栈、脚本与 API 的参考位置由 **content 内 knowledge/ 或 reference/ 的 README** 说明，本规则不假定具体路径或文件名。
+- 回答与**项目结构、模块划分、实现位置、核心类/蓝图分布**相关的问题时，**先查阅** `content/knowledge/01-project-architecture-overview.md`（若存在），据此建立整体架构后再结合具体代码/蓝图作答。若该文件不存在，则按下一句约定处理。
+- 理解 **UE 蓝图与项目结构**时，可参考 `content/knowledge/07-blueprint-snapshot-for-agent.md`；若项目根下存在 **BlueprintSnapshot**（含 `_index.json`、OVERVIEW.md、ARCHITECTURE_*.md），优先据此建立蓝图分布与核心架构印象。
+- **本项目约定**：项目根下若存在 `ManteumTower/BlueprintSnapshot/`，其中的各蓝图快照 JSON（由蓝图导出插件生成）是**蓝图逻辑与调用关系的权威来源**。当需要「读蓝图实现」或说明蓝图行为时，应优先直接解析这些 JSON，而不是假定可以在编辑器中打开蓝图图表。
 
 ## 缺少 content 时
 
