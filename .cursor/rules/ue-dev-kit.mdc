@@ -1,11 +1,11 @@
 ---
-description: UE 研发·知识库 Kit — 识别项目与 Kit，应用研发方法论
+description: 研发知识库 Kit — 识别项目与 Kit，应用研发方法论
 alwaysApply: true
 ---
 
-# UE 研发·知识库 Kit（桥接规则）
+# 研发知识库 Kit（桥接规则）
 
-本规则使 AI 在多根工作区中识别「项目」与「Kit」并应用研发方法论（设计-测试-验证-迭代、迭代计划、知识库）。Kit 只服务一个项目。
+本规则使 AI 在多根工作区中识别「项目」与「Kit」并应用研发方法论（设计-测试-验证-迭代、迭代计划、知识库）。Kit 只服务一个项目。**本规则与 METHODOLOGY 不依赖 content/ 或项目内任何具体路径、文件名或技术栈**；content 内结构由项目自定，并在 content 的 README 中说明。
 
 ## 项目与 Kit
 
@@ -16,9 +16,10 @@ alwaysApply: true
 
 ## 方法论定义
 
-- 完整方法论（文档结构、编写约定、与 AI 协作约定、初始化步骤）见**本 Kit 根目录**下的 `METHODOLOGY.md`。
-- 对文档与知识库的读/写均在 **Kit 根下的 content/**：`content/plan.md`、`content/design/`、`content/dev/`、`content/knowledge/`、`content/reference/`。不写项目路径下的 docs。
-- 回答与代码相关问题时，引用**项目根**下的代码与资源。
+- 完整方法论（文档结构、knowledge 与 dev 边界、编写约定、与 AI 协作约定、初始化步骤）见**本 Kit 根目录**下的 `METHODOLOGY.md`。
+- **「总结经验」**：用户说总结经验时，根据当前上下文自动做「方法论回顾（METHODOLOGY.md）+ 知识沉淀回顾（content/knowledge/、content/dev/ 及 plan/design 中相关部分）」，给出经验小结与可写回 knowledge 或 dev 的建议；若长时间未触发总结经验，应**主动询问**是否要总结并沉淀。
+- 对文档与知识库的读/写均在 **Kit 根下的 content/**：`content/plan.md`、`content/design/`、`content/dev/`、`content/knowledge/`、`content/reference/`。不写项目路径下的文档目录。
+- 回答与代码相关问题时，引用**项目根**下的代码与资源。具体技术栈、脚本与 API 的参考位置由 **content 内 knowledge/ 或 reference/ 的 README** 说明，本规则不假定具体路径或文件名。
 
 ## 缺少 content 时
 
