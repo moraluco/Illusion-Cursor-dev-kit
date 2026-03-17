@@ -1,0 +1,13 @@
+---
+description: Agent 运行 AngelScript 测试并根据结果自动迭代修复
+globs: "**/*.as"
+alwaysApply: false
+---
+
+# AngelScript 测试与迭代（指向技能）
+
+本 Rule 仅在用户要求「跑测试并修复」「TDD」「根据测试结果迭代」或修改 `Script/**/*.as` 并希望验证测试时触发：
+
+- 按技能 **angelscript-tdd-agent-iteration** 执行：运行 RunAngelscriptTests.ps1、解析退出码与输出、失败时自动迭代修复。
+- 具体命令、退出码含义、迭代步骤与约定以 `.cursor/skills/angelscript-tdd-agent-iteration/SKILL.md` 为唯一权威来源。
+- 写 AS 的整体流程见技能 **write-angelscript**。

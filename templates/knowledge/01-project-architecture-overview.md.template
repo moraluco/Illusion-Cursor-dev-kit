@@ -83,5 +83,5 @@
 | 04-decisions.md | 项目/技术决策记录 | 了解选型与约定 |
 | 05-gotchas.md | 易错点、排错备忘 | 排错与避坑 |
 | 06-lessons-blueprint-serializer.md | 蓝图快照与导出插件 | 导出与 Agent 优化 |
-| 07-blueprint-snapshot-for-agent.md | 蓝图快照阅读顺序与字段 | 读蓝图 JSON |
+| 07-blueprint-snapshot-for-agent.md | 蓝图快照阅读顺序与字段 | 读/解析蓝图 JSON、按 schema 1.5 与 _agentSummary/structuredGraphs 分析逻辑时 |
 | 08/09-xxx.md | 玩家 3C、动画系统等 | 对应子系统实现与约定 |

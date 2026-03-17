@@ -1,0 +1,74 @@
+# 易错点与排错备忘（模板）
+
+> 本文档用于沉淀“踩坑 → 复现 → 定位 → 解决/规避”的最短路径。复制到项目 `content/knowledge/05-gotchas.md` 后持续补充。
+
+---
+
+## 1. Unreal Zen / DDC：每次开 UE 都要手动启动 Zen Server
+
+### 现象
+
+- UE 每次启动都提示/需要手动点击启动 Zen 服务器（Zen Store / Zen Server）。
+- 关闭 UE 后 Zen 也随之退出，导致下次又要手动启动。
+
+### 推荐做法：安装为 Windows 服务并设为开机自启
+
+> 适用于 Windows；优点是 Zen 常驻，UE 打开即连，无需手动操作。
+
+1. 找到本机 `zenserver.exe`（常见路径示例）：
+   - `C:\Users\<User>\AppData\Local\UnrealEngine\Common\Zen\Install\zenserver.exe`
+   - 或 `UE_5.x\Engine\Binaries\Win64\ZenServer.exe`（视版本/安装方式而定）
+2. **管理员** PowerShell 执行（注意是双横线）：
+
+```powershell
+& "C:\Users\<User>\AppData\Local\UnrealEngine\Common\Zen\Install\zenserver.exe" --install
+```
+
+3. 查询服务名（`Name`）并设置自启、启动服务（注意 `Name` 可能带空格，需要引号）：
+
+```powershell
+Get-Service *zen* | Format-Table -Auto Name,DisplayName,Status,StartType
+Set-Service -Name "<NameFromAbove>" -StartupType Automatic
+Start-Service -Name "<NameFromAbove>"
+```
+
+### 常见坑
+
+- **`-install` 会失败**：参数是 `--install`（双横线）。错误表现通常类似：`Option 'i' does not exist`。
+- **服务名不是 DisplayName**：命令行里要用 `Name` 字段；且可能包含空格，例如 `Zen Store`，要写成 `"Zen Store"`。
+
+### 启动失败的快速排查
+
+1. 看服务当前状态/错误码：
+
+```powershell
+sc.exe query "<NameFromAbove>"
+```
+
+2. 看系统日志里 Service Control Manager 的失败原因（最近 20 条）：
+
+```powershell
+wevtutil qe System /q:"*[System[Provider[@Name='Service Control Manager'] and (EventID=7000 or EventID=7009 or EventID=7011 or EventID=7024)]]" /c:20 /f:text
+```
+
+3. 检查端口是否被占用（Zen 默认端口常见为 8558）：
+
+```powershell
+netstat -ano | findstr ":8558"
+```
+
+若端口被占用，进一步定位 PID 对应进程：
+
+```powershell
+tasklist /FI "PID eq <PID>"
+```
+
+---
+
+## 2.（按需新增主题）
+
+- 编译/链接错误
+- 启动崩溃与日志定位
+- 资产重定向、DDC/缓存一致性
+- 插件启用顺序、模块依赖
+

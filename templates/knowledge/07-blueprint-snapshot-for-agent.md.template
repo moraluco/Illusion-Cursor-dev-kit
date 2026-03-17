@@ -1,0 +1,94 @@
+# 蓝图快照阅读顺序与字段（Agent 用）
+
+> 本文档描述由蓝图序列化插件导出的 JSON 快照结构（schema 1.5）。复制到 `content/knowledge/07-blueprint-snapshot-for-agent.md` 后，Agent 与人工可按此阅读顺序与关键键解析蓝图逻辑。更完整字段说明见项目内 BlueprintSerializer 插件的 `ContextSystem/SCHEMA_REFERENCE.md`（若存在）。
+
+---
+
+## 0. Agent 必读：快照与蓝图的关系
+
+- **BlueprintSnapshot 下的 \*.json 是蓝图的只读快照**，仅用于理解蓝图里的逻辑、结构、节点与属性。
+- **修改这些 JSON 不会改变任何蓝图行为**。运行时使用的是 Content 中的 .uasset，由 UE 编辑器编辑。
+- Agent 只应用快照来**阅读、分析、比对**；若要改蓝图逻辑或属性，须在**编辑器中打开对应蓝图**修改，或改 C++/AngelScript 等代码，**不要通过改快照 JSON 来“修复”蓝图**。
+
+---
+
+## 1. 阅读顺序
+
+1. **先读** 项目根下的 `BlueprintSnapshot/_index.json`，了解导出时间、目录与蓝图列表。
+2. 用 `blueprints[].summary`（name、type、parentClass、nodeCount 等）筛选需要分析的蓝图。
+3. **再打开** 对应单蓝图 JSON：路径 = `_index.json` 中的 `exportDirectory` + `exportFileName`（如 `BlueprintSnapshot/BP_Enemy_Shadow.json`）。
+4. 单文件内：先看 `_agentSummary` 确认是否为目标蓝图，再按需查 `eventNodes`、`structuredGraphs`（优先）或 `graphNodes`、`dependencyClosure` 等。
+
+---
+
+## 2. _index.json 结构
+
+| 键 | 说明 |
+|----|------|
+| `_schema` | 版本与描述（如 version "1.0"） |
+| `_agentReadme` | 给 Agent 的简要说明：先读本文件，用 summary 决定打开哪些 JSON |
+| `exportTimestamp` | 导出时间（如 "2026.03.12-10.58.01"） |
+| `exportDirectory` | 快照目录绝对路径 |
+| `total` / `successCount` / `failCount` | 总数与成功/失败数 |
+| `blueprints[]` | 每项含：`blueprintPath`、`assetName`、`success`、`exportFileName`、`summary` |
+
+**summary 字段**（用于筛选）：`name`、`path`、`type`（Blueprint / AnimBlueprint / MacroLibrary 等）、`parentClass`、`nodeCount`、`variableCount`、`functionCount`、`graphCount`。
+
+---
+
+## 3. 单蓝图 JSON 结构（schema 1.5）
+
+### 3.1 先看 _agentSummary
+
+与 _index 中该蓝图的 `summary` 一致，用于快速判断本文件是否相关：`name`、`path`、`type`、`parentClass`、`nodeCount`、`variableCount`、`functionCount`、`graphCount`。
+
+### 3.2 身份与元数据
+
+| 键 | 说明 |
+|----|------|
+| `schemaVersion` | 如 "1.5" |
+| `metadata` | name、blueprint_type、blueprint_class、blueprint_namespace |
+| `blueprintPath` / `blueprintName` | 资产路径与短名 |
+| `parentClassName` / `parentClassPath` | 父类 |
+| `generatedClassName` / `generatedClassPath` | 生成类（如 BP_XXX_C） |
+| `extractionTimestamp` | 提取时间 |
+
+### 3.3 依赖与 C++（dependencyClosure）
+
+用于查依赖与头文件：`classPaths`、`structPaths`、`enumPaths`、`interfacePaths`、`assetPaths`、`macroGraphPaths`、`macroBlueprintPaths`、`moduleNames`、`nativeIncludeHints`、`includeHints`（建议的 #include 路径）。
+
+### 3.4 AnimBP 专用（blueprintInfo）
+
+`isAnimBlueprint`、`targetSkeleton`（骨骼资产路径）。
+
+### 3.5 列表型
+
+- `variables`：变量名列表（含继承）。
+- `functions`：函数/图名列表。
+- `eventNodes`：事件名列表（如 "Event: BlueprintUpdateAnimation"）。
+- `components`：组件列表。
+
+### 3.6 图与节点（核心）
+
+- **优先使用 `structuredGraphs`**：每项为一张图，含 `name`、`graphType`（Ubergraph、Function、AnimGraph、StateMachine 等）、`nodes[]`、`flows`（`execution[]`、`data[]`）。
+  - `nodes[]`：每节点有 `nodeGuid`、`nodeType`、`title`、`pins`、`nodeProperties`（含 `meta.*`，如 meta.functionName、meta.eventName）。
+  - `flows.execution`：执行边（sourceNodeGuid、sourcePinName → targetNodeGuid、targetPinName）。
+  - `flows.data`：数据边（同上结构），用于还原数据流。
+- **备选 `graphNodes`**：数组元素为**已转义的 JSON 字符串**，需解析后得到节点对象；内含 `nodeType`、`nodeTitle`、`nodeGuid`、`pins`（含 `connections`：`connectedNodeGuid`、`connectedPinName` 等）。当无 structuredGraphs 或需兼容旧导出时使用。
+
+### 3.7 详细与回退
+
+- `detailedVariables` / `detailedFunctions`：变量与函数的结构化详情（类型、bytecodeSize、inputParameters 等）。
+- `compilerIRFallback`：`hasUnsupportedNodes`、`unsupportedNodeTypes`、`bytecodeBackedFunctions` 等，表示部分节点未完全提取或回退到字节码。
+
+---
+
+## 4. 文件命名
+
+与 BlueprintSnapshot 目录下 README_naming.md 一致：默认 `<BlueprintName>.json`；同次导出中若重名，则追加 `_<ParentFolder>` 或 `_<Hash4>` 后缀。
+
+---
+
+## 5. 参考
+
+- 插件更完整字段说明（structuredGraphs 节点/引脚/flow、meta.*、compilerIRFallback 等）：项目内 **BlueprintSerializer/ContextSystem/SCHEMA_REFERENCE.md**（若存在）。

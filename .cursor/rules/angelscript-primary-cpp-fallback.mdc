@@ -1,0 +1,13 @@
+---
+description: 实现功能默认必须用 AngelScript；仅当 AS 无法满足时才用 C++。具体写作流程与参考见 skill write-angelscript。
+globs: "**/*.as,**/*.cpp,**/*.h,**/*.uasset"
+alwaysApply: true
+---
+
+# AngelScript 默认实现功能，C++ 仅作补充（指向技能）
+
+本 Rule 只负责在实现功能时提醒以下硬性约定，具体写作流程与参考见技能 **write-angelscript**：
+
+- **新增或实现游戏功能时，默认必须使用 AngelScript（.as）**。未明确要求用 C++/蓝图写逻辑时，一律在 AS 中实现。
+- 仅当确认 AngelScript 无法满足（如引擎 API 未暴露、性能瓶颈、需改插件/引擎代码）时，才改用 C++ 或说明原因，并由 AS 调用 C++ 扩展。
+- 具体查阅路径、书写约定、写法速查与测试流程，以 `.cursor/skills/write-angelscript/SKILL.md` 为唯一权威来源。

@@ -1,0 +1,12 @@
+---
+description: 编辑 .as 或涉及 AS 时按 write-angelscript 执行；文档与 API 路径以该技能及 content/reference 为准
+globs: "**/*.as,**/*.cpp,**/*.h"
+alwaysApply: true
+---
+
+# AngelScript 文档与 API 参考（指向技能）
+
+本 Rule 仅在编辑 `.as` 或涉及 AngelScript 时做触发与提醒，不重复技能内容：
+
+- 在编写或修改 AngelScript、或涉及 AS 与 UE 交互时，按技能 **write-angelscript** 执行。
+- 文档路径（`content/reference/AS_API/`、`content/reference/Docs-UE-Angelscript/`）、API 查阅顺序、写法约定与常见坑，以该技能及其 `reference.md` 为唯一权威来源。
