@@ -74,10 +74,15 @@
 
 ### 自动化-3：UE + soft-ue-cli
 
-- **状态**：未开始
-- **最近进展**：本节与下方 UE 子阶段表已写入 `plan.md`，便于本机验证后**直接回写**勾选与迭代记录；详见 [dev/automation-three-steps.md](dev/automation-three-steps.md)、技能 **soft-ue-cli-ue-bridge**。
-- **下一步**：启动交互式 UE → `py -3 -m soft_ue_cli check-setup` → 按 **UE 0→1→2** 表逐级验证（只读 → 观察闭环）。
-- **验证结果**：（待填）各子能力勾选如下。
+- **状态**：进行中
+- **最近进展**：
+  - 已完成“无人值守 Editor CLI 最小闭环”一次演练：以 `UnrealEditor-Cmd.exe` 启动工程、依赖退出码与 `Saved/Logs/*.log` 定位现场。
+  - 当前现象：`-run=AngelscriptTest` 与 `-ExecCmds="Automation RunTests ..."` 均能启动，但在给定超时内未自动退出（脚本已自动 kill 并 tail 最新 log）。
+  - 启动早期可见插件解析错误（PlainProps*），可能影响后续 commandlet/automation 的正常收敛。
+- **下一步**：
+  - 先修复/禁用 PlainProps* 插件的 `.uplugin` 解析错误（否则 Editor-Cmd 启动就污染日志与行为）。
+  - 将无人值守测试入口沉淀为项目侧 `Scripts/*.ps1`（带超时、日志定位、可覆盖 UE_EDITOR_CMD），并按“每次小提交→跑一次→记录结论”收敛失败面。
+- **验证结果**：（进行中）本机已可稳定得到：启动成功→超时 kill→定位最新 `Saved/Logs/*.log`→tail 关键现场。
 
 
 | UE 子阶段 | 内容                             | 状态  |
@@ -87,7 +92,8 @@
 | 2 观察闭环 | PIE、`capture-screenshot`（按需）   | 未开始 |
 
 
-- **迭代记录**：（待填）每次验证的命令与结论一句。
+- **迭代记录**：
+  - 轮次 1：以 `UnrealEditor-Cmd.exe` 跑最小 AS/Automation 两条入口；两者均在超时内未退出（exit=124），但日志可稳定定位与 tail；后续优先修复 PlainProps* 插件解析错误，再继续收敛到“能跑完并返回 0/非 0”。
 
 ---
 

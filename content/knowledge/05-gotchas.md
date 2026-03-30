@@ -15,6 +15,7 @@
 | 文档写在了项目根         | 与 Kit 约定不符                                         | 文档与知识库统一放在 Kit 的 content/                |
 | 阶段/任务状态未更新       | 忘记更新 plan.md                                       | 完成小目标或验证后更新 plan 中对应阶段与任务状态              |
 | BlueprintSerializer 编译报「VMNode 未声明的标识符」 | 使用 RigVM/ControlRig 的代码未用 `#if UEARATAME_HAS_CONTROL_RIG` 包裹，在未包含对应头时仍参与编译 | 将 `MakeStableRigVMNodeGuid` 等仅 ControlRig 分支下使用的函数整体包在 `#if UEARATAME_HAS_CONTROL_RIG` / `#endif` 中；.uplugin 中声明对 GameplayAbilities、EnhancedInput 等依赖可消除构建警告 |
+| 本机默认工程/引擎路径不统一，导致 CLI 脚本难复用 | 每台机器 UnrealEditor(.exe/.Cmd.exe) 与 `.uproject` 路径不同，未形成“默认值 + 可覆盖”的约定 | 默认值（本机）：`.uproject` = `D:\\Workspace\\MT\\Engine\\ManteumTower\\ManteumTower.uproject`；`UnrealEditor.exe` = `D:\\Workspace\\MT\\Engine\\Engine\\Engine\\Binaries\\Win64\\UnrealEditor.exe`；无人值守运行优先用同目录的 `UnrealEditor-Cmd.exe`，并允许用参数或 `UE_EDITOR_CMD` 覆盖 |
 | UnrealEditor-Cmd 找不到（脚本报错） | 引擎为源码多级目录（如 Engine/Engine/Engine/Binaries）或 Epic 安装在其他路径 | 用 .uproject 的 EngineAssociation 解析引擎根后依次尝试 Engine/Engine/Binaries、Engine/Binaries、Binaries；或建 Scripts/engine_path.txt 写一行 Binaries/Win64 路径；或传 --engine-path / UE_ENGINE_PATH |
 | 运行 BlueprintSerializer 测试脚本「没有任何输出」 | 在 UE 控制台里执行了 .ps1/.cmd（控制台只认引擎命令）或 UnrealEditor-Cmd 不向 stdout 打日志 | 在系统 PowerShell/CMD 中于项目根执行脚本；脚本应合并 Saved/Logs 下最新 .log 到输出，便于调试 |
 | 自动化历史难复盘、`git log` 看不懂 | commit 不原子化：一个提交混杂多主题改动、备注缺少“为什么/如何验证” | 约定 **一个 commit = 一个可验证点**；中文备注写清“为什么/做了什么/怎么验证”；按仓库边界拆分（改项目提交项目、改 Kit 提交 Kit）。参见 `content/dev/git-automation.md` 与技能 **git-local-p4-workflow** |
