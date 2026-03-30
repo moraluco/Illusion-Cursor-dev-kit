@@ -26,6 +26,7 @@
 | [10-als-data-config.md](10-als-data-config.md) | ALS 数据配置（移动）：加速度、阻尼、制动 — 配置入口、数据流向、速查表（Lin_MovementSettings_Default / 曲线 X/Y/Z） |
 | [11-als-animinstance-framework-and-layering-curves.md](11-als-animinstance-framework-and-layering-curves.md) | ALS-Refactored：`UAlsAnimationInstance` 与 AnimBP 职责、三阶段刷新、Layering 曲线 → `FAlsLayeringState` 数据流 |
 | [12-enemy-animation-system-refactor-roadmap.md](12-enemy-animation-system-refactor-roadmap.md) | 敌人通用动画系统重构路线：MM 基底 + ALS 风格分层曲线（目标架构、曲线契约、分阶段实施与验收清单） |
+| [13-ue-automation-test-playbook.md](13-ue-automation-test-playbook.md) | UE 自动化测试通用 Playbook：Editor+Bridge vs Editor-Cmd、启动与等待、并发/资源治理、证据采集与清理 |
 
 ---
 

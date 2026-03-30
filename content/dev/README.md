@@ -15,6 +15,7 @@
 | [git-automation.md](git-automation.md) | Git 与长程上下文；**自动化优先**与**自动化专仓**（独立仓库管 CI/工作流） |
 | [player-overlay-mode-extension.md](player-overlay-mode-extension.md) | 新增 OverlayMode 的操作步骤、C++ 验证、AS 中调试显示 OverlayMode |
 | [editor-tools/blueprint-export-serializer.md](editor-tools/blueprint-export-serializer.md) | 蓝图导出与 BlueprintSerializer 使用与排错（非 Agent 读图主路径） |
+| [ue-automation-tests.md](ue-automation-tests.md) | UE 自动化测试：Pester Unit/E2E、并发/输出隔离、如何跑与注意事项 |
 
 ## 编写建议
 

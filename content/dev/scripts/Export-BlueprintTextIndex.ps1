@@ -134,6 +134,20 @@ function Get-AssetPathFromItem {
     return $null
 }
 
+function Has-Prop {
+    param(
+        [Parameter(Mandatory = $true)] $Obj,
+        [Parameter(Mandatory = $true)] [string] $Name
+    )
+    if (-not $Obj) { return $false }
+    try {
+        return ($Obj.PSObject.Properties.Name -contains $Name)
+    }
+    catch {
+        return $false
+    }
+}
+
 function Ensure-OutDir {
     if (-not $OutDir) {
         $script:OutDir = Join-Path $ProjectRoot '.soft-ue-index'
@@ -171,10 +185,10 @@ foreach ($root in $ContentPaths) {
         if ($assetResp -is [System.Collections.IEnumerable] -and -not ($assetResp -is [string])) {
             $assetItems = @($assetResp)
         }
-        elseif ($assetResp.assets) {
+        elseif ((Has-Prop -Obj $assetResp -Name 'assets') -and $assetResp.assets) {
             $assetItems = @($assetResp.assets)
         }
-        elseif ($assetResp.results) {
+        elseif ((Has-Prop -Obj $assetResp -Name 'results') -and $assetResp.results) {
             $assetItems = @($assetResp.results)
         }
         else {
@@ -313,8 +327,10 @@ foreach ($bp in $assetPaths) {
         foreach ($c in $callableEntries) {
             $cname = $c.name
             if (-not $cname) { continue }
-            $ctype = $c.type
-            $cgraph = $c.graph
+            $ctype = $null
+            if (Has-Prop -Obj $c -Name 'type') { $ctype = $c.type }
+            $cgraph = $null
+            if (Has-Prop -Obj $c -Name 'graph') { $cgraph = $c.graph }
 
             Append-NDJsonLine @{
                 kind = 'blueprint.callable'
@@ -346,14 +362,17 @@ foreach ($bp in $assetPaths) {
                     }
                 }
                 $nodes = @()
-                if ($g.nodes) { $nodes = @($g.nodes) }
-                elseif ($g.graph -and $g.graph.nodes) { $nodes = @($g.graph.nodes) }
+                if ((Has-Prop -Obj $g -Name 'nodes') -and $g.nodes) { $nodes = @($g.nodes) }
+                elseif ((Has-Prop -Obj $g -Name 'graph') -and $g.graph -and (Has-Prop -Obj $g.graph -Name 'nodes') -and $g.graph.nodes) { $nodes = @($g.graph.nodes) }
 
                 foreach ($n in $nodes) {
-                    $title = $n.title
-                    if (-not $title) { $title = $n.node_title }
-                    $cls = $n.node_class
-                    if (-not $cls) { $cls = $n.class }
+                    $title = $null
+                    if (Has-Prop -Obj $n -Name 'title') { $title = $n.title }
+                    if (-not $title -and (Has-Prop -Obj $n -Name 'node_title')) { $title = $n.node_title }
+
+                    $cls = $null
+                    if (Has-Prop -Obj $n -Name 'node_class') { $cls = $n.node_class }
+                    if (-not $cls -and (Has-Prop -Obj $n -Name 'class')) { $cls = $n.class }
                     if (-not $title -and -not $cls) { continue }
 
                     Append-NDJsonLine @{

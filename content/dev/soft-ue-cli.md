@@ -29,6 +29,31 @@ py -3 -m soft_ue_cli check-setup
 - 环境变量：`SOFT_UE_BRIDGE_PORT`、`SOFT_UE_BRIDGE_URL`。
 - 多开编辑器时指定目标实例的 URL。
 
+## 自动化：避免重复开多个 UE（内存门禁 + 复用 + 自动关闭）
+
+在自动化脚本中，**不要直接 `Start-Process UnrealEditor.exe`**。请使用 Kit 脚本 `content/dev/scripts/Start-UnrealEditor.ps1` 统一管理编辑器生命周期：
+
+- **同工程复用**：如果已存在打开同一个 `.uproject` 的 `UnrealEditor.exe`，脚本会复用，不再重复启动。
+- **并发上限 + 内存门禁**：默认最多允许 2 个 UE；当 **可用内存 < 3GB** 时会等待，最多 5 分钟；超时则 **skip（退出码 0，不启动 UE）**。
+- **任务后自动关闭**：`Ensure-BlueprintSnapshot.ps1` 在需要时会启动 UE，导出完成后**只关闭本次脚本启动的实例**（不会误关你手动打开的 UE）。
+
+## 自动化测试（Pester）
+
+Kit 提供了 Pester 测试用于验证“门禁/复用/并发”行为：
+
+- **Unit（默认）**：不启动 UE，只测门禁 skip、并发 smoke 等逻辑。
+- **E2E（可选）**：会真实启动/关闭 UE，并发触发脚本，验证不多开、不误关。\n  - E2E 用例带 `E2E` tag，若检测到机器上已有 UE 正在运行，会自动 skip，避免打断你的编辑器会话。
+
+运行方式（在 Kit 的 `content/dev/scripts/` 目录下）：
+
+```powershell
+# Unit only
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Invoke-UEAutomationTests.ps1
+
+# Unit + E2E
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Invoke-UEAutomationTests.ps1 -E2E
+```
+
 ## 常用只读示例
 
 ```powershell

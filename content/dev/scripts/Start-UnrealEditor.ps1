@@ -22,10 +22,138 @@ param(
     [string] $UProjectPath = 'D:\Workspace\MT\Engine\ManteumTower\ManteumTower.uproject',
     [string] $UnrealEditorExe,
     [switch] $WaitForBridge,
-    [int] $WaitTimeoutSec = 180
+    [int] $WaitTimeoutSec = 180,
+
+    # Gate: do not start new editors when memory is low / too many already running.
+    [int] $MaxEditors = 2,
+    [double] $MinFreeMemoryGB = 3,
+    [int] $GateTimeoutSec = 300,
+    [int] $GatePollSec = 2
 )
 
 $ErrorActionPreference = 'Stop'
+
+function New-StartInfo {
+    param(
+        [bool] $StartedNew,
+        [int] $ProcessId,
+        [string] $UProject,
+        [bool] $Skipped,
+        [string] $SkipReason
+    )
+    return [pscustomobject]@{
+        startedNew = $StartedNew
+        pid = $ProcessId
+        uproject = $UProject
+        skipped = $Skipped
+        skipReason = $SkipReason
+    }
+}
+
+function Get-FreeMemoryGB {
+    try {
+        $os = Get-CimInstance -ClassName Win32_OperatingSystem
+        # FreePhysicalMemory is in KB
+        if ($null -ne $os.FreePhysicalMemory) {
+            return ([double]$os.FreePhysicalMemory) / 1024 / 1024
+        }
+    }
+    catch {
+        # ignore
+    }
+    return $null
+}
+
+function Get-UnrealEditorProcesses {
+    try {
+        # Use CIM to read CommandLine (Get-Process doesn't expose it).
+        return @(Get-CimInstance -ClassName Win32_Process -Filter "Name='UnrealEditor.exe'")
+    }
+    catch {
+        return @()
+    }
+}
+
+function Normalize-PathString([string] $Path) {
+    if (-not $Path) { return $null }
+    $p = $Path.Trim().Trim('"')
+    try {
+        $p = (Resolve-Path -LiteralPath $p -ErrorAction Stop).Path
+    }
+    catch {
+        # Keep best-effort.
+    }
+    return $p.ToLowerInvariant()
+}
+
+function Find-ExistingEditorPidForUProject([string] $UProjectPath) {
+    $needle = Normalize-PathString $UProjectPath
+    if (-not $needle) { return $null }
+
+    foreach ($p in (Get-UnrealEditorProcesses)) {
+        $cmd = [string]$p.CommandLine
+        if (-not $cmd) { continue }
+        $cmdNorm = $cmd.ToLowerInvariant()
+        if ($cmdNorm -like "*$needle*") {
+            return [int]$p.ProcessId
+        }
+        # also check quoted form
+        $needleQuoted = '"' + $needle + '"'
+        if ($cmdNorm -like "*$needleQuoted*") {
+            return [int]$p.ProcessId
+        }
+    }
+    return $null
+}
+
+function Wait-ForGateOk {
+    param(
+        [int] $MaxEditors,
+        [double] $MinFreeMemoryGB,
+        [int] $GateTimeoutSec,
+        [int] $GatePollSec
+    )
+
+    $deadline = (Get-Date).AddSeconds($GateTimeoutSec)
+    while ((Get-Date) -lt $deadline) {
+        $procs = @(Get-UnrealEditorProcesses)
+        $count = $procs.Count
+        $freeGb = Get-FreeMemoryGB
+
+        $memOk = $true
+        if ($null -ne $freeGb) { $memOk = ($freeGb -ge $MinFreeMemoryGB) }
+
+        $countOk = $true
+        if ($MaxEditors -gt 0) { $countOk = ($count -lt $MaxEditors) }
+
+        if ($memOk -and $countOk) {
+            return $true
+        }
+
+        $memText = if ($null -ne $freeGb) { ("{0:N2}GB" -f $freeGb) } else { "unknown" }
+        Write-Host ("Gate not OK. UnrealEditor count={0} (max<{1}), FreeMem={2} (min>={3}GB). Waiting..." -f $count, $MaxEditors, $memText, $MinFreeMemoryGB)
+        Start-Sleep -Seconds $GatePollSec
+    }
+    return $false
+}
+
+function Wait-ForBridgeRunning {
+    param([int] $WaitTimeoutSec)
+    $deadline = (Get-Date).AddSeconds($WaitTimeoutSec)
+    while ((Get-Date) -lt $deadline) {
+        try {
+            $out = (py -3 -m soft_ue_cli status 2>&1 | Out-String).Trim()
+            if ($out -match '"running"\s*:\s*true') {
+                return $true
+            }
+        }
+        catch {
+            # ignore and retry
+        }
+        Start-Sleep -Seconds 2
+    }
+    return $false
+}
 
 if (-not $UnrealEditorExe) {
     if ($env:UE_EDITOR_EXE) {
@@ -46,23 +174,80 @@ if (-not (Test-Path -LiteralPath $UProjectPath)) {
 Write-Host "UnrealEditorExe: $UnrealEditorExe"
 Write-Host "UProjectPath:   $UProjectPath"
 
-Start-Process -FilePath $UnrealEditorExe -ArgumentList @($UProjectPath) | Out-Null
-Write-Host "Started UnrealEditor.exe"
+try {
+    $mutexName = 'Global\IllusionSoftUEBridge_StartUnrealEditor'
+    $mutex = New-Object System.Threading.Mutex($false, $mutexName)
+    $got = $false
+    try {
+        $mutexWaitSec = [Math]::Max(30, $GateTimeoutSec)
+        $got = $mutex.WaitOne([TimeSpan]::FromSeconds($mutexWaitSec))
+        if (-not $got) {
+            throw "Start mutex timeout (${mutexWaitSec}s). Another start decision is still running."
+        }
+
+        $existingPid = Find-ExistingEditorPidForUProject -UProjectPath $UProjectPath
+        if ($existingPid) {
+            Write-Host ("Found existing UnrealEditor for this uproject (pid={0}). Reusing." -f $existingPid)
+            $info = New-StartInfo -StartedNew $false -ProcessId $existingPid -UProject $UProjectPath -Skipped $false -SkipReason $null
+            Write-Output $info
+
+            if ($WaitForBridge) {
+                if (Wait-ForBridgeRunning -WaitTimeoutSec $WaitTimeoutSec) {
+                    Write-Host "SoftUEBridge: OK"
+                    exit 0
+                }
+                throw "SoftUEBridge not reachable within ${WaitTimeoutSec}s (try py -3 -m soft_ue_cli check-setup)"
+            }
+
+            exit 0
+        }
+
+        $gateOk = Wait-ForGateOk -MaxEditors $MaxEditors -MinFreeMemoryGB $MinFreeMemoryGB -GateTimeoutSec $GateTimeoutSec -GatePollSec $GatePollSec
+        if (-not $gateOk) {
+            $reason = "Gate timeout (${GateTimeoutSec}s): UnrealEditor count>=${MaxEditors} or FreeMem<${MinFreeMemoryGB}GB"
+            Write-Host ("Skip starting UnrealEditor.exe: {0}" -f $reason)
+            Write-Output (New-StartInfo -StartedNew $false -ProcessId 0 -UProject $UProjectPath -Skipped $true -SkipReason $reason)
+            exit 0
+        }
+
+        # Re-check after waiting (another process may have started the editor meanwhile).
+        $existingPid = Find-ExistingEditorPidForUProject -UProjectPath $UProjectPath
+        if ($existingPid) {
+            Write-Host ("Found existing UnrealEditor for this uproject (pid={0}). Reusing." -f $existingPid)
+            $info = New-StartInfo -StartedNew $false -ProcessId $existingPid -UProject $UProjectPath -Skipped $false -SkipReason $null
+            Write-Output $info
+
+            if ($WaitForBridge) {
+                if (Wait-ForBridgeRunning -WaitTimeoutSec $WaitTimeoutSec) {
+                    Write-Host "SoftUEBridge: OK"
+                    exit 0
+                }
+                throw "SoftUEBridge not reachable within ${WaitTimeoutSec}s (try py -3 -m soft_ue_cli check-setup)"
+            }
+
+            exit 0
+        }
+
+        $p = Start-Process -FilePath $UnrealEditorExe -ArgumentList @($UProjectPath) -PassThru
+        $processId = [int]$p.Id
+        Write-Host ("Started UnrealEditor.exe (pid={0})" -f $processId)
+        Write-Output (New-StartInfo -StartedNew $true -ProcessId $processId -UProject $UProjectPath -Skipped $false -SkipReason $null)
+    }
+    finally {
+        if ($got) {
+            try { $mutex.ReleaseMutex() | Out-Null } catch { }
+        }
+        $mutex.Dispose()
+    }
+}
+catch {
+    throw
+}
 
 if ($WaitForBridge) {
-    $deadline = (Get-Date).AddSeconds($WaitTimeoutSec)
-    while ((Get-Date) -lt $deadline) {
-        try {
-            $out = (py -3 -m soft_ue_cli status 2>&1 | Out-String).Trim()
-            if ($out -match '"running"\s*:\s*true') {
-                Write-Host "SoftUEBridge: OK"
-                exit 0
-            }
-        }
-        catch {
-            # ignore and retry
-        }
-        Start-Sleep -Seconds 2
+    if (Wait-ForBridgeRunning -WaitTimeoutSec $WaitTimeoutSec) {
+        Write-Host "SoftUEBridge: OK"
+        exit 0
     }
     throw "SoftUEBridge not reachable within ${WaitTimeoutSec}s (try py -3 -m soft_ue_cli check-setup)"
 }
