@@ -18,13 +18,15 @@
 
 （按本项目实际情况填写阶段名称与顺序）
 
-| 阶段 | 名称 | 状态 | 最近更新 |
-|------|------|------|----------|
-| 自动化-1 | 文档与 Git（plan + knowledge + 中文提交） | 进行中 | 结构已落地 |
-| 自动化-2 | 纯工程验证（不含 UE/AS） | 进行中 | 示例脚本已跑通 |
-| 自动化-3 | UE + soft-ue-cli 闭环 | 未开始 | - |
-| 0 | （示例） | 未开始 | - |
-| 1 | （示例） | 未开始 | - |
+
+| 阶段    | 名称                               | 状态  | 最近更新    |
+| ----- | -------------------------------- | --- | ------- |
+| 自动化-1 | 文档与 Git（plan + knowledge + 中文提交） | 进行中 | 结构已落地   |
+| 自动化-2 | 纯工程验证（不含 UE/AS）                  | 进行中 | 示例脚本已跑通 |
+| 自动化-3 | UE + soft-ue-cli 闭环              | 未开始 | -       |
+| 0     | （示例）                             | 未开始 | -       |
+| 1     | （示例）                             | 未开始 | -       |
+
 
 **状态可选**：`未开始` | `进行中` | `已完成`
 
@@ -32,11 +34,13 @@
 
 ## 任务拆解表
 
-| 顺序 | 任务名 | 阶段 | 优先级 | 状态 | 说明 |
-|------|--------|------|--------|------|------|
-| 1 | 收敛演练：plan / knowledge / git log 对齐 | 自动化-1 | 高 | 进行中 | 见下节「自动化-1」迭代记录 |
-| 2 | 跑通 Step2 示例脚本并记入验证结果 | 自动化-2 | 高 | 进行中 | `dev/scripts/Invoke-AutomationStep2Sample.ps1` |
-| 3 | soft-ue-cli：`check-setup` 与 UE 0→2 | 自动化-3 | 高 | 未开始 | 见下节「自动化-3」与 soft-ue-cli 技能 |
+
+| 顺序  | 任务名                                | 阶段    | 优先级 | 状态  | 说明                                             |
+| --- | ---------------------------------- | ----- | --- | --- | ---------------------------------------------- |
+| 1   | 收敛演练：plan / knowledge / git log 对齐 | 自动化-1 | 高   | 进行中 | 见下节「自动化-1」迭代记录                                 |
+| 2   | 跑通 Step2 示例脚本并记入验证结果               | 自动化-2 | 高   | 进行中 | `dev/scripts/Invoke-AutomationStep2Sample.ps1` |
+| 3   | soft-ue-cli：`check-setup` 与 UE 0→2 | 自动化-3 | 高   | 未开始 | 见下节「自动化-3」与 soft-ue-cli 技能                     |
+
 
 **状态**：`未开始` | `进行中` | `已完成`
 
@@ -75,11 +79,13 @@
 - **下一步**：启动交互式 UE → `py -3 -m soft_ue_cli check-setup` → 按 **UE 0→1→2** 表逐级验证（只读 → 观察闭环）。
 - **验证结果**：（待填）各子能力勾选如下。
 
-| UE 子阶段 | 内容 | 状态 |
-|-----------|------|------|
-| 0 基线 | pip、插件、`check-setup` 通过 | 未开始 |
-| 1 只读 | `project-info`、`query-asset` 等 | 未开始 |
-| 2 观察闭环 | PIE、`capture-screenshot`（按需） | 未开始 |
+
+| UE 子阶段 | 内容                             | 状态  |
+| ------ | ------------------------------ | --- |
+| 0 基线   | pip、插件、`check-setup` 通过        | 未开始 |
+| 1 只读   | `project-info`、`query-asset` 等 | 未开始 |
+| 2 观察闭环 | PIE、`capture-screenshot`（按需）   | 未开始 |
+
 
 - **迭代记录**：（待填）每次验证的命令与结论一句。
 
@@ -107,19 +113,24 @@
 
 ### UE（soft-ue-cli + SoftUEBridge）
 
-| 阶段 | 能力 |
-|------|------|
-| 0 基线 | pip、插件、`check-setup` 通过 |
-| 1 只读 | `project-info`、`query-asset`、`query-blueprint`、`get-logs` 等 |
-| 2 观察闭环 | PIE、`capture-screenshot`、`trigger-input`（按需） |
-| 3 编辑闭环 | 编译蓝图、存盘、图编辑（需团队规范） |
+
+| 阶段        | 能力                                                                       |
+| --------- | ------------------------------------------------------------------------ |
+| 0 基线      | pip、插件、`check-setup` 通过                                                  |
+| 1 只读      | `project-info`、`query-asset`、`query-blueprint`、`get-logs` 等              |
+| 2 观察闭环    | PIE、`capture-screenshot`、`trigger-input`（按需）                             |
+| 3 编辑闭环    | 编译蓝图、存盘、图编辑（需团队规范）                                                       |
 | 4 与 CI 边界 | 桥不用于 unattended；AS 测试仍走 Commandlet / **angelscript-tdd-agent-iteration** |
+
 
 ### Git（本地自动化）
 
-| 阶段 | 能力 |
-|------|------|
-| G0 | 在正确仓库根使用 `git status` / `git log` / `git diff` |
-| G1 | 验证通过后再提交；中文 message |
-| G2 | 常用 log/diff 参数见 `content/dev/git-automation.md` |
-| G3 | 长程上下文：`plan.md` + knowledge + 路径级 `git log` |
+
+| 阶段  | 能力                                              |
+| --- | ----------------------------------------------- |
+| G0  | 在正确仓库根使用 `git status` / `git log` / `git diff`  |
+| G1  | 验证通过后再提交；中文 message                             |
+| G2  | 常用 log/diff 参数见 `content/dev/git-automation.md` |
+| G3  | 长程上下文：`plan.md` + knowledge + 路径级 `git log`     |
+
+
