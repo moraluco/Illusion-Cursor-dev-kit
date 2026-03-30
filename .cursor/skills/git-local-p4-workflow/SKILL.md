@@ -1,11 +1,11 @@
 ---
 name: git-local-p4-workflow
-description: 本地多 Git 仓库（ManteumTower + Kit）、本地优先（D:\GitRepo）、自动化优先、目录联接、忽略规则、中文提交、Perforce 同步；Agent 用 log/diff 做长程上下文；嵌套 .git 备份说明。
+description: 本地多 Git 仓库（ManteumTower + Kit）、本地优先（D:\GitRepo）、自动化优先、目录联接、忽略规则、中文提交；Agent 用 log/diff 做长程上下文；P4 为人工边界提示。
 ---
 
-# 本地 Git + Perforce 工作流
+# 本地 Git 工作流（P4 人工边界）
 
-在需要**初始化/维护本地 Git**、**从 `D:\GitRepo` 访问工程**，或说明 **Git 与 P4 如何配合** 时使用本技能。
+在需要**初始化/维护本地 Git**、**从 `D:\GitRepo` 访问工程**时使用本技能。P4 相关仅保留为**人工操作边界提示**；Cursor/Agent 不执行 P4 操作。
 
 ## 仓库与路径
 
@@ -42,11 +42,9 @@ mklink /J "D:\GitRepo\Illusion-Cursor-dev-kit" "D:\CursorProject\Illusion-Cursor
 - **避免混杂**：不要把多主题改动（规则+脚本+知识库+大量无关格式化）塞进同一次提交；应拆成可回滚、可复盘的小步。
 - **与仓库边界一致**：改项目提交项目；改 Kit 提交 Kit；不要跨仓“打包提交”，否则 Step1 的收敛与复盘会失真。
 
-## 与 Perforce
+## P4（人工操作边界）
 
-1. 日常在 **Git** 中小步提交。
-2. 阶段性向 **P4** 交稿前：`p4 reconcile` / 按团队流程提交 changelist；本地先编译与测试。
-3. 在 Git 中可选：`git tag p4-cl-12345` 或在最近一次提交正文中写 `P4: changelist 12345`。
+- Cursor/Agent **不负责**执行 `p4 edit/submit/reconcile` 等操作。\n+- 若文件因 P4 流程而只读导致无法保存/写入，由人类先在 P4V/命令行完成 checkout，再继续 Git 与自动化闭环。\n+- 本技能主体只关心 Git 的可复盘与自动化友好（原子提交、中文备注、可重复验证）。
 
 ## 忽略规则要点
 

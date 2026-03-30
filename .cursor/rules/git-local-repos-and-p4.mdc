@@ -30,9 +30,8 @@ alwaysApply: true
 
 ## 与 Perforce 的关系
 
-- **Perforce 为团队主源**；本地 Git 用于个人高频提交、TDD、Cursor 自动化，**不替代** P4。
-- 向 P4 提交前请自行完成编译与测试；可在 Git 中用 **tag** 或提交正文记录对应的 **P4 changelist** 号以便对齐。
-- 项目侧 `.p4ignore` 已排除 `.git/` 等，本地 Git 元数据不应进入 P4。
+- **P4 为人工操作**：Cursor/Agent **不负责**执行 P4 命令或变更（例如 `p4 edit/submit/reconcile`）。只需在工作区约定中**知道边界**：项目文件若因 P4 只读而无法写入，应由人类在 P4V/命令行完成 checkout 后再继续。
+- **Cursor/Agent 只关心 Git**：本规则关注本地 Git 的可复盘与自动化友好（原子提交、中文备注、可重复验证）。
 
 ## 嵌套 Git 与备份目录
 
