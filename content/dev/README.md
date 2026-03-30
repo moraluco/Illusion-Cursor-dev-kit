@@ -9,7 +9,10 @@
 | 文件 | 内容 |
 |------|------|
 | [soft-ue-cli.md](soft-ue-cli.md) | soft-ue-cli / SoftUEBridge：自检、端口、常用命令备忘 |
-| [git-automation.md](git-automation.md) | Git 与长程上下文（plan + knowledge + log） |
+| [unattended-ue-automation.md](unattended-ue-automation.md) | 无人值守：UnrealEditor-Cmd、Saved/Logs、CI 归档与 tail；与桥式读图分工 |
+| [scripts/Run-UnrealEditorCmd-CollectLog.ps1](scripts/Run-UnrealEditorCmd-CollectLog.ps1) | 封装 Editor-Cmd、可选日志关键字检查、失败时 tail |
+| [automation-three-steps.md](automation-three-steps.md) | **三阶段自动化**：知识库+Git → 纯 Coding+Git（不含 UE/AS）→ UE+CLI；与 `plan.md` 三节对应 |
+| [git-automation.md](git-automation.md) | Git 与长程上下文；**自动化优先**与**自动化专仓**（独立仓库管 CI/工作流） |
 | [player-overlay-mode-extension.md](player-overlay-mode-extension.md) | 新增 OverlayMode 的操作步骤、C++ 验证、AS 中调试显示 OverlayMode |
 | [editor-tools/blueprint-export-serializer.md](editor-tools/blueprint-export-serializer.md) | 蓝图导出与 BlueprintSerializer 使用与排错（非 Agent 读图主路径） |
 
