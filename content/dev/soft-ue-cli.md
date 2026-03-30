@@ -74,6 +74,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "<KIT>\\content\\dev\\script
 - `blueprints.txt`：人类可读、适合 Ctrl+Shift+F / ripgrep
 - `blueprints.ndjson`：一行一个 JSON 对象，适合工具二次处理
 
+默认会导出 **Blueprint + AnimBlueprint（ABP_*）** 两类资产；如需自定义可用 `-AssetClasses`（例如只导出 AnimBlueprint：`-AssetClasses AnimBlueprint`）。
+
 如果需要把**注释框/节点标题**也纳入搜索（更慢）：
 
 ```powershell
@@ -81,6 +83,29 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "<KIT>\\content\\dev\\script
 ```
 
 提示：为了让 Cursor 能搜到索引文件，不要把 `.soft-ue-index/` 放进 `.cursorignore`；是否提交到 Git 由项目约定决定（通常建议本地缓存，不进库）。
+
+### 方式 C：生成“可提交”的层次化资产快照（推荐：离线可读、可复盘）
+
+当你希望把蓝图/动画蓝图的**完整图细节**（节点、pins、连线、默认值）以及 AI/StateTree 等结构**落盘并提交到项目仓库**时，使用层次化快照脚本：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "<KIT>\\content\\dev\\scripts\\Export-AssetSnapshot.ps1" `
+  -ProjectRoot "D:\\Workspace\\MT\\Engine\\ManteumTower" `
+  -UProjectPath "D:\\Workspace\\MT\\Engine\\ManteumTower\\ManteumTower.uproject" `
+  -SnapshotDir "D:\\Workspace\\MT\\Engine\\ManteumTower\\BlueprintSnapshot" `
+  -AssetClasses Blueprint,AnimBlueprint,BehaviorTree,StateTree `
+  -Level Full `
+  -Force
+```
+
+产物默认写到 `BlueprintSnapshot/`：
+
+- `snapshot.meta.json`：生成参数与范围
+- `assets_index.ndjson|.txt`：全量资产索引
+- `assets/<sanitized_asset_path>/summary.json`：资产摘要（变量/函数/继承/关联等）
+- `assets/<...>/graphs/*.graph.json`：Blueprint/AnimBlueprint 每个 callable 的完整图 JSON（含 pins/连线/defaults，可离线重建拓扑与执行链）
+- `assets/<...>/behavior_tree.full.json`：BehaviorTree 导出（当前会包含 blackboard 等摘要；若某些结构在 API 中不可读，会在 `limitations` 中说明）
+- `assets/<...>/state_tree.full.json`：StateTree 完整结构（若项目里存在 StateTree 资产）
 
 ## 与无人值守自动化（CI）的边界
 

@@ -3,9 +3,11 @@
   Ensure an on-disk, searchable Blueprint snapshot exists (and refresh if stale).
 
 .DESCRIPTION
-  Grep/Explore/Search only work on text files. This script generates a full Blueprint snapshot
-  (functions/variables/callables/nodes) into a project-committed directory so it can always be searched
-  even when Unreal Editor is not running.
+  Grep/Explore/Search only work on text files. This script generates a project-committed snapshot directory
+  so it can always be searched even when Unreal Editor is not running.
+
+  Note: Prefer the hierarchical snapshot exporter (Export-AssetSnapshot.ps1) when you need full-fidelity
+  graph details (pins/links/defaults). This script keeps the legacy flat text index for simple grep.
 
   Scope: /Game + enabled plugins from the .uproject (treated as content roots like "/PluginName").
 
@@ -117,9 +119,11 @@ if (-not (Test-Path -LiteralPath $SnapshotDir)) {
 $kitRoot = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSCommandPath))
 $startUe = Join-Path $kitRoot 'dev\scripts\Start-UnrealEditor.ps1'
 $export = Join-Path $kitRoot 'dev\scripts\Export-BlueprintTextIndex.ps1'
+$exportHier = Join-Path $kitRoot 'dev\scripts\Export-AssetSnapshot.ps1'
 
 if (-not (Test-Path -LiteralPath $startUe)) { throw "Start-UnrealEditor.ps1 not found: $startUe" }
 if (-not (Test-Path -LiteralPath $export)) { throw "Export-BlueprintTextIndex.ps1 not found: $export" }
+if (-not (Test-Path -LiteralPath $exportHier)) { throw "Export-AssetSnapshot.ps1 not found: $exportHier" }
 
 # Ensure bridge is up (will start UE if needed)
 & $startUe -UProjectPath $UProjectPath -WaitForBridge -WaitTimeoutSec 240
@@ -162,6 +166,14 @@ for ($i = 1; $i -le $exportAttempts; $i++) {
         continue
     }
     exit $code
+}
+
+# Also generate hierarchical snapshot meta/index (Full graph export is handled by Export-AssetSnapshot.ps1 directly)
+try {
+    & $exportHier -ProjectRoot $ProjectRoot -UProjectPath $UProjectPath -SnapshotDir $SnapshotDir -NameQuery $NameQuery -Level IndexOnly
+}
+catch {
+    Write-Host ("Export-AssetSnapshot(IndexOnly) failed (non-fatal): {0}" -f $_.Exception.Message)
 }
 
 Write-Host "Ensure-BlueprintSnapshot: OK"

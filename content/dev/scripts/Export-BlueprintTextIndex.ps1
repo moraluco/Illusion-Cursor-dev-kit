@@ -30,6 +30,9 @@ param(
     # Output directory (must NOT be ignored by Cursor if you want Search/Grep to see it)
     [string] $OutDir,
 
+    # Asset classes to export (defaults include AnimBlueprint so ABP_* is searchable)
+    [string[]] $AssetClasses = @('Blueprint', 'AnimBlueprint'),
+
     # Content Browser path prefixes (e.g. /Game, /MyPlugin). Preferred over -ContentPath.
     [string[]] $ContentPaths = @('/Game'),
 
@@ -147,6 +150,7 @@ Write-Host "Export-BlueprintTextIndex: start"
 Write-Host ("ProjectRoot: {0}" -f (Get-Location).Path)
 Write-Host ("OutDir: {0}" -f $OutDir)
 if ($ContentPath) { $ContentPaths = @($ContentPath) }
+Write-Host ("AssetClasses: {0}" -f ($AssetClasses -join ', '))
 Write-Host ("ContentPaths: {0}" -f ($ContentPaths -join ', '))
 Write-Host ("NameQuery: {0}" -f $NameQuery)
 Write-Host ("IncludeCallables: {0}" -f [bool]$IncludeCallables)
@@ -159,26 +163,29 @@ $null = Invoke-SoftUEJson -CliArgs @('status')
 $assetPaths = @()
 foreach ($root in $ContentPaths) {
     if (-not $root) { continue }
-    $assetResp = Invoke-SoftUEJson -CliArgs @('query-asset', '--class', 'Blueprint', '--path', $root, '--query', $NameQuery, '--limit', "$Limit")
+    foreach ($cls in $AssetClasses) {
+        if (-not $cls) { continue }
+        $assetResp = Invoke-SoftUEJson -CliArgs @('query-asset', '--class', $cls, '--path', $root, '--query', $NameQuery, '--limit', "$Limit")
 
-    $assetItems = @()
-    if ($assetResp -is [System.Collections.IEnumerable] -and -not ($assetResp -is [string])) {
-        $assetItems = @($assetResp)
-    }
-    elseif ($assetResp.assets) {
-        $assetItems = @($assetResp.assets)
-    }
-    elseif ($assetResp.results) {
-        $assetItems = @($assetResp.results)
-    }
-    else {
-        # best effort: treat the response itself as a single item if it has a path
-        $assetItems = @($assetResp)
-    }
+        $assetItems = @()
+        if ($assetResp -is [System.Collections.IEnumerable] -and -not ($assetResp -is [string])) {
+            $assetItems = @($assetResp)
+        }
+        elseif ($assetResp.assets) {
+            $assetItems = @($assetResp.assets)
+        }
+        elseif ($assetResp.results) {
+            $assetItems = @($assetResp.results)
+        }
+        else {
+            # best effort: treat the response itself as a single item if it has a path
+            $assetItems = @($assetResp)
+        }
 
-    foreach ($it in $assetItems) {
-        $p = Get-AssetPathFromItem -Item $it
-        if ($p) { $assetPaths += $p }
+        foreach ($it in $assetItems) {
+            $p = Get-AssetPathFromItem -Item $it
+            if ($p) { $assetPaths += $p }
+        }
     }
 }
 $assetPaths = $assetPaths | Sort-Object -Unique
@@ -199,6 +206,7 @@ New-Item -ItemType File -Path $textPath -Force | Out-Null
 $meta = [ordered]@{
     generated_at = (Get-Date).ToString('o')
     project_root = (Get-Location).Path
+    asset_classes = @($AssetClasses)
     content_paths = @($ContentPaths)
     name_query = $NameQuery
     limit = $Limit
