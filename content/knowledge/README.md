@@ -27,6 +27,7 @@
 | [11-als-animinstance-framework-and-layering-curves.md](11-als-animinstance-framework-and-layering-curves.md) | ALS-Refactored：`UAlsAnimationInstance` 与 AnimBP 职责、三阶段刷新、Layering 曲线 → `FAlsLayeringState` 数据流 |
 | [12-enemy-animation-system-refactor-roadmap.md](12-enemy-animation-system-refactor-roadmap.md) | 敌人通用动画系统重构路线：MM 基底 + ALS 风格分层曲线（目标架构、曲线契约、分阶段实施与验收清单） |
 | [13-ue-automation-test-playbook.md](13-ue-automation-test-playbook.md) | UE 自动化测试通用 Playbook：Editor+Bridge vs Editor-Cmd、启动与等待、并发/资源治理、证据采集与清理 |
+| [14-git-atomic-commits-tdd.md](14-git-atomic-commits-tdd.md) | Git 原子提交与 TDD：单测门禁、一次提交一个可验证点、误合成大提交后的拆分思路 |
 
 ---
 

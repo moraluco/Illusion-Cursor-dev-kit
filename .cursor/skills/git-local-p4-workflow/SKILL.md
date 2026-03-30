@@ -68,9 +68,18 @@ Remove-Item -LiteralPath $msgPath -Force
 - **避免混杂**：不要把多主题改动（规则+脚本+知识库+大量无关格式化）塞进同一次提交；应拆成可回滚、可复盘的小步。
 - **与仓库边界一致**：改项目提交项目；改 Kit 提交 Kit；不要跨仓“打包提交”，否则 Step1 的收敛与复盘会失真。
 
+### TDD / AS 项目（ManteumTower）时的强约定
+
+- **顺序**：写或改最小单测（Red）→ 实现到绿 → **先跑** `Scripts\Run-UnattendedTests-Min.ps1 -Mode AS`（项目根）→ **再** `git commit`。
+- **粒度**：一次提交尽量只包含「一个函数/一条行为链」及其对应测试；不要把多段独立迁移堆在一次提交里。
+- **若已误合成大提交**：在基线备份分支上，可用 `git reset` 回到合并前再按功能拆分重建（详见 `content/dev/git-automation.md` § TDD）。
+- **提交信息**：正文末尾附验证命令；中文 UTF-8，推荐 `git commit -F` + **无 BOM** 的 UTF-8 文件（见同文档 § UTF-8）。
+
 ## P4（人工操作边界）
 
-- Cursor/Agent **不负责**执行 `p4 edit/submit/reconcile` 等操作。\n+- 若文件因 P4 流程而只读导致无法保存/写入，由人类先在 P4V/命令行完成 checkout，再继续 Git 与自动化闭环。\n+- 本技能主体只关心 Git 的可复盘与自动化友好（原子提交、中文备注、可重复验证）。
+- Cursor/Agent **不负责**执行 `p4 edit/submit/reconcile` 等操作。
+- 若文件因 P4 流程而只读导致无法保存/写入，由人类先在 P4V/命令行完成 checkout，再继续 Git 与自动化闭环。
+- 本技能主体只关心 Git 的可复盘与自动化友好（原子提交、中文备注、可重复验证）。
 
 ## 忽略规则要点
 
@@ -105,6 +114,18 @@ Remove-Item -LiteralPath $msgPath -Force
 | 某次提交详情 | `git show <commit>` |
 
 **推荐顺序**：改代码/资产 →（AS 测试 **或** soft-ue-cli 验证）→ `git add` / `git commit`（中文说明）。用户未要求提交时，Agent **不要擅自** `git commit`。
+
+## 防呆：如何确认自己在“正确的 Git 根”
+
+- `D:\Workspace\MT` **不是** Git 仓库根；项目仓库的 `.git` 在 **`D:\Workspace\MT\Engine\ManteumTower\.git`**。
+- 因此任何与项目相关的 Git 操作（`status/log/diff/commit`）应先：
+
+```powershell
+cd D:\Workspace\MT\Engine\ManteumTower
+git status
+```
+
+- 若在错误目录运行 Git 导致 “not a git repository”，先检查当前目录；不要据此推断项目无 Git。
 
 ---
 

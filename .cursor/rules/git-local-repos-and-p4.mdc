@@ -16,6 +16,7 @@ alwaysApply: true
   - 细节与命令见技能 **git-local-p4-workflow** 与 `content/dev/git-automation.md`。
 - 可选在 `D:\GitRepo\ManteumTower`、`D:\GitRepo\Illusion-Cursor-dev-kit` 使用 **目录联接（junction）** 指向真实路径，便于统一从 `D:\GitRepo` 访问；联接与真实目录为同一工作树，`.git` 仅一份。
 - 真实路径示例：项目 `D:\Workspace\MT\Engine\ManteumTower`；Kit `D:\CursorProject\Illusion-Cursor-dev-kit`。
+- **Git 根务必准确**：`D:\Workspace\MT` 不是 Git 仓库根；项目仓库的 `.git` 位于 `D:\Workspace\MT\Engine\ManteumTower\.git`（等价 Git root 为 `D:\Workspace\MT\Engine\ManteumTower`）。在跑 `git status/log/diff` 前先 `cd` 到正确仓库根，避免误判“不是仓库”或在错误目录下提交。
 
 ## 提交语言
 
@@ -27,6 +28,7 @@ alwaysApply: true
 - **原子化**：一个 commit 只做**一类最小闭环改动**（一个可验证点），不要把「规则+脚本+大量无关格式化+多主题文档」混在同一个提交里。
 - **可读性**：仅凭 commit message 与 `git show`，应能独立理解**为什么改、改了什么、怎么验证**（尤其是自动化/脚本类变更）。
 - **跨仓边界**：改项目提交项目；改 Kit 提交 Kit。不要在一个提交里跨两个仓库“同时改完”，否则历史难以复盘。
+- **TDD（AngelScript 等）**：先让门禁/单测绿，再提交；一次提交对应一个可验证点（函数或行为链 + 测试），不要把多块独立实现挤进同一 commit。详见 `content/dev/git-automation.md` 与知识库 `content/knowledge/14-git-atomic-commits-tdd.md`。
 - 细节与模板见 `content/dev/git-automation.md` 与技能 **git-local-p4-workflow**。
 
 ## 与 Perforce 的关系
