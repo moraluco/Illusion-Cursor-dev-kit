@@ -35,6 +35,32 @@ mklink /J "D:\GitRepo\Illusion-Cursor-dev-kit" "D:\CursorProject\Illusion-Cursor
 ## 提交信息
 
 - **全部使用中文**（如：`修复：某某逻辑`、`chore：初始化忽略规则`）。分支名可用英文。
+- **编码必须为 UTF-8**：避免在 Windows 上用 `cmd.exe` 的 `echo ... > commit-msg.txt` 生成提交信息（会写成系统代码页，导致 Git 历史里中文乱码）。
+
+### Windows 中文提交信息（推荐做法）
+
+- **优先**：在 PowerShell 中写 UTF-8 message file，再用 `git commit -F`：
+
+```powershell
+$msgPath = Join-Path $env:TEMP "commit-msg.txt"
+Set-Content -LiteralPath $msgPath -Encoding utf8 -Value @(
+  "修复：这里是标题"
+  ""
+  "这里是正文"
+  ""
+)
+git commit -F $msgPath
+Remove-Item -LiteralPath $msgPath -Force
+```
+
+- **若需要 amend**：同样用 `git commit --amend -F $msgPath`。
+
+### 复检（避免把乱码带进历史）
+
+- 提交后立刻检查：
+  - `git log -1 --format=%s`
+  - `git log -1 --format=%b`
+  - 若显示异常，且尚未 push：立刻 `git commit --amend` 修正提交信息（不要等到推远端后再改写历史）。
 
 ## 提交原子化（对自动化友好）
 

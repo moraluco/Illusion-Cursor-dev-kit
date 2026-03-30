@@ -20,6 +20,7 @@ alwaysApply: true
 ## 提交语言
 
 - **提交说明（commit message）一律使用中文**（与 `locale-zh.mdc` 一致）；仅在用户明确要求英文时使用英文。
+- **提交信息必须 UTF-8**：禁止用 `cmd.exe` 的 `echo ... > commit-msg.txt` 生成中文提交信息（会写成系统代码页导致乱码）。推荐按技能 `git-local-p4-workflow` 的 PowerShell 模板用 `git commit -F <utf8-file>`。
 
 ## 提交必须原子化（对自动化友好）
 
