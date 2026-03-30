@@ -32,6 +32,23 @@
 
 ---
 
+## Cursor 规则与技能（索引）
+
+Kit 根 `.cursor/rules/*.mdc` 负责**触发与轻量提醒**；`.cursor/skills/*/SKILL.md` 承载**完整流程**。下表便于 `@` 知识库时选对文档；**权威步骤以对应 Skill 为准**。
+
+| 领域 | Rule（触发） | 主 Skill | 知识库 / dev |
+|------|----------------|----------|----------------|
+| Git 双仓、中文提交、原子化 | `git-local-repos-and-p4` | `git-local-p4-workflow` | [14-git-atomic-commits-tdd.md](14-git-atomic-commits-tdd.md)、[../dev/git-automation.md](../dev/git-automation.md) |
+| Kit 方法论、总结经验写回 | `ue-dev-kit` | `summarize-to-knowledge`、`retro-automation-workflow` | [METHODOLOGY.md](../../METHODOLOGY.md)、[15-retro-automation-workflow.md](15-retro-automation-workflow.md) |
+| UE 自动化测试 / Bridge / Editor-Cmd | `ue-automation-testing` | `ue-automation-test-harness` | [13-ue-automation-test-playbook.md](13-ue-automation-test-playbook.md) |
+| 蓝图大范围搜索 vs 在线读图 | `blueprint-snapshot-search` | `soft-ue-cli-ue-bridge` | [07-blueprint-query-workflow.md](07-blueprint-query-workflow.md) |
+| 启动 UE、解析编辑器路径 | `ue-editor-path` | `ue-editor-launch` | [../dev/soft-ue-cli.md](../dev/soft-ue-cli.md) |
+| AngelScript 编写、API、保存即生效 | `angelscript-docs-reference`、`angelscript-primary-cpp-fallback` | `write-angelscript`、`angelscript-api-query` | [03-angelscript-ue.md](03-angelscript-ue.md)、[../reference/](../reference/) |
+| 跑 AS 测试并迭代修复 | `angelscript-tdd-agent-iteration` | `angelscript-tdd-agent-iteration` | [13-ue-automation-test-playbook.md](13-ue-automation-test-playbook.md) |
+| Rule/Skill 去重与职责边界 | — | `sync-rules-and-skills` | 本表 |
+
+---
+
 ## 使用方式
 
 1. **日常沉淀**：研发过程中把关键概念、链接、决策与易错点整理到对应文件。

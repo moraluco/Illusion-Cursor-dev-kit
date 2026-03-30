@@ -1,33 +1,21 @@
 ---
-description: 研发知识库 Kit — 识别项目与 Kit，应用研发方法论
+description: 研发知识库 Kit — 识别项目与 Kit，应用 METHODOLOGY 与 content/
 alwaysApply: true
 ---
 
 # 研发知识库 Kit（桥接规则）
 
-本规则使 AI 在多根工作区中识别「项目」与「Kit」并应用研发方法论（设计-测试-验证-迭代、迭代计划、知识库）。Kit 只服务一个项目。**本规则与 METHODOLOGY 不依赖 content/ 或项目内任何具体路径、文件名或技术栈**；content 内结构由项目自定，并在 content 的 README 中说明。
+本 Rule 使 AI 区分 **Kit 根**（文档/知识库/`.cursor`）与 **项目根**（代码与资源）。**方法论全文、content 边界、初始化步骤**以 Kit 根目录 `METHODOLOGY.md` 为准。
 
-## 项目与 Kit
+## 必须遵循的入口
 
-- 工作区 = Kit 根 + 项目根。
-- **Kit 根** = 含本规则文件（ue-dev-kit.mdc）的根；文档与知识库均在 Kit 根下的 **content/**。
-- **项目根** = 工作区中另一枚根（放代码与资源）；项目路径下不包含文档。
-- 说「项目」即指该根，唯一，无需额外识别。
-
-## 方法论定义
-
-- 完整方法论（文档结构、knowledge 与 dev 边界、编写约定、与 AI 协作约定、初始化步骤）见**本 Kit 根目录**下的 `METHODOLOGY.md`。
-- **「总结经验」是写回动作**：用户说总结经验时，必须执行写回闭环（回顾 → 沉淀 → 索引更新），而非仅口头总结。完整流程、命名约定与 knowledge/dev 边界以技能 **summarize-to-knowledge** 为唯一权威来源；若为 **AS 专项经验**，可选用技能 **summarize-as-experience** 写回并增强 write-angelscript。
-- 对文档与知识库的读/写均在 **Kit 根下的 content/**：`content/plan.md`、`content/design/`、`content/dev/`、`content/knowledge/`、`content/reference/`。不写项目路径下的文档目录。
-- 回答与代码相关问题时，引用**项目根**下的代码与资源。具体技术栈、脚本与 API 的参考位置由 **content 内 knowledge/ 或 reference/ 的 README** 说明，本规则不假定具体路径或文件名。
-- 回答与**项目结构、模块划分、实现位置、核心类/蓝图分布**相关的问题时，**先查阅** `content/knowledge/01-project-architecture-overview.md`（若存在），据此建立整体架构后再结合具体代码/蓝图作答。若该文件不存在，则按下一句约定处理。
-- **自动化优先**：凡能由脚本、测试、流水线**稳定、可重复**完成的验证与交付步骤，应通过**自动化**实现（PowerShell、UnrealEditor-Cmd、`Saved/Logs` 等），**不**把「长期依赖人工开 UE、逐条看 Output Log」当作唯一手段。无人值守与日志见 `content/dev/unattended-ue-automation.md`；AS 测试见 **angelscript-tdd-agent-iteration**；本地优先开发入口与 `D:\GitRepo` 约定见 rule **git-local-repos-and-p4** 与技能 **git-local-p4-workflow**。
-- **长程任务**：在修改代码或资产前，宜先查阅 `content/plan.md` 与 `content/knowledge/` 中相关主题，必要时结合 **Git** 历史（见技能 **git-local-p4-workflow**）；细节与命令不在本规则展开。
-- **读/查编辑器内蓝图、行为树、关卡、材质等（精确结构/最新事实）**：使用 **soft-ue-cli** 与 **SoftUEBridge**（编辑器须已运行且桥可用）。完整流程与命令见技能 **soft-ue-cli-ue-bridge** 与 `content/dev/soft-ue-cli.md`。
-- **离线检索/复盘（Search/Grep、无 UE 也能查、可提交证据）**：使用项目内的文本快照/索引（如 `BlueprintSnapshot/`、`.soft-ue-index/` 等）。注意：离线产物可能滞后，不能替代在线读图的权威事实。
+- **「总结经验」且要写回**：技能 **summarize-to-knowledge**（回顾 → 沉淀 → 索引）；AS 专项可配合 **summarize-as-experience**。若强调**复盘自动化闭环、门禁、原子提交**，用 **retro-automation-workflow** 与 `content/knowledge/15-retro-automation-workflow.md`。
+- **读/写**：仅在 Kit 下 `content/`（`plan`、`design`、`dev`、`knowledge`、`reference`），不在项目根建文档目录。
+- **架构总览**：优先 `content/knowledge/01-project-architecture-overview.md`（若存在）。
+- **自动化优先**：可脚本/测试/流水线重复的步骤应自动化；无人值守见 `content/dev/unattended-ue-automation.md`；AS 测试见 **angelscript-tdd-agent-iteration**；Git 长程上下文见 **git-local-p4-workflow**。
+- **蓝图在线权威**：**soft-ue-cli** + SoftUEBridge → 技能 **soft-ue-cli-ue-bridge**、`content/dev/soft-ue-cli.md`；决策树见 `content/knowledge/07-blueprint-query-workflow.md`。
+- **离线快照检索**：`BlueprintSnapshot/`、`.soft-ue-index/` 等（可能滞后）— 与 rule **blueprint-snapshot-search** 配合。
 
 ## 缺少 content 时
 
-若 Kit 内不存在 `content/` 或尚未初始化：
-
-- 提示用户可要求 Agent 按 METHODOLOGY 中的「初始化步骤」完成初始化（为项目添加 rule、在 Kit 内生成 content/）。
+按 `METHODOLOGY.md` 的初始化步骤提示用户补齐；本 Rule 不假定具体文件名（由 content/README 说明）。

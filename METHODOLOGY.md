@@ -127,6 +127,7 @@
 ## 工作区使用 Kit 的方式
 
 - **工作区**：Kit 根 + 项目根（双根）。文档与知识库仅在 Kit 的 `content/` 下；项目根仅放代码与资源。
+- **Cursor Rule / Skill 与知识库对照**：`.cursor/rules` 与 `.cursor/skills` 的职责边界与索引表见 `content/knowledge/README.md` §「Cursor 规则与技能（索引）」；整理 Rule/Skill 去重时见技能 **sync-rules-and-skills**。
 - **查概念 / 决策 / 易错**：@ `content/knowledge/` 或其下与当前上下文相关的文件；做方案或排错时优先引用此处。具体文件名与结构由 content 内 README 或项目约定说明。
 - **查实现与工具用法**：@ `content/dev/` 或其子目录；需要「怎么做、用什么命令、目录与配置约定」时引用 dev。
 - **查 API / 示例 / 结构**：@ `content/reference/`；写代码或脚本时引用。reference 下具体子目录与用途由 content 内 README 说明。

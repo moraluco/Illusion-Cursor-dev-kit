@@ -1,20 +1,12 @@
-# UE 自动化测试（通用入口）
+---
+description: 进 UE 做自动化测试/验证时按 ue-automation-test-harness 与相关 knowledge
+alwaysApply: true
+---
 
-当用户提出以下需求时（任一）：
+# UE 自动化测试（指向技能）
 
-- “进 UE 做自动化测试 / 自动化验证”
-- “并发跑 UE 自动化”
-- “soft-ue-cli / SoftUEBridge 测试”
-- “UnrealEditor-Cmd 无人值守测试 / CI”
+当用户要「进 UE 自动化测试」「并发跑 UE」「soft-ue-cli / Bridge」「Editor-Cmd / CI」时：
 
-优先按技能 **ue-automation-test-harness** 执行，先做模式选择与治理，再写脚本/跑测试：
-
-- **Editor+Bridge**：交互式 `UnrealEditor.exe` + SoftUEBridge（soft-ue-cli）
-- **Editor-Cmd**：`UnrealEditor-Cmd.exe`（unattended/Commandlet；以退出码+Saved/Logs 为主）
-
-强制约定（避免高频踩坑）：
-
-- **不要直接多处 `Start-Process UnrealEditor.exe`**：统一用 `content/dev/scripts/Start-UnrealEditor.ps1` 管理复用/门禁/互斥。
-- **并发任务必须隔离输出目录**（OutDir/SnapshotDir），避免文件锁把问题伪装成“桥干扰”。
-- PowerShell 脚本中避免使用变量名 `$pid/$Pid`（会撞到只读 `$PID`）。
-
+- **主流程**：技能 **ue-automation-test-harness**（先选 Editor+Bridge vs Editor-Cmd，再谈脚本/并发/证据）。
+- **复盘与门禁口径**：`content/knowledge/13-ue-automation-test-playbook.md`、`content/knowledge/15-retro-automation-workflow.md`。
+- **硬约定（摘要）**：统一用 `content/dev/scripts/Start-UnrealEditor.ps1` 管理 UE 启动；并发隔离 **OutDir**；PowerShell 避免用 `$pid` 作变量名。细节以 harness 技能为准。

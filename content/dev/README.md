@@ -2,6 +2,8 @@
 
 本目录存放开发与实现说明，与 [../plan.md](../plan.md) 及 [../design/](../design/) 对应。
 
+**Rule / Skill / knowledge 对照表**（自动化与 Git 入口）：[../knowledge/README.md](../knowledge/README.md) §「Cursor 规则与技能（索引）」。
+
 ## 目录说明
 
 （按本项目需要增删条目）

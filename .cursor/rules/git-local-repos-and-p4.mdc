@@ -1,41 +1,14 @@
 ---
-description: 本地 Git 双仓库路径、中文提交、与 Perforce 的主次关系
+description: 本地 Git 双仓库路径、中文提交、原子化、与 P4 边界
 alwaysApply: true
 ---
 
-# 本地 Git 与 Perforce（ManteumTower + Kit）
+# 本地 Git 与 Perforce（指向技能）
 
-## 仓库位置
+本 Rule 只做触发与边界提醒；**完整路径、联接、提交模板、嵌套 Git、TDD 粒度**见技能 **git-local-p4-workflow** 与 `content/dev/git-automation.md`。
 
-- **项目（ManteumTower）**与 **Kit（本仓库）**各为独立 Git 仓库。
-- **本地优先（D:\GitRepo）**：团队使用 `D:\GitRepo\...` 下的**本地 Git 仓库**推进自动化开发与验证，以规避 GitHub 的网络环境、LFS、runner 等限制。约定：
-  - 改 **项目** → 在 `D:\GitRepo\ManteumTower`（或其真实目录联接）提交。
-  - 改 **Kit** → 在 `D:\GitRepo\Illusion-Cursor-dev-kit`（或其真实目录联接）提交。
-  - 自动化所需的**文档、计划、脚本（非 UE 工程）**统一写进 **Kit**（`content/`、`.cursor/rules`、`.cursor/skills`）。
-  - 需要引擎/编辑器的验证（UE/soft-ue-cli、unattended log 等）按各自技能与 dev 文档执行，但“自动化是否成立”的验收以**本地可重复**为主。
-  - 细节与命令见技能 **git-local-p4-workflow** 与 `content/dev/git-automation.md`。
-- 可选在 `D:\GitRepo\ManteumTower`、`D:\GitRepo\Illusion-Cursor-dev-kit` 使用 **目录联接（junction）** 指向真实路径，便于统一从 `D:\GitRepo` 访问；联接与真实目录为同一工作树，`.git` 仅一份。
-- 真实路径示例：项目 `D:\Workspace\MT\Engine\ManteumTower`；Kit `D:\CursorProject\Illusion-Cursor-dev-kit`。
-- **Git 根务必准确**：`D:\Workspace\MT` 不是 Git 仓库根；项目仓库的 `.git` 位于 `D:\Workspace\MT\Engine\ManteumTower\.git`（等价 Git root 为 `D:\Workspace\MT\Engine\ManteumTower`）。在跑 `git status/log/diff` 前先 `cd` 到正确仓库根，避免误判“不是仓库”或在错误目录下提交。
-
-## 提交语言
-
-- **提交说明（commit message）一律使用中文**（与 `locale-zh.mdc` 一致）；仅在用户明确要求英文时使用英文。
-- **提交信息必须 UTF-8**：禁止用 `cmd.exe` 的 `echo ... > commit-msg.txt` 生成中文提交信息（会写成系统代码页导致乱码）。推荐按技能 `git-local-p4-workflow` 的 PowerShell 模板用 `git commit -F <utf8-file>`。
-
-## 提交必须原子化（对自动化友好）
-
-- **原子化**：一个 commit 只做**一类最小闭环改动**（一个可验证点），不要把「规则+脚本+大量无关格式化+多主题文档」混在同一个提交里。
-- **可读性**：仅凭 commit message 与 `git show`，应能独立理解**为什么改、改了什么、怎么验证**（尤其是自动化/脚本类变更）。
-- **跨仓边界**：改项目提交项目；改 Kit 提交 Kit。不要在一个提交里跨两个仓库“同时改完”，否则历史难以复盘。
-- **TDD（AngelScript 等）**：先让门禁/单测绿，再提交；一次提交对应一个可验证点（函数或行为链 + 测试），不要把多块独立实现挤进同一 commit。详见 `content/dev/git-automation.md` 与知识库 `content/knowledge/14-git-atomic-commits-tdd.md`。
-- 细节与模板见 `content/dev/git-automation.md` 与技能 **git-local-p4-workflow**。
-
-## 与 Perforce 的关系
-
-- **P4 为人工操作**：Cursor/Agent **不负责**执行 P4 命令或变更（例如 `p4 edit/submit/reconcile`）。只需在工作区约定中**知道边界**：项目文件若因 P4 只读而无法写入，应由人类在 P4V/命令行完成 checkout 后再继续。
-- **Cursor/Agent 只关心 Git**：本规则关注本地 Git 的可复盘与自动化友好（原子提交、中文备注、可重复验证）。
-
-## 嵌套 Git 与备份目录
-
-- 若在父仓库中需要**完整跟踪**子目录文件，Git 会将「含 `.git` 的子目录」视为嵌入仓库；实施时已将部分嵌套 `.git` 迁至 **`_git_nested_backup/`**（Kit）或 **`Plugins/_git_nested_backup/`**（项目），**勿将备份目录提交入库**（已由 `.gitignore` 排除）。恢复子目录独立 Git 可将备份目录移回并重命名为 `.git`。
+- **双仓**：项目（ManteumTower）与 Kit 各为独立 Git；改哪边就在哪边提交，**勿跨仓混在一个 commit**。
+- **本地优先**：常用 `D:\GitRepo\...` 联接至真实路径；自动化验收以**本地可重复**为主。
+- **Git 根**：项目仓库根为 `...\Engine\ManteumTower`（`D:\Workspace\MT` 不是 Git 根）。`git status/log` 前先 `cd` 到正确根。
+- **提交**：说明**一律中文**；编码 **UTF-8**（禁用 cmd `echo` 写中文 message）；**原子化**（一个可验证点一次提交），详见 `content/knowledge/14-git-atomic-commits-tdd.md`。
+- **P4**：Agent **不执行** P4；文件只读时由人类 checkout 后再改。**Git 相关以技能与 dev 文档为准。**
