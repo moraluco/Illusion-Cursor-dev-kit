@@ -1,0 +1,26 @@
+---
+description: 本地 Git 双仓库路径、中文提交、与 Perforce 的主次关系
+alwaysApply: true
+---
+
+# 本地 Git 与 Perforce（ManteumTower + Kit）
+
+## 仓库位置
+
+- **项目（ManteumTower）**与 **Kit（本仓库）**各为独立 Git 仓库。
+- 可选在 `D:\GitRepo\ManteumTower`、`D:\GitRepo\Illusion-Cursor-dev-kit` 使用 **目录联接（junction）** 指向真实路径，便于统一从 `D:\GitRepo` 访问；联接与真实目录为同一工作树，`.git` 仅一份。
+- 真实路径示例：项目 `D:\Workspace\MT\Engine\ManteumTower`；Kit `D:\CursorProject\Illusion-Cursor-dev-kit`。
+
+## 提交语言
+
+- **提交说明（commit message）一律使用中文**（与 `locale-zh.mdc` 一致）；仅在用户明确要求英文时使用英文。
+
+## 与 Perforce 的关系
+
+- **Perforce 为团队主源**；本地 Git 用于个人高频提交、TDD、Cursor 自动化，**不替代** P4。
+- 向 P4 提交前请自行完成编译与测试；可在 Git 中用 **tag** 或提交正文记录对应的 **P4 changelist** 号以便对齐。
+- 项目侧 `.p4ignore` 已排除 `.git/` 等，本地 Git 元数据不应进入 P4。
+
+## 嵌套 Git 与备份目录
+
+- 若在父仓库中需要**完整跟踪**子目录文件，Git 会将「含 `.git` 的子目录」视为嵌入仓库；实施时已将部分嵌套 `.git` 迁至 **`_git_nested_backup/`**（Kit）或 **`Plugins/_git_nested_backup/`**（项目），**勿将备份目录提交入库**（已由 `.gitignore` 排除）。恢复子目录独立 Git 可将备份目录移回并重命名为 `.git`。

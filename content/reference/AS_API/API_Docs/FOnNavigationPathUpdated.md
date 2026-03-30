@@ -1,0 +1,9 @@
+# FOnNavigationPathUpdated
+
+## Inheritance
+
+FOnNavigationPathUpdated → FUNCTIONS → IsBound
+
+## Description
+
+bool IsBound() const Clear void Clear() AddUFunction void AddUFunction( const 	UObject 	Object, 	FName 	FunctionName 	) Unbind void Unbind( UObject 	Object, FName 	FunctionName 	) UnbindObject void UnbindObject( UObject 	Object 	) Broadcast void Broadcast( UNavigationPath 	AffectedPath, ENavPathEvent 	PathEvent 	) const opAssign FOnNavigationPathUpdated& opAssign( FOnNavigationPathUpdated 	Other 	)

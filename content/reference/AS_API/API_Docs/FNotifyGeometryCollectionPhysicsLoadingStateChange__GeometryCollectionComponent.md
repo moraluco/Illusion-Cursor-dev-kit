@@ -1,0 +1,19 @@
+# FNotifyGeometryCollectionPhysicsLoadingStateChange__GeometryCollectionComponent
+
+## Inheritance
+
+FNotifyGeometryCollectionPhysicsLoadingStateChange__GeometryCollectionComponent → FUNCTIONS → IsBound
+
+## Description
+
+bool IsBound() const Clear void Clear() AddUFunction void AddUFunction( const 	UObject 	Object, 	FName 	FunctionName 	) Unbind void Unbind( UObject 	Object, FName 	FunctionName 	) UnbindObject void UnbindObject( UObject 	Object 	) Broadcast void Broadcast( UGeometryCollectionComponent 	FracturedComponent 	) const opAssign FNotifyGeometryCollectionPhysicsLoadingStateChange__GeometryCollectionComponent& opAssign(
+
+## Members
+
+### Other
+
+```
+FNotifyGeometryCollectionPhysicsLoadingStateChange__GeometryCollectionComponent Other
+```
+
+)

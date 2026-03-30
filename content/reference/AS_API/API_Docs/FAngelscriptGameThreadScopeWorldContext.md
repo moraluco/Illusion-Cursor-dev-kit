@@ -1,0 +1,5 @@
+# FAngelscriptGameThreadScopeWorldContext
+
+## Inheritance
+
+FAngelscriptGameThreadScopeWorldContext

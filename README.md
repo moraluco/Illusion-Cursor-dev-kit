@@ -31,9 +31,9 @@
 
 ## 核心与内容层分离
 
-- **Kit 为独立 Git 仓库**；仓库 **ignore 所有知识库/项目内容**（content/ 已由 .gitignore 忽略），克隆/拉取仅含核心层。
-- **核心泛化层**（在 Kit 仓库内单独版本控制）：METHODOLOGY.md、.cursor/rules/、templates/。
-- **具体内容层**（项目专属）：content/，由 Agent 按项目生成，不提交到 Kit 仓库。**项目内容仅影响 content/**，不触及核心层；核心层与 content/ 迭代互不干扰。
+- **Kit 为独立 Git 仓库**。本地开发可选用 Git **跟踪整库**（含 `content/`、`.cursor/` 等），便于 TDD 与 Cursor 自动化；与团队 **Perforce** 的阶段性同步由项目侧完成。路径与惯例见 **技能 `git-local-p4-workflow`**、规则 **`git-local-repos-and-p4`**。
+- **核心泛化层**：METHODOLOGY.md、`.cursor/rules/`、`templates/`。
+- **具体内容层**（项目专属）：`content/`，由 Agent 按项目生成与维护；与核心模板迭代互不干扰。
 
 ## 目录结构
 

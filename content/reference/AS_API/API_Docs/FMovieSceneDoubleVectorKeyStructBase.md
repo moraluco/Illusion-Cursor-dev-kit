@@ -1,0 +1,5 @@
+# FMovieSceneDoubleVectorKeyStructBase
+
+## Inheritance
+
+FMovieSceneDoubleVectorKeyStructBase

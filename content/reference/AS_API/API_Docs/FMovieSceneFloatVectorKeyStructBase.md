@@ -1,0 +1,5 @@
+# FMovieSceneFloatVectorKeyStructBase
+
+## Inheritance
+
+FMovieSceneFloatVectorKeyStructBase

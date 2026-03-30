@@ -1,0 +1,32 @@
+# -----------------------------------------------------------------------------
+# Illusion-Cursor-dev-kit — 本地 Git（研发知识库 Kit）
+# -----------------------------------------------------------------------------
+
+# 自 content 迁出的原 .git 备份（勿提交）
+_git_nested_backup/
+
+# --- 嵌套 Git 元数据（不纳入本仓库；content 曾可为独立仓，仅忽略其 .git）---
+content/.git/
+content/**/.git/
+
+# --- 自 content/.gitignore 合并（全局生效）---
+*.Cache
+*.cache
+content/reference/AS_Example/*.Cache
+content/reference/AS_Example/*.cache
+*.log
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+bin/
+obj/
+dist/
+build/
+
+# --- Docs-UE-Angelscript 站点生成物（与子目录 .gitignore 中 public、api 一致）---
+content/reference/Docs-UE-Angelscript/public/
+content/reference/Docs-UE-Angelscript/api/
+
+# --- 编辑器本地配置 ---
+.vscode/

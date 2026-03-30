@@ -1,0 +1,27 @@
+# UParticleModuleAcceleration
+
+**Visibility:** public
+
+## Inheritance
+
+UParticleModuleAccelerationBase → UParticleModuleAcceleration → ACCELERATION → Acceleration
+
+## Description
+
+FRawDistributionVector Acceleration
+
+The initial acceleration of the particle.  Value is obtained using the EmitterTime at particle spawn.  Each frame, the current and base velocity of the particle is then updated using the formula velocity += acceleration * DeltaTime where DeltaTime is the time passed since the last frame.
+
+## FUNCTIONS
+
+### SetbApplyOwnerScale
+
+```
+void SetbApplyOwnerScale(bool Value)
+```
+
+### STATIC FUNCTIONS
+
+```
+STATIC FUNCTIONS StaticClass static UClass UParticleModuleAcceleration::StaticClass()
+```

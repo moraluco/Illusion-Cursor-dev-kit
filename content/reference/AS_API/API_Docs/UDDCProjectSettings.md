@@ -1,0 +1,11 @@
+# UDDCProjectSettings
+
+**Visibility:** public
+
+## Inheritance
+
+UDeveloperSettings → UDDCProjectSettings → WARNINGS → RecommendEveryoneSetupAGlobalLocalDDCPath
+
+## Description
+
+bool RecommendEveryoneSetupAGlobalLocalDDCPath RecommendEveryoneSetupAGlobalSharedDDCPath bool RecommendEveryoneSetupAGlobalSharedDDCPath RecommendEveryoneSetupAGlobalS3DDCPath bool RecommendEveryoneSetupAGlobalS3DDCPath RecommendEveryoneEnableS3DDC bool RecommendEveryoneEnableS3DDC RecommendEveryoneUseHordeStorage bool RecommendEveryoneUseHordeStorage EnableWarnings bool EnableWarnings STATIC FUNCTIONS StaticClass static UClass UDDCProjectSettings::StaticClass()

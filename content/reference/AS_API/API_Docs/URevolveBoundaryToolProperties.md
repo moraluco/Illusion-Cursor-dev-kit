@@ -1,0 +1,41 @@
+# URevolveBoundaryToolProperties
+
+**Visibility:** public
+
+## Inheritance
+
+URevolveProperties → URevolveBoundaryToolProperties → REVOLUTIONAXIS → AxisOrigin
+
+## Description
+
+FVector AxisOrigin
+
+Sets the revolution axis origin.
+
+AxisOrientation FVector2D AxisOrientation
+
+Sets the revolution axis pitch and yaw.
+
+## REVOLVE
+
+### bDisplayInputMesh
+
+```
+bool bDisplayInputMesh
+```
+
+If true, displays the original mesh in addition to the revolved boundary.
+
+### CapFillMode
+
+```
+ERevolvePropertiesCapFillMode CapFillMode
+```
+
+Determines how end caps are created. This is not relevant if the end caps are not visible or if the path is not closed.
+
+### STATIC FUNCTIONS
+
+```
+STATIC FUNCTIONS StaticClass static UClass URevolveBoundaryToolProperties::StaticClass()
+```
