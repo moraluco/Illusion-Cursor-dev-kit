@@ -37,7 +37,12 @@ SoftUEBridge 在 **Commandlet / `-unattended` / 非交互进程**中**不启动*
   -run=AngelscriptTest -unattended -stdout -nosplash -noscreenmessages
 ```
 
-封装「等待进程 + 定位最新日志 + 可选按关键字失败」见同目录 **[scripts/Run-UnrealEditorCmd-CollectLog.ps1](scripts/Run-UnrealEditorCmd-CollectLog.ps1)**。
+建议在无人值守场景额外加：
+
+- `-NullRHI -NoSound`: 降低启动成本，避免 GPU/音频相关不确定性
+- `-nop4`: 避免因本机 P4/登录态导致的卡顿或噪音（仍可在需要时移除）
+
+封装「等待进程 + 定位最新日志 + 可选按关键字失败」见同目录 **[scripts/Run-UnrealEditorCmd-CollectLog.ps1](scripts/Run-UnrealEditorCmd-CollectLog.ps1)**。如遇到 Editor-Cmd 启动后**长时间不退出**，建议在项目侧再包一层 **超时 kill**（并 tail 最新 log），把“卡住点”稳定收敛成可复盘的失败。
 
 ## CI：归档日志与失败时 tail
 
