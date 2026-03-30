@@ -5,7 +5,9 @@ description: >-
   and existing knowledge, write reusable experience into content/knowledge or
   content/dev, then update README indexes. Use when the user says "总结经验"
   (summarize experience), after a phase or task is done, or when suggesting
-  knowledge沉淀 to the knowledge base.
+  knowledge沉淀 to the knowledge base. If the user focuses on 复盘自动化闭环、取证与门禁、
+  Git 原子提交与工作流进化, prefer or chain with skill **retro-automation-workflow**
+  and content/knowledge/15-retro-automation-workflow.md.
 ---
 
 # Summarize to Knowledge
@@ -68,3 +70,4 @@ All paths below are relative to **Kit root** (the repo containing this skill and
 - [ ] Used `NN-主题.md` naming for new knowledge files; content is reusable (conventions/checklists/templates)
 - [ ] Updated `content/knowledge/README.md` (and dev README if needed)
 - [ ] Quoted new doc paths in the reply for @ reference
+- [ ] If the session was automation/TDD/CLI-heavy: consider **retro-automation-workflow** + `15-retro-automation-workflow.md` for structured retro (avoid duplicating the same checklist in free-form summary only)

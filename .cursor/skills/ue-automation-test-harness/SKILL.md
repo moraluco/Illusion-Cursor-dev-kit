@@ -63,3 +63,13 @@ description: >-
 默认仅跑 Unit；使用 `-E2E` 跑真实启动/关闭 UE 的用例。\
 详见 `content/dev/ue-automation-tests.md`。
 
+---
+
+## 5) 复盘与工作流进化（可选）
+
+一段自动化 harness / Editor-Cmd / 证据采集任务结束后，若要把「坑」与改进**写回 Kit**并形成可重复套路：
+
+- 技能 **retro-automation-workflow**
+- 文档 `content/knowledge/15-retro-automation-workflow.md`（含 Mermaid：取证 → 门禁 → 提交）
+- 易错点摘要：`content/knowledge/05-gotchas.md`、`content/knowledge/13-ue-automation-test-playbook.md` § Editor-Cmd + AngelScript
+

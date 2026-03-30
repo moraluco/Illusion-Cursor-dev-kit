@@ -119,6 +119,7 @@
 
 - **写哪里**：通用概念、选型理由、项目级决策、易错与排错要点 → `content/knowledge/`（项目在 knowledge 内自定文件名，如决策类、易错类或按主题分）；具体工具用法、导出流程、编辑器/插件操作与编译步骤 → `content/dev/`（可按子目录组织）。同一件事可同时在 knowledge 留决策/易错摘要，在 dev 留操作与配置细节。
 - **何时沉淀**：完成一个小阶段或解决一个典型问题后，将「为什么这样选」「踩了什么坑」「具体怎么操作」拆开，分别落入 knowledge 或 dev；用户说「总结经验」时按下一节的流程执行并建议写回。
+- **复盘自动化工作流**（取证、门禁、Git 原子提交、pitfalls-inbox 晋升）：除通用沉淀外，可按技能 **retro-automation-workflow** 与 `content/knowledge/15-retro-automation-workflow.md` 的结构化清单执行，并与 **summarize-to-knowledge** 衔接索引更新。
 - **与 plan 联动**：阶段/任务完成时，在 plan 的迭代记录中简述结果，并把可复用的收获写入 knowledge 或 dev，保持 plan 简洁、知识可检索。
 
 ---

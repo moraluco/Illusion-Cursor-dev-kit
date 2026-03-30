@@ -23,6 +23,39 @@
 - **粒度**：一次提交对应「一个函数/一条行为链 + 其单测」或「纯重构 + 仍通过同一门禁」；不要把一整块蓝图迁移的多个独立函数塞进同一次提交。
 - **若历史已合并成大提交**：可用 `git reset` 回到合并前基线后按上述顺序重建（先备份分支或 `reflog`），避免强推前丢失引用。
 
+### 拆分大提交、重建原子提交（可复制）
+
+**前提**：在**当前分支**操作；若已推送远端，拆分后需 `git push --force-with-lease`（与团队对齐）。
+
+1. **备份指针**（可选但推荐）：
+
+```powershell
+git branch backup/pre-split-$(Get-Date -Format yyyyMMdd-HHmm)
+```
+
+2. **软回退到合并前的基线**（保留工作区与暂存区改动；`N` = 要撤销的提交数，或改用 `abc1234^` 指向合并前的父提交）：
+
+```powershell
+# 例：把最近 1 个大提交拆开
+git reset --soft HEAD~1
+# 此时所有变更仍在 index，可分批 git add
+```
+
+3. **按主题分批暂存并提交**（每批一个可验证点）：
+
+```powershell
+git add -p                    # 交互式挑选 hunk
+# 或
+git add path/to/one/file.as
+git commit -F path/to/msg-utf8-no-bom.txt
+```
+
+4. **验证**：每批提交后跑对应门禁（如 `Run-UnattendedTests-Min.ps1 -Mode AS`）。
+
+5. **若已搞乱**：`git reflog` 找回 `backup/pre-split-*` 或 `HEAD@{1}`。
+
+**不要用**：在 PowerShell 里混用 `cd /d`（那是 cmd）；见 `content/knowledge/05-gotchas.md`。
+
 ### 提交信息 UTF-8（避免 BOM 与乱码）
 
 - **禁止**用 `cmd.exe` 的 `echo ... > commit-msg.txt` 写中文提交（易成系统代码页）。

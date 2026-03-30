@@ -141,4 +141,6 @@ git status
 
 **推荐顺序**：`plan.md` → 相关 knowledge → 针对涉及路径的 `git log` → 再编辑。**多根工作区**须确认当前终端目录属于**哪一个** Git 仓库。
 
+- **复盘自动化工作流**（取证、门禁、提交粒度、pitfalls-inbox 晋升）：技能 **retro-automation-workflow**，文档 `content/knowledge/15-retro-automation-workflow.md`。
+
 详见 `content/dev/git-automation.md`（可复制命令片段）。

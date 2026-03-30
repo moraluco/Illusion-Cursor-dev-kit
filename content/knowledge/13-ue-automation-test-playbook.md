@@ -69,7 +69,25 @@
 
 ---
 
-## 4) 解析与兼容：对 Bridge/CLI 输出做防御式处理
+## 4) Editor-Cmd + AngelScript：门禁与证据（项目实践）
+
+### 4.1 不要只信 exit code
+
+- 无人值守跑 `UnrealEditor-Cmd` 时，**AngelScript 编译失败**在部分环境下**不一定**让进程返回非 0。
+- **项目侧**（ManteumTower）`Scripts/Run-UnattendedTests-Min.ps1` 通过 `-AlsoFailOnLogPatterns` 额外失败于日志关键字，例如：
+  - `Angelscript: Error:`
+  - `Hot reload failed due to script compile errors`
+  - `Cannot run when angelscript has failed to compile`
+- **Runner** 优先合并 **stdout/stderr**（见 `Run-UnrealEditorCmd-CollectLog.ps1`），避免仅看 `Saved/Logs` 旧文件导致误报/漏报。
+
+### 4.2 验收时保留什么证据
+
+- 失败时：stdout/stderr 路径、Latest log 路径、以及触发失败的关键字行（便于复盘）。
+- 成功时：至少保留「最后一条 OK 输出」或 CI 归档策略（由流水线约定）。
+
+---
+
+## 5) 解析与兼容：对 Bridge/CLI 输出做防御式处理
 
 现实中 `soft-ue-cli` 输出结构可能随版本/命令变化、字段缺失或类型变化。通用写法：
 
@@ -81,9 +99,9 @@
 
 ---
 
-## 5) PowerShell 约定（避免测试环境专有坑）
+## 6) PowerShell 约定（避免测试环境专有坑）
 
-### 5.1 不要使用 `$pid/$Pid` 变量名
+### 6.1 不要使用 `$pid/$Pid` 变量名
 
 PowerShell 的 `$PID` 是只读自动变量，且大小写不敏感；在 job/Pester 环境下尤其容易报 “只读变量不可写”。建议统一使用：
 
@@ -92,7 +110,7 @@ PowerShell 的 `$PID` 是只读自动变量，且大小写不敏感；在 job/Pe
 
 ---
 
-## 6) 验收清单（可复制）
+## 7) 验收清单（可复制）
 
 - **并发启动**：并发触发 2 次启动，最终只启动 1 个 UE（同 pid 复用）
 - **门禁 skip**：触发门禁时返回 0 且不启动 UE；上游保持旧产物不动
@@ -102,10 +120,11 @@ PowerShell 的 `$PID` 是只读自动变量，且大小写不敏感；在 job/Pe
 
 ---
 
-## 7) 交叉引用
+## 8) 交叉引用
 
 - `content/dev/soft-ue-cli.md`
 - `content/dev/unattended-ue-automation.md`
 - `content/dev/scripts/Invoke-UEAutomationTests.ps1`
 - `content/knowledge/05-gotchas.md`
+- `content/knowledge/15-retro-automation-workflow.md`
 

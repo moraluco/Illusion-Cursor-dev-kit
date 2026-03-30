@@ -30,6 +30,12 @@
 | 在 AS 里用 Tick + IsInputKeyDown 做按键触发 | 每帧轮询、易重复触发或漏触发，且与引擎输入架构不一致 | 改用 SetupPlayerInputComponent + UEnhancedInputComponent::BindDebugKey(FKey, this, n"回调函数名")，在回调里写逻辑；见 [03-angelscript-ue.md](03-angelscript-ue.md) § 输入与调试键 |
 | `FCollisionObjectQueryParams::AddObjectTypesToQuery(EObjectTypeQuery)` 报「No matching signatures」 | AS 绑定只暴露了 `AddObjectTypesToQuery(ECollisionChannel)`，未暴露 EObjectTypeQuery / int 重载 | 不用 Add 逐项添加；改用构造函数 `FCollisionObjectQueryParams(TArray<EObjectTypeQuery>)`：先建 `TArray<EObjectTypeQuery>`，Add 三个 ObjectTypeQuery，再 `FCollisionObjectQueryParams ObjectParams(ObjectTypes)` |
 | `UEnemyStatComponent::GetResolvedBodyPartForBone(FName)` 报「No matching signatures」 | 骨骼→部位解析在**角色类**上，不在组件上；组件只有 TakeDamage 等 | 对射线命中的根 Actor 做 `Cast<AEnemyCharacterBase>(DamageTarget)`，用 `EnemyChar.GetBoneBodyPart(OutHit.BoneName)` 得到 BodyPartName，再传给 `EnemyStat.TakeDamage(BodyPartName, ...)` |
+| PowerShell 里用 `cd /d` 或 `&&` 链式命令 | `cd /d` 为 **cmd** 语法；`&&` 在旧版 Windows PowerShell 中可能解析失败 | 使用 `Set-Location <path>`；多命令用 `;` 分隔或单独一行；需要链式时用 PowerShell 7+ 或脚本块 |
+| `git commit -F` 用的中文消息在 `git log` 首行出现不可见字符 | 提交信息文件为 **UTF-8 BOM**（如部分 `Set-Content -Encoding utf8`） | 用 `System.Text.UTF8Encoding($false)` + `[System.IO.File]::WriteAllText` 写 message 文件；见 `content/dev/git-automation.md` |
+| AngelScript 编译失败但进程 exit code 仍为 0 | 部分环境下 Editor-Cmd 对 AS 错误未正确反映到退出码 | 项目 `Run-UnattendedTests-Min.ps1` 已用 `AlsoFailOnLogPatterns` 扫描 `Angelscript: Error:` 等；**以 stdout/stderr + 模式串为准**；见 [13-ue-automation-test-playbook.md](13-ue-automation-test-playbook.md) |
+| 蓝图节点显示 `GetSlotLocalWeight`，AS 报 `UAnimInstance::GetSlotLocalWeight` 无匹配 | UE 蓝图 DisplayName 与 C++/AS **暴露名**不一致（例：实际为 `Blueprint_GetSlotMontageLocalWeight`） | 以编译器报错为准；查 `content/reference/AS_API` 或引擎头 `AnimInstance.h`；勿凭蓝图显示名猜方法名 |
+| `soft-ue-cli query-blueprint-graph` 终端输出被截断 | 图 JSON 体积大，滚屏丢节点 | **落地到文件**（`%TEMP%` 或仓库外路径），再 Read；见 [07-blueprint-query-workflow.md](07-blueprint-query-workflow.md) |
+| `.soft-ue-index/`、`Script/Binds.Cache*` 被 `git status` 列出 | 本地生成物未忽略或误 `git add` | 确认 `.gitignore`；勿提交生成缓存；复盘时记入 gotchas |
 
 
 ---
@@ -39,4 +45,5 @@
 - 遇到新坑或排错经验，在此表或下方分条追加。
 - 与「决策」区分：易错点偏操作与排错，决策偏选型与约定。
 - 开发过程中的随手记录先写到 `content/dev/pitfalls-inbox.md`，收敛后再迁移到本文件；工作流见 `content/dev/pitfall-capture.md`。
+- 结构化「复盘自动化工作流」（取证、门禁、提交粒度）见 [15-retro-automation-workflow.md](15-retro-automation-workflow.md) 与技能 **retro-automation-workflow**。
 

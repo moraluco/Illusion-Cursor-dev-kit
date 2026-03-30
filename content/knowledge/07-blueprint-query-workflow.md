@@ -43,6 +43,12 @@
 - **优先**：soft-ue-cli 在线 `query-blueprint-graph`
 - **若 UE 不可用但已有层次化快照**：从 `BlueprintSnapshot/assets/<asset>/graphs/*.graph.json` 离线读取（注意可能不是最新）
 
+### 2.2.1 取证输出必须落地（避免终端截断）
+
+- `query-blueprint-graph` 返回的 JSON **可能很大**；仅在终端里滚动查看容易**截断**、漏节点或漏连线。
+- **推荐**：将输出重定向到**临时文件**（例如 `%TEMP%\bpc_anim_Movement.json`），再用编辑器/Read 工具完整查看。
+- **不要**依赖“一次性复制终端输出”作为唯一证据；需要写进 PR/复盘时，保留文件路径或归档到约定目录（由项目约定）。
+
 ### 2.3 需要“可提交复盘材料 / 可追溯证据”
 
 - **优先**：层次化快照（L1/L2/L3）
@@ -64,4 +70,5 @@
 - 技能：`soft-ue-cli-ue-bridge`
 - 文档：`content/dev/soft-ue-cli.md`
 - 规则：`.cursor/rules/blueprint-snapshot-search.mdc`
+- 复盘（CLI 输出落地、避免终端截断）：`content/knowledge/15-retro-automation-workflow.md`
 

@@ -12,7 +12,11 @@
 | [unattended-ue-automation.md](unattended-ue-automation.md) | 无人值守：UnrealEditor-Cmd、Saved/Logs、CI 归档与 tail；与桥式读图分工 |
 | [scripts/Run-UnrealEditorCmd-CollectLog.ps1](scripts/Run-UnrealEditorCmd-CollectLog.ps1) | 封装 Editor-Cmd、可选日志关键字检查、失败时 tail |
 | [automation-three-steps.md](automation-three-steps.md) | **三阶段自动化**：知识库+Git → 纯 Coding+Git（不含 UE/AS）→ UE+CLI；与 `plan.md` 三节对应 |
-| [git-automation.md](git-automation.md) | Git 与长程上下文；**自动化优先**与**自动化专仓**（独立仓库管 CI/工作流） |
+| [pitfall-capture.md](pitfall-capture.md) | **踩坑记录工作流**：inbox 快记录 → knowledge 稳沉淀；附一键追加脚本 |
+| [pitfalls-inbox.md](pitfalls-inbox.md) | 踩坑随手记录区（进行中/未收敛的问题先记这里） |
+| [scripts/Add-Pitfall.ps1](scripts/Add-Pitfall.ps1) | 一键往 pitfalls inbox 追加一段模板 |
+| [git-automation.md](git-automation.md) | Git 与长程上下文；**自动化优先**与**自动化专仓**（独立仓库管 CI/工作流）；拆分大提交、UTF-8 无 BOM 提交信息 |
+| [../knowledge/15-retro-automation-workflow.md](../knowledge/15-retro-automation-workflow.md) | 复盘自动化工作流：取证→门禁→原子提交（Mermaid）；技能 **retro-automation-workflow** |
 | [player-overlay-mode-extension.md](player-overlay-mode-extension.md) | 新增 OverlayMode 的操作步骤、C++ 验证、AS 中调试显示 OverlayMode |
 | [editor-tools/blueprint-export-serializer.md](editor-tools/blueprint-export-serializer.md) | 蓝图导出与 BlueprintSerializer 使用与排错（非 Agent 读图主路径） |
 | [ue-automation-tests.md](ue-automation-tests.md) | UE 自动化测试：Pester Unit/E2E、并发/输出隔离、如何跑与注意事项 |
