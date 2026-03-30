@@ -54,7 +54,7 @@
 - **验证结果**：（进行中）已具备 plan 三节 + `dev/automation-three-steps.md`；后续以 2～3 次中文提交继续对齐「目标 vs 变更」。
 - **迭代记录**：
   - 轮次 1：落地 `plan.md` 里程碑/任务/三节占位，新增 `dev/automation-three-steps.md` 与 Step2 示例脚本、`dev/README` 索引。
-  - 轮次 2：（待填）一次仅改 knowledge 或 design 的小提交，并在本条记录中写对应路径与意图。
+  - 轮次 2：两次中文提交收敛——（1）`plan.md` 里程碑与三节占位；（2）`dev/automation-three-steps.md`、Step2 示例脚本与 `dev/README` 索引；可用 `git log -2 --oneline` 对照。
   - 轮次 3：（待填）一次与 `git log -- path` 对照的回顾提交或 tag 说明。
 
 ### 自动化-2：纯工程验证（不含 UE/AS）
