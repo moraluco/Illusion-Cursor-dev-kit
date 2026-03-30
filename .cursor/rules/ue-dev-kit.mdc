@@ -23,7 +23,8 @@ alwaysApply: true
 - 回答与**项目结构、模块划分、实现位置、核心类/蓝图分布**相关的问题时，**先查阅** `content/knowledge/01-project-architecture-overview.md`（若存在），据此建立整体架构后再结合具体代码/蓝图作答。若该文件不存在，则按下一句约定处理。
 - **自动化优先**：凡能由脚本、测试、流水线**稳定、可重复**完成的验证与交付步骤，应通过**自动化**实现（PowerShell、UnrealEditor-Cmd、`Saved/Logs` 等），**不**把「长期依赖人工开 UE、逐条看 Output Log」当作唯一手段。无人值守与日志见 `content/dev/unattended-ue-automation.md`；AS 测试见 **angelscript-tdd-agent-iteration**；本地优先开发入口与 `D:\GitRepo` 约定见 rule **git-local-repos-and-p4** 与技能 **git-local-p4-workflow**。
 - **长程任务**：在修改代码或资产前，宜先查阅 `content/plan.md` 与 `content/knowledge/` 中相关主题，必要时结合 **Git** 历史（见技能 **git-local-p4-workflow**）；细节与命令不在本规则展开。
-- **读/查编辑器内蓝图、行为树、关卡、材质等**：使用 **soft-ue-cli** 与 **SoftUEBridge**（编辑器须已运行且桥可用）。完整流程与命令见技能 **soft-ue-cli-ue-bridge** 与 `content/dev/soft-ue-cli.md`。**不**使用 BlueprintSnapshot 目录或导出 JSON 作为读图权威来源。
+- **读/查编辑器内蓝图、行为树、关卡、材质等（精确结构/最新事实）**：使用 **soft-ue-cli** 与 **SoftUEBridge**（编辑器须已运行且桥可用）。完整流程与命令见技能 **soft-ue-cli-ue-bridge** 与 `content/dev/soft-ue-cli.md`。
+- **离线检索/复盘（Search/Grep、无 UE 也能查、可提交证据）**：使用项目内的文本快照/索引（如 `BlueprintSnapshot/`、`.soft-ue-index/` 等）。注意：离线产物可能滞后，不能替代在线读图的权威事实。
 
 ## 缺少 content 时
 

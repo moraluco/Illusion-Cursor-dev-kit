@@ -67,7 +67,11 @@ py -3 -m soft_ue_cli check-setup
 
 ## 5. 桥不可用时的行为
 
-若 `check-setup` 失败或用户未开编辑器：说明无法通过桥读图；可仅依据**源码、AS、knowledge** 推理，并提示用户**启动 UE** 后再执行桥命令。**无** BlueprintSnapshot 本地 JSON 兜底。
+若 `check-setup` 失败或用户未开编辑器：说明无法通过桥读图；此时优先使用**离线快照/索引 + 源码 + knowledge** 做定位与推理，并明确标注“这不是编辑器内实时事实”。需要确认**最新图结构 / pins / 默认值 / 连线**时，提示用户启动 UE 后再执行桥命令。
+
+> 说明（避免口径冲突）  
+> - **在线权威**：soft-ue-cli 查询的是“编辑器内 `.uasset` 的实时状态”，用于最终确认与精确结构（图、pins、默认值、引用等）。  
+> - **离线快照**：`BlueprintSnapshot/`、`.soft-ue-index/` 等文本产物用于 **Search/Grep、离线复盘、可提交证据**；但可能滞后于编辑器内最新修改，因此不能替代在线权威。
 
 提示：本项目“启动 UE 并确保能找到 UnrealEditor.exe”的权威入口为技能 **ue-editor-launch**（含路径优先级与桥可达性检查）。
 
