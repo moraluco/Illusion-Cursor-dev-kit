@@ -1,0 +1,16 @@
+---
+description: 大范围搜索时自动刷新蓝图快照，并优先搜索快照内容
+alwaysApply: true
+---
+
+# 蓝图全量快照优先（Search/Grep 工作流）
+
+当用户请求以下类型任务时，视为**大范围搜索**（需要离线可搜的蓝图 Index）：
+
+- 全局搜索蓝图函数/变量/注释/节点标题
+- “项目里到处找”“全项目搜”“大范围搜”“搜不到就全局扫”
+- 涉及 Blueprint 的跨资产排查（例如“谁在用 X”“哪些蓝图有 Y 注释/节点”）
+
+## 强制步骤（必须按顺序）
+
+1. **确保快照存在且新鲜**：先运行 Kit 脚本 `content/dev/scripts/Ensure-BlueprintSnapshot.ps1`（它会在项目仓库内生成可提交的快照文本）。\n2. **优先搜索快照**：先在 `BlueprintSnapshot/blueprints_full.txt` 与 `BlueprintSnapshot/blueprints_full.ndjson` 中搜索。\n3. **再搜索源码与在线查询**：仅当快照无结果或需要更精确结构信息时，再搜索源码或调用 soft-ue-cli 在线查询（`query-blueprint(-graph)` / `find-references`）。\n\n## 桥不可用时的退化\n\n- 若无法启动 UE 或 SoftUEBridge 不可达：只做离线快照搜索 + 源码搜索，并明确提示“在线查询不可用”。\n

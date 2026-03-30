@@ -1,0 +1,23 @@
+---
+description: 确保始终能定位/启动 UnrealEditor.exe（路径优先级 + 环境变量约定）
+alwaysApply: true
+---
+
+# UE Editor 路径定位（必须可复用）
+
+当任务涉及 **启动 UE**、**soft-ue-cli / SoftUEBridge**、**读蓝图/关卡**、**截图/PIE**、或任何需要交互式编辑器的操作时，必须先用同一套规则定位 `UnrealEditor.exe`。
+
+## 定位优先级（从高到低）
+
+- **环境变量覆盖**：若设置了 `UE_EDITOR_EXE`，始终优先使用该路径。
+- **项目固定路径兜底**：若未设置环境变量，则使用本项目已知路径：
+  - `D:\Workspace\MT\Engine\Engine\Engine\Binaries\Win64\UnrealEditor.exe`
+
+## 失败处理
+
+- 若上述路径不存在或不可执行：不要继续调用 soft-ue-cli；应先输出“找不到 UnrealEditor.exe / 无法启动 UE”的明确错误，并给出需要用户修复的路径/环境变量项。
+
+## 与 soft-ue-cli 的关系
+
+- soft-ue-cli 只能连接**已启动**且桥可用的交互式 UE；因此“启动 UE 并等待桥可用”是所有桥接自动化的前置步骤。
+

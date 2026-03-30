@@ -69,10 +69,13 @@ py -3 -m soft_ue_cli check-setup
 
 若 `check-setup` 失败或用户未开编辑器：说明无法通过桥读图；可仅依据**源码、AS、knowledge** 推理，并提示用户**启动 UE** 后再执行桥命令。**无** BlueprintSnapshot 本地 JSON 兜底。
 
+提示：本项目“启动 UE 并确保能找到 UnrealEditor.exe”的权威入口为技能 **ue-editor-launch**（含路径优先级与桥可达性检查）。
+
 ---
 
 ## 6. 交叉引用
 
 - 操作步骤与端口：`content/dev/soft-ue-cli.md`
+- 启动 UE：技能 **ue-editor-launch**
 - Git、提交顺序、长程上下文：技能 **git-local-p4-workflow**
 - 经验沉淀：技能 **summarize-to-knowledge**
