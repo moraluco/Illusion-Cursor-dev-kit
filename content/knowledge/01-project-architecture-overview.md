@@ -1,15 +1,15 @@
 # 项目架构总览（ManteumTower）
 
-本文基于**项目根**下 C++ 插件、`ManteumTower/Script`、`BlueprintSnapshot/_index.json` 归纳，用于快速建立项目骨架。蓝图细节以 BlueprintSnapshot JSON 为权威来源；子系统实现见 08、09 等文档。
+本文基于**项目根**下 C++ 插件、`ManteumTower/Script`、UE Content 资产归纳，用于快速建立项目骨架。**读编辑器内蓝图/行为树/关卡图结构**以 **soft-ue-cli + SoftUEBridge**（见 Kit 技能 `soft-ue-cli-ue-bridge` 与 `content/dev/soft-ue-cli.md`）为准；子系统叙述见 08、09 等文档。
 
-**数据来源约定**：与 [09-player-animation-system](09-player-animation-system.md) 一致，本文涉及的事实均以项目根下上述源码与快照为准。
+**数据来源约定**：与 [09-player-animation-system](09-player-animation-system.md) 一致；涉及 .uasset 内逻辑时以**桥查询结果**或编辑器内事实为准，并与源码/AS 交叉核对。
 
 ---
 
 ## 1. 项目根与 Kit 关系
 
 - **工作区** = Kit 根 + 项目根（双根）。文档与知识库在 **Kit 根下的 content/**；代码与资源在**项目根**。
-- **项目根**下主要内容集中在 **ManteumTower**（Plugins、Script、Content、BlueprintSnapshot 等）。本总览描述该范围内的目录、插件、脚本与蓝图分布。
+- **项目根**下主要内容集中在 **ManteumTower**（Plugins、Script、Content 等）。本总览描述该范围内的目录、插件、脚本与蓝图分布。
 
 ---
 
@@ -20,8 +20,7 @@
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
 | ManteumTower/Plugins/           | 项目自用 C++ 插件：BlueprintSerializer、ALS-Refactored、ReCapability                                                        |
 | ManteumTower/Script/            | AngelScript 脚本：Character、System、Utils                                                                              |
-| ManteumTower/Content（UE 资产）     | 蓝图、材质、动画等，由 UE 编辑器管理；蓝图已导出至 BlueprintSnapshot                                                                      |
-| ManteumTower/BlueprintSnapshot/ | 蓝图导出快照：_index.json、各蓝图 JSON；供 Agent 与工具读取，详见 [07-blueprint-snapshot-for-agent](07-blueprint-snapshot-for-agent.md) |
+| ManteumTower/Content（UE 资产）     | 蓝图、材质、动画、行为树等，由 UE 编辑器管理；Agent 需读图时用 soft-ue-cli（见上） |
 
 
 ---
@@ -31,7 +30,7 @@
 
 | 插件名                     | 模块                                             | 职责                                                  | 参考文档                                                                                                                          |
 | ----------------------- | ---------------------------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| **BlueprintSerializer** | BlueprintSerializer (Editor)                   | 将蓝图序列化为 JSON，供分析、文档与 Agent 阅读；导出至 BlueprintSnapshot | [06-lessons-blueprint-serializer](06-lessons-blueprint-serializer.md)                                                         |
+| **BlueprintSerializer** | BlueprintSerializer (Editor)                   | 可选：将蓝图序列化为 JSON 供人工/管线分析；**非** Agent 读蓝图主路径（Agent 用 soft-ue-cli） | [06-lessons-blueprint-serializer](06-lessons-blueprint-serializer.md)                                                         |
 | **ALS-Refactored**      | ALS, ALSCamera, ALSExtras, ALSEditor           | 高级 locomotion 与动画系统（C++ 重写版）；角色移动、姿态、相机与动画实例        | [08-player-3c-animation-system](08-player-3c-animation-system.md)、[09-player-animation-system](09-player-animation-system.md)、[10-als-data-config](10-als-data-config.md) |
 | **ReCapability**        | ReCapabilityCore (Runtime), ReCapabilityEditor | ManteumTower 能力系统相关插件（Runtime + Editor）             | —                                                                                                                             |
 
@@ -75,7 +74,7 @@
 
 ## 5. 蓝图分布
 
-快照索引：**项目根下 ManteumTower/BlueprintSnapshot/_index.json**（当前约 249 张蓝图）。阅读顺序与字段含义见 [07-blueprint-snapshot-for-agent](07-blueprint-snapshot-for-agent.md)：先 _index，再按需单蓝图 JSON。
+在编辑器中通过 Content Browser 或 **soft-ue-cli**（如 `query-asset`、`query-blueprint`）盘点；以下为历史上常用的路径前缀分类。
 
 ### 5.1 按路径/模块分类（主要前缀）
 
@@ -87,7 +86,7 @@
 | /Game/System     | 系统组件：UnitInfo、Weapon、PatrolPath、QTE、Spread 等                 | BPC_PlayerStat, BPC_EnemyStat, BPC_Weapon, BP_Weapon_Pistol, BPC_PatrolPath, BPC_EnemyQTE |
 | /EnemyRefactored | 重构版 AI：BT、EQS、敌人基类、AIC                                       | BTT_*, BTS_*, BP_Enemy_Base_Old, AIC_Enemy_Base_Old, EQS_Context_TargetActor              |
 | /ALS             | 动画与相机（ALS-Refactored 插件内容）                                   | AB_Als_*, B_Als_* 等；详见 08、09                                                              |
-| /Engine 及其他      | 引擎/插件自带蓝图                                                    | 宏、DamageType、Sky 等；数量较多，按需在 _index 中筛选                                                    |
+| /Engine 及其他      | 引擎/插件自带蓝图                                                    | 宏、DamageType、Sky 等；数量较多，按需搜索或 query-asset 筛选 |
 
 
 ### 5.2 核心蓝图清单（速查）
@@ -117,8 +116,7 @@
 | [03-angelscript-ue](03-angelscript-ue.md)                             | AS 与 UE 集成、脚本规范、reference 对应关系 | 写/读 AS 脚本    |
 | [04-decisions](04-decisions.md)                                       | 项目/技术决策记录                      | 了解选型与约定      |
 | [05-gotchas](05-gotchas.md)                                           | 易错点、排错备忘                       | 排错与避坑        |
-| [06-lessons-blueprint-serializer](06-lessons-blueprint-serializer.md) | 蓝图快照与 BlueprintSerializer 插件   | 导出与 Agent 优化 |
-| [07-blueprint-snapshot-for-agent](07-blueprint-snapshot-for-agent.md) | 蓝图快照阅读顺序与字段                    | 读蓝图 JSON     |
+| [06-lessons-blueprint-serializer](06-lessons-blueprint-serializer.md) | BlueprintSerializer 插件与管线经验   | 非 Agent 读图主路径 |
 | [08-player-3c-animation-system](08-player-3c-animation-system.md)     | 玩家 3C 与动画系统边界、扩展与调试            | 玩家动画与 3C     |
 | [09-player-animation-system](09-player-animation-system.md)           | 玩家动画资产结构、刷新链路、曲线与蒙太奇           | 玩家 ABP 与动画管线 |
 

@@ -1,5 +1,7 @@
 # 蓝图导出 JSON 与 BlueprintSerializer 插件
 
+> **Agent 读蓝图的主路径**是 **soft-ue-cli + SoftUEBridge**（见 Kit 技能 `soft-ue-cli-ue-bridge` 与 `content/dev/soft-ue-cli.md`）。本文档仅描述**可选**的 BlueprintSerializer 导出管线，供人工或离线分析使用。
+
 > 实际开发内容：编辑器工具使用、导出流程、编译与测试。通用决策与易错点见 [content/knowledge/04-decisions.md](../../knowledge/04-decisions.md)、[05-gotchas.md](../../knowledge/05-gotchas.md)。
 
 来源：对话记录 [38c38910-e711-4459-b59f-b5e75177295a]，整理自「蓝图可读化 → 插件集成与编译修复」全流程。
@@ -8,9 +10,9 @@
 
 ## 1. 目标与背景
 
-- **目标**：用 AngelScript 全面重构蓝图逻辑，蓝图只做数据配置；让 Cursor 能「读」到整个项目以便逐步重构。
-- **核心难点**：蓝图逻辑在 `.uasset` 中，Cursor 不可读 → 需先把蓝图导出为 **Cursor 可读的文本（如 JSON）**，再谈盘点与迁移。
-- **选型**：采用「基于已有项目 BlueprintSerializer」集成，而非从零写插件；在插件上增加快照路径、Tools 菜单一键导出、可选 `_index.json`。
+- **目标（历史管线）**：在需要「离线 JSON」时，用 BlueprintSerializer 将蓝图导出为文本，便于盘点或工具处理。
+- **与 Agent 的关系**：日常迭代中 Agent **不依赖**本导出；**读图请用 soft-ue-cli**。
+- **选型**：基于已有项目 BlueprintSerializer 扩展路径、Tools 菜单、可选 `_index.json`。
 
 ---
 

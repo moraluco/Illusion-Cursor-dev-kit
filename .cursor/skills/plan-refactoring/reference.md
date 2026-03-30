@@ -8,8 +8,8 @@
 
 | 步骤 | 说明 |
 |------|------|
-| **快照索引** | 用 `BlueprintSnapshot/_index.json` 与 `blueprints[].summary` 列出所有蓝图，按 `parentClass`、`nodeCount`、`functionCount` 排优先级（简单/纯数据先移，复杂后移）。 |
-| **依赖图** | 从快照的 `dependencyClosure`、`eventNodes`、`structuredGraphs` 理清蓝图之间、蓝图与 C++ 的调用关系，标出「被多处引用」的核心蓝图。 |
+| **资产盘点** | 在**运行中的编辑器**下用 **soft-ue-cli**（`query-asset`、`query-blueprint` 等，见技能 **soft-ue-cli-ue-bridge**）列出相关蓝图，按复杂度、引用面排优先级（简单/纯数据先移，复杂后移）。 |
+| **依赖与图** | 用 `query-blueprint` / `query-blueprint-graph` 理清调用与图结构；结合 **Git** 看近期变更（**git-local-p4-workflow**）。 |
 | **接口清单** | 列出蓝图必须暴露给编辑器/其他系统的接口（事件、变量、函数）；在 AS 中对应为 `UFUNCTION(BlueprintCallable/BlueprintPure)` 等。 |
 
 产出：**迁移顺序**（先移谁后移谁）、**接口清单**（AS 需实现的签名与事件）。
@@ -25,7 +25,7 @@
 - **动画**：AnimInstance（如 RevolverPistolAnimInstance）→ 对应 AnimBP。
 - **输入 / QTE / 交互 / 巡逻**：按依赖顺序，逐个把 BP 侧调用改为 AS。
 
-每个子系统内：**读快照 → 在 AS 实现/对齐行为 → 切换引用（编辑器改为使用 AS 类）→ 验证 → 收尾（废弃或保留空壳 BP）**。
+每个子系统内：**用 soft-ue-cli 读图 → 在 AS 实现/对齐行为 → 切换引用（编辑器改为使用 AS 类）→ 验证 → 收尾（废弃或保留空壳 BP）**。
 
 ---
 
@@ -33,8 +33,8 @@
 
 对选定的一个子系统（例如武器）：
 
-1. **读快照**：按 `content/knowledge/07-blueprint-snapshot-for-agent.md`（或项目内等价文档）：`_agentSummary` → `eventNodes` / `structuredGraphs` → `flows.execution` / `data`，整理出事件流与数据流。
-2. **在 AS 实现/对齐**：在现有 AS 类（如 `WeaponBase.as`、`WeaponComponent.as`）上补全或调整，使行为与蓝图一致；新接口用 `UFUNCTION(BlueprintCallable/BlueprintPure)` 等按需暴露。
+1. **读图**：`query-blueprint` / `query-blueprint-graph` 整理事件流与数据流（编辑器须运行且桥可用）。
+2. **在 AS 实现/对齐**：在现有 AS 类上补全或调整；新接口用 `UFUNCTION` 按需暴露。
 3. **切换引用**：在编辑器中把使用该子系统的地方从「用 BP_XXX」改为「用 AS 生成的类」；一次改一个引用点并验证。
 4. **验证**：功能测试；若有 AS 单测，跑 **angelscript-tdd-agent-iteration**。
 5. **收尾**：当某 BP 完全被 AS 替代且无引用后，标记废弃或删除；若需保留资产（Mesh、Montage 等），可保留「空壳」蓝图，逻辑全在 AS。
@@ -55,7 +55,7 @@
 
 ## 与 Kit 规则/技能的配合
 
-- **快照只读**：改行为只在 AS 或编辑器中改 .uasset，不通过改快照 JSON（rule blueprint-snapshot-cognition）。
+- **读图**：**soft-ue-cli-ue-bridge**；修改行为在 AS 或编辑器内 `.uasset`。
 - **AS 优先**：新逻辑一律在 AS；仅当 AS 无法满足时用 C++ 扩展，再由 AS 调用（rule angelscript-primary-cpp-fallback）。
 - **写 AS**：按技能 **write-angelscript**；需 API/签名时用 **angelscript-api-query**。
 - **测试与沉淀**：跑测试用 **angelscript-tdd-agent-iteration**；迁移阶段结束后用 **summarize-as-experience** / **summarize-to-knowledge** 把 BP→AS 的坑与约定写入知识库。

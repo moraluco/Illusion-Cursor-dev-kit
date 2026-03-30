@@ -2,7 +2,7 @@
 
 本文描述当前项目**玩家角色动画系统**的资产结构、刷新链路、曲线约定、转场/TIP 与蒙太奇、AnimNotify 及与相机的联动。与 3C 的接口边界（动画消费哪些状态、向外暴露哪些曲线与事件）见 [08-player-3c-animation-system](08-player-3c-animation-system.md)。
 
-**数据来源约定**：本项目所有 UE 蓝图已通过蓝图导出插件导出为**项目蓝图快照 JSON**，统一存放在项目根下 `ManteumTower/BlueprintSnapshot/` 目录中（含 `_index.json` 及各蓝图快照）。本文中涉及的「AnimBP/子图/Notify/蒙太奇逻辑」等事实，均以这些 BlueprintSnapshot JSON 为权威来源进行描述和推导，而不是依赖在编辑器中人工浏览蓝图图表。
+**数据来源约定**：涉及 AnimBP、子图、Notify、蒙太奇等 **.uasset 内逻辑**时，以 **运行中编辑器 + soft-ue-cli**（`query-blueprint`、`query-blueprint-graph` 等）或人工在编辑器中确认为准；并与 C++/AS 源码、knowledge 文档交叉核对。
 
 ### 1) 系统概览与职责边界
 

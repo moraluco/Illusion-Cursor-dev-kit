@@ -2,7 +2,7 @@
 
 本文整理 **ALS-Refactored** 中与**角色移动数据**相关的配置入口与数据流向，便于调整玩家角色的加速度、制动（减速度）、地面阻尼等。与 3C/动画的边界见 [08-player-3c-animation-system](08-player-3c-animation-system.md)、[09-player-animation-system](09-player-animation-system.md)。
 
-**约定**：项目蓝图快照位于 `ManteumTower/BlueprintSnapshot/`，ALS 插件代码位于 `ManteumTower/Plugins/ALS-Refactored/Source/ALS/`。
+**约定**：蓝图/DataAsset 以编辑器内资产为准；读图可用 **soft-ue-cli**。ALS 插件代码位于 `ManteumTower/Plugins/ALS-Refactored/Source/ALS/`。
 
 ---
 
@@ -118,4 +118,4 @@
 
 - **UAlsMovementSettings**：`.../ALS/Public/Settings/AlsMovementSettings.h`（FAlsMovementGaitSettings、曲线与速度字段）。
 - **UAlsCharacterMovementComponent**：`.../ALS/Public/AlsCharacterMovementComponent.h`，`.../ALS/Private/AlsCharacterMovementComponent.cpp`（RefreshGaitSettings、RefreshGroundedMovementSettings、SetMovementSettings、GetMaxAcceleration、CalcVelocity 使用处）。
-- **BP_Character_Lin**：快照见 `BlueprintSnapshot/BP_Character_Lin.json`，其中 `MovementSettings`、`CharacterMovement` 引用与 08/09 中 3C 描述一致。
+- **BP_Character_Lin**：`/Game/Core/BP_Character_Lin`（或项目内实际路径）；`MovementSettings`、`CharacterMovement` 引用与 08/09 中 3C 描述一致；细节以编辑器或 soft-ue-cli 查询为准。

@@ -4,7 +4,7 @@
 
 ## 项目结构（与本 Kit 配合）
 
-- **项目根**：仅放代码、资源、配置；不含文档与知识库。
+- **项目根**：仅放代码、资源、配置；不含文档与知识库。**当前工程** UE 项目根为 `D:\Workspace\MT\Engine\ManteumTower`（`ManteumTower.uproject`）。
 - **文档与知识库**：全部在 Kit 的 `content/` 下（plan、design、dev、knowledge、reference）。
 - 工作区 = Kit 根 + 项目根（Cursor 多根工作区）。
 
@@ -19,6 +19,11 @@
 - 设计文档（目标、方案、接口、UE 设计要点）→ `content/design/`。
 - 实现说明、关键接口、配置、UE 实现要点 → `content/dev/`。
 - API/脚本参考、示例代码 → `content/reference/`（如 AS_API、Docs-UE-Angelscript）。
+
+## 编辑器自动化（读蓝图/关卡）
+
+- Agent **读**编辑器内蓝图、行为树、关卡等：使用 **soft-ue-cli + SoftUEBridge**，见 Kit 技能 **soft-ue-cli-ue-bridge** 与 `content/dev/soft-ue-cli.md`。
+- **长程上下文**：任务前可查阅 `content/plan.md`、本 knowledge 目录与 **Git** 提交历史（见 **git-local-p4-workflow**）。
 
 ## 扩展
 

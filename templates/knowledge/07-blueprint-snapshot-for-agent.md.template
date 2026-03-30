@@ -1,6 +1,8 @@
 # 蓝图快照阅读顺序与字段（Agent 用）
 
-> 本文档描述由蓝图序列化插件导出的 JSON 快照结构（schema 1.5）。复制到 `content/knowledge/07-blueprint-snapshot-for-agent.md` 后，Agent 与人工可按此阅读顺序与关键键解析蓝图逻辑。更完整字段说明见项目内 BlueprintSerializer 插件的 `ContextSystem/SCHEMA_REFERENCE.md`（若存在）。
+> **已弃用作为 Agent 主路径。** 新项目请使用 Kit 技能 **soft-ue-cli-ue-bridge** 与 `content/dev/soft-ue-cli.md` 通过编辑器桥读图。下列内容仅当**仍使用 BlueprintSerializer 导出 JSON 做离线分析**时保留参考。
+>
+> 本文档描述由蓝图序列化插件导出的 JSON 快照结构（schema 1.5）。更完整字段说明见项目内 BlueprintSerializer 插件的 `ContextSystem/SCHEMA_REFERENCE.md`（若存在）。
 
 ---
 

@@ -11,7 +11,7 @@
 | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | 01-project-architecture-overview.md | 项目架构总览（目录结构、C++ 插件、AS 模块、蓝图分布、与 knowledge 其他文档的引用）。可参考同目录下的 `01-project-architecture-overview.md.template` 建议结构。 |
 | 05-gotchas.md | 易错点与排错备忘（常见坑、命令行片段、日志位置与定位步骤）。可参考同目录下的 `05-gotchas.md.template` 建议结构。 |
-| 07-blueprint-snapshot-for-agent.md | 蓝图快照阅读顺序与字段（_index、单蓝图 JSON、structuredGraphs/graphNodes、dependencyClosure 等），供 Agent 与人工读蓝图 JSON 时查阅。 |
+| （读编辑器蓝图） | 使用 Kit 技能 **soft-ue-cli-ue-bridge** 与 `content/dev/soft-ue-cli.md`，不依赖 BlueprintSnapshot JSON。 |
 | （其他 NN-主题.md）                       | （该文件主题简述）                                                                                                        |
 
 

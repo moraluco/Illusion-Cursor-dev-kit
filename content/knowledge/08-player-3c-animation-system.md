@@ -1,6 +1,6 @@
 ## 玩家 3C 系统（ManteumTower 当前实现：Control + Character + Camera + Animation）
 
-本文基于蓝图快照 `D:\ManteumTower\BlueprintSnapshot` 与项目代码（`D:\Workspace\MT\Engine\ManteumTower\Plugins\ALS-Refactored`）整理**当前玩家 3C（Control + Character + Camera）与动画（Animation）之间的真实链路**，目标是：
+本文基于项目代码（`Plugins/ALS-Refactored` 等）与 **UE 编辑器内资产**（通过 **soft-ue-cli** 查询或与人工核对）整理**当前玩家 3C（Control + Character + Camera）与动画（Animation）之间的真实链路**，目标是：
 
 - 让后续迭代能稳定扩展（新动作/新 Overlay/新运动模式）
 - 能快速定位常见“动画像坏了”的根因（状态口径、曲线、TIP、转场、IK）

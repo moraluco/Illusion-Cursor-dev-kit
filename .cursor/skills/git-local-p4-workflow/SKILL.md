@@ -1,6 +1,6 @@
 ---
 name: git-local-p4-workflow
-description: 本地双 Git 仓库（ManteumTower + Kit）、目录联接、忽略规则、中文提交，以及与 Perforce 阶段性同步的惯例；嵌套 .git 备份目录说明。
+description: 本地双 Git 仓库（ManteumTower + Kit）、目录联接、忽略规则、中文提交、Perforce 同步；Agent 用 log/diff 做长程上下文；嵌套 .git 备份说明。
 ---
 
 # 本地 Git + Perforce 工作流
@@ -49,3 +49,37 @@ mklink /J "D:\GitRepo\Illusion-Cursor-dev-kit" "D:\CursorProject\Illusion-Cursor
 ## 与 TDD
 
 - 编写或运行 AngelScript 测试时，与技能 **angelscript-tdd-agent-iteration** 配合：先跑测试再提交；Git 提交信息用中文说明本次通过/修复的测试点。
+- 验证 **UE 编辑器内行为**时，与技能 **soft-ue-cli-ue-bridge** 配合：先 `check-setup` / 跑相关 CLI，再提交。
+
+---
+
+## Cursor / Agent 自动化开发中的 Git
+
+在对应**仓库根**执行（先 `cd` 到项目根或 Kit 根，勿混仓）：
+
+| 场景 | 命令示例 |
+|------|----------|
+| 近期提交摘要 | `git log -n 15 --oneline` |
+| 某路径相关历史 | `git log -n 20 --oneline -- path/to/file` |
+| 工作区改动 | `git status` |
+| 未暂存差异 | `git diff` |
+| 已暂存差异 | `git diff --cached` |
+| 某次提交详情 | `git show <commit>` |
+
+**推荐顺序**：改代码/资产 →（AS 测试 **或** soft-ue-cli 验证）→ `git add` / `git commit`（中文说明）。用户未要求提交时，Agent **不要擅自** `git commit`。
+
+---
+
+## 长期上下文：知识库 + 计划 + Git
+
+目标：让任务具备**跨会话**的脉络——**文档**说明「为什么、计划什么」，**Git** 说明「实际改了什么」。
+
+| 信息类型 | 来源 | 用法 |
+|----------|------|------|
+| 路线图与任务 | `content/plan.md` | 接手阶段前读当前阶段与验证记录 |
+| 架构与结论 | `content/knowledge/`、`content/design/` | `@` 或阅读相关 `NN-*.md` |
+| 具体变更 | `git log` / `git show` / `git diff` | 与文档不一致时**以仓库为准**，并考虑用 **summarize-to-knowledge** 更新 knowledge |
+
+**推荐顺序**：`plan.md` → 相关 knowledge → 针对涉及路径的 `git log` → 再编辑。**多根工作区**须确认当前终端目录属于**哪一个** Git 仓库。
+
+详见 `content/dev/git-automation.md`（可复制命令片段）。

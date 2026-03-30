@@ -21,8 +21,8 @@ alwaysApply: true
 - 对文档与知识库的读/写均在 **Kit 根下的 content/**：`content/plan.md`、`content/design/`、`content/dev/`、`content/knowledge/`、`content/reference/`。不写项目路径下的文档目录。
 - 回答与代码相关问题时，引用**项目根**下的代码与资源。具体技术栈、脚本与 API 的参考位置由 **content 内 knowledge/ 或 reference/ 的 README** 说明，本规则不假定具体路径或文件名。
 - 回答与**项目结构、模块划分、实现位置、核心类/蓝图分布**相关的问题时，**先查阅** `content/knowledge/01-project-architecture-overview.md`（若存在），据此建立整体架构后再结合具体代码/蓝图作答。若该文件不存在，则按下一句约定处理。
-- 理解 **UE 蓝图与项目结构**时，可参考 `content/knowledge/07-blueprint-snapshot-for-agent.md`；若项目根下存在 **BlueprintSnapshot**（含 `_index.json`、OVERVIEW.md、ARCHITECTURE_*.md），优先据此建立蓝图分布与核心架构印象。单蓝图 JSON 为 **schema 1.5**，含 **`_agentSummary`**（先读以判断是否相关）、**`structuredGraphs`**（优先）或 **`graphNodes`**（节点为 JSON 字符串）、**`dependencyClosure`**；详见 `content/knowledge/07-blueprint-snapshot-for-agent.md`。
-- **本项目约定**：项目根下若存在 `ManteumTower/BlueprintSnapshot/`，其中的各蓝图快照 JSON（由蓝图导出插件生成）是**蓝图逻辑与调用关系的权威来源**。当需要「读蓝图实现」或说明蓝图行为时，应优先直接解析这些 JSON，而不是假定可以在编辑器中打开蓝图图表。
+- **长程任务**：在修改代码或资产前，宜先查阅 `content/plan.md` 与 `content/knowledge/` 中相关主题，必要时结合 **Git** 历史（见技能 **git-local-p4-workflow**）；细节与命令不在本规则展开。
+- **读/查编辑器内蓝图、行为树、关卡、材质等**：使用 **soft-ue-cli** 与 **SoftUEBridge**（编辑器须已运行且桥可用）。完整流程与命令见技能 **soft-ue-cli-ue-bridge** 与 `content/dev/soft-ue-cli.md`。**不**使用 BlueprintSnapshot 目录或导出 JSON 作为读图权威来源。
 
 ## 缺少 content 时
 

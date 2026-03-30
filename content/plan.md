@@ -49,3 +49,28 @@
 ## 与设计/开发文档的对应
 
 各阶段对应的设计文档见 [design/](design/)，实现说明见 [dev/](dev/)。更新本文件中的阶段状态时，可一并更新或引用相关 design/dev 文档。
+
+---
+
+## Agent 自动化：UE 桥与 Git（参考阶段）
+
+以下为 Kit 方法论中的**能力阶段**，可在上表任务中拆解或单独跟踪；细节见技能 **soft-ue-cli-ue-bridge**、**git-local-p4-workflow** 与 `content/dev/soft-ue-cli.md`、`content/dev/git-automation.md`。
+
+### UE（soft-ue-cli + SoftUEBridge）
+
+| 阶段 | 能力 |
+|------|------|
+| 0 基线 | pip、插件、`check-setup` 通过 |
+| 1 只读 | `project-info`、`query-asset`、`query-blueprint`、`get-logs` 等 |
+| 2 观察闭环 | PIE、`capture-screenshot`、`trigger-input`（按需） |
+| 3 编辑闭环 | 编译蓝图、存盘、图编辑（需团队规范） |
+| 4 与 CI 边界 | 桥不用于 unattended；AS 测试仍走 Commandlet / **angelscript-tdd-agent-iteration** |
+
+### Git（本地自动化）
+
+| 阶段 | 能力 |
+|------|------|
+| G0 | 在正确仓库根使用 `git status` / `git log` / `git diff` |
+| G1 | 验证通过后再提交；中文 message |
+| G2 | 常用 log/diff 参数见 `content/dev/git-automation.md` |
+| G3 | 长程上下文：`plan.md` + knowledge + 路径级 `git log` |

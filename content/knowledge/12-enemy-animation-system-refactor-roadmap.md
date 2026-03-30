@@ -2,10 +2,7 @@
 
 本文用于沉淀敌人动画系统的长期重构方案，目标是把当前敌人动画从“单体蓝图可用”逐步演进为“可复用、可扩展、可调试”的通用框架。
 
-当前主要参考资产：
-
-- `MT/Engine/ManteumTower/BlueprintSnapshot/ABP_Enemy_Shadow.json`
-- 已有玩家侧经验文档：
+当前主要参考资产：编辑器内 **ABP_Enemy_Shadow** 等（通过 soft-ue-cli 或 Content 路径打开）。参考文档：
   - [08-player-3c-animation-system](08-player-3c-animation-system.md)
   - [09-player-animation-system](09-player-animation-system.md)
   - [11-als-animinstance-framework-and-layering-curves](11-als-animinstance-framework-and-layering-curves.md)

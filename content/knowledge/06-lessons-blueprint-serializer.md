@@ -7,8 +7,9 @@
 ## 1. 目标与背景
 
 - **目标**：用 AngelScript 全面重构蓝图逻辑，蓝图只做数据配置；让 Cursor 能「读」到整个项目以便逐步重构。
-- **核心难点**：蓝图逻辑在 `.uasset` 中，Cursor 不可读 → 需先把蓝图导出为** Cursor 可读的文本（如 JSON）**，再谈盘点与迁移。
-- **选型**：采用「基于已有项目 BlueprintSerializer」集成，而非从零写插件；在插件上增加快照路径、Tools 菜单一键导出、可选 `_index.json`。
+- **核心难点**：蓝图逻辑在 `.uasset` 中，纯文本仓库不可直接读图。
+- **当前 Agent 读图路径**：使用 **soft-ue-cli + SoftUEBridge**（见 Kit 技能 `soft-ue-cli-ue-bridge`），在编辑器运行时查询蓝图/图结构；**不**再依赖 BlueprintSnapshot JSON 作为权威。
+- **BlueprintSerializer**：仍可作为**可选**人工/管线工具，将蓝图导出为 JSON 做离线分析；与 Agent 主读路径分离。
 
 ---
 
@@ -82,11 +83,13 @@
 
 ---
 
-## 7. 近期经验：Agent 友好优化与结构文档
+## 7. 近期经验：插件侧 JSON 优化（可选管线）
 
-### 7.1 目标
+以下适用于**仍使用 BlueprintSerializer 做导出**的场景；**Agent 日常读图请用 soft-ue-cli**（见上）。
 
-让 **Cursor/Agent 能基于蓝图快照快速理解项目结构**，无需逐个打开大 JSON，也不依赖编辑器。
+### 7.1 目标（历史）
+
+在导出 JSON 管线存在时，优化索引与摘要以便人工或后处理脚本使用。
 
 ### 7.2 已做优化（BlueprintSerializer 插件侧）
 
@@ -114,19 +117,18 @@
 - **OVERVIEW.md**：按路径/模块统计蓝图数量，列出本游戏核心蓝图（GM、角色、武器、敌人等），便于建立「项目骨架」。
 - **ARCHITECTURE_*.md**：针对某一子系统（如玩家 Lin）写清类层次、组件、动画、数据流；结合 `_index.json` 与单蓝图 JSON 的 `parentClass`、`detailedComponents`、`dependencyClosure` 归纳而成。
 
-### 7.4 经验要点
+### 7.4 经验要点（导出 JSON 管线）
 
 | 要点 | 说明 |
 |------|------|
-| 先索引后单文件 | Agent 应优先读 `_index.json`（及 OVERVIEW/ARCHITECTURE），再按需打开单蓝图 JSON，避免一次性加载全部。 |
+| 先索引后单文件 | 若使用导出：优先读 `_index.json`（及 OVERVIEW/ARCHITECTURE），再按需打开单蓝图 JSON。 |
 | 摘要前置 | 单蓝图内 `_agentSummary` 放在根对象前面，便于流式/截断读取。 |
-| 快照与代码结合 | 架构文档可同时引用快照（父类、组件、依赖）与项目 C++/脚本（若有），例如 Angelscript 的 PlayerCharacterBase 在 C++ 中无源码，需在知识库中说明。 |
-| 导出时机 | 快照为某一时刻的导出结果；若用户未重新导出，需在回答中注明「基于快照时间 xxx」。 |
+| 与代码结合 | 架构文档应结合项目 C++/AS 与**编辑器内事实**（桥查询或人工确认）。 |
 
 ### 7.5 知识库衔接
 
-- **Agent 如何使用蓝图快照** → [07-blueprint-snapshot-for-agent.md](07-blueprint-snapshot-for-agent.md)。  
-- **插件使用与 Agent 友好 JSON 细节** → [content/dev/editor-tools/blueprint-export-serializer.md](../dev/editor-tools/blueprint-export-serializer.md)。
+- **Agent 读编辑器内蓝图/行为树** → Kit 技能 **soft-ue-cli-ue-bridge**，`content/dev/soft-ue-cli.md`。  
+- **插件导出与路径排错** → [content/dev/editor-tools/blueprint-export-serializer.md](../dev/editor-tools/blueprint-export-serializer.md)。
 
 ---
 

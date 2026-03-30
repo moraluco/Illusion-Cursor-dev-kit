@@ -25,6 +25,7 @@ All paths below are relative to **Kit root** (the repo containing this skill and
    - What was decided and why (→ knowledge or `04-decisions.md`)
    - What went wrong or is easy to get wrong (→ knowledge or `05-gotchas.md`)
    - What was done step-by-step with tools/editor/export (→ dev)
+5. **可选**：若本次涉及大量文件或易与历史混淆，在**对应仓库根**对照 **相关路径的 `git log`** / 最近提交的 `message`，避免知识库叙事与仓库事实脱节（技能 **git-local-p4-workflow**）。
 
 ---
 

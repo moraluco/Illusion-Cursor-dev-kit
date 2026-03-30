@@ -19,8 +19,7 @@
 | [03-angelscript-ue.md](03-angelscript-ue.md) | AngelScript 与 UE 集成要点、脚本规范、与 reference 的对应关系 |
 | [04-decisions.md](04-decisions.md)           | 项目/技术决策记录（架构、选型、约定）                          |
 | [05-gotchas.md](05-gotchas.md)               | 易错点、排错备忘与常见问题                                |
-| [06-lessons-blueprint-serializer.md](06-lessons-blueprint-serializer.md) | 经验总结：蓝图快照、BlueprintSerializer 集成、编译修复与 Agent 友好优化 |
-| [07-blueprint-snapshot-for-agent.md](07-blueprint-snapshot-for-agent.md) | 蓝图快照使用指南（供 Agent 理解项目结构：索引、OVERVIEW、架构文档、阅读顺序） |
+| [06-lessons-blueprint-serializer.md](06-lessons-blueprint-serializer.md) | 经验总结：BlueprintSerializer 插件、编译修复；可选 JSON 导出管线（非 Agent 读图主路径） |
 | [08-player-3c-animation-system.md](08-player-3c-animation-system.md) | 经验总结：玩家 3C 动画系统（ALS/Linked Anim Graph/AS），扩展模式与调试清单 |
 | [09-player-animation-system.md](09-player-animation-system.md) | 玩家动画系统（ALS + AB_Als_Lin + LinkedGraphs + Montage/Notify）：资产结构、刷新链路、曲线与蒙太奇 |
 | [10-als-data-config.md](10-als-data-config.md) | ALS 数据配置（移动）：加速度、阻尼、制动 — 配置入口、数据流向、速查表（Lin_MovementSettings_Default / 曲线 X/Y/Z） |
@@ -33,7 +32,8 @@
 
 1. **日常沉淀**：研发过程中把关键概念、链接、决策与易错点整理到对应文件。
 2. **AI 上下文**：在 Cursor 中 `@` 引用本目录或具体文件，让 AI 基于本地知识库回答。
-3. **团队同步**：本目录约定可同步至飞书知识库，同步方式由项目自定。
+3. **长程任务**：结合 [../plan.md](../plan.md) 与本目录相关主题；**具体文件级变更**对照 **Git** 历史（`git log` / `git diff`，见 Kit 技能 **git-local-p4-workflow**）。文档与提交不一致时以仓库为准，并视情况更新本目录。
+4. **团队同步**：本目录约定可同步至飞书知识库，同步方式由项目自定。
 
 ## 维护约定
 

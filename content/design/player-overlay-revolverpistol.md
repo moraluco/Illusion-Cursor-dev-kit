@@ -6,10 +6,7 @@
 
 - ALS 插件 C++ 源码（`Plugins/ALS-Refactored/Source/ALS`）
 - AngelScript 武器系统脚本（`Engine/ManteumTower/Script/System/Weapon`）
-- 蓝图快照（`Engine/ManteumTower/BlueprintSnapshot`），尤其：
-  - `Game_Core_BP_Character_Lin_BP_Character_Lin.json`
-  - `Game_Art_Character_Lin_ABP_AB_Als_Lin_PistolOneHanded_A_974fc017.json`
-  - `Game_Art_Character_Lin_ABP_AB_Als_Lin_RevolverPistol_AB_91b55641.json`
+- 相关 AnimBP（`AB_Als_Lin` 系列及 RevolverPistol 子图）与 `BP_Character_Lin`：以 **UE 编辑器内资产** 或 **soft-ue-cli** 查询为准
 
 ---
 
