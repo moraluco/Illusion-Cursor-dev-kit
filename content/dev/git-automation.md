@@ -6,6 +6,9 @@
 
 - 能由**脚本、UnrealEditor-Cmd、单测、CI 工作流**稳定重复完成的验证与交付，应走**自动化**；长期方案不应依赖「只开 UE 人工看 Output Log」。详见 `content/dev/unattended-ue-automation.md` 与技能 **angelscript-tdd-agent-iteration**。
 
+## 提交必须原子化（对自动化流程更友好）
+
+- **原则**：一个 commit 只做**一个可验证点**；commit message 必须能让人不看上下文也知道“为什么/做了什么/如何验证”。\n+- **拆分建议**：\n+  - 规则/技能（`.cursor/`）单独提交\n+  - dev 文档单独提交\n+  - 脚本单独提交（尽量自带 `exit code` 或“如何运行”）\n+  - 项目工程改动（代码/配置）单独提交\n+- **反例**：把“规则改动 + 10 个文档 + 2 个脚本 + 大量格式化”混在一个提交里，会让 Step1 无法用 `git log` 收敛叙事。\n+
 ## 自动化专仓
 
 本项目的“专仓”不是指某个单一的 GitHub 仓库，而是指**本地优先**的开发方式：以 `D:\GitRepo\...` 下的本地仓库推进自动化开发与验证，规避 GitHub 的网络环境、LFS、runner 等限制。

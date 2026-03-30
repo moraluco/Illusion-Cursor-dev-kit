@@ -21,6 +21,13 @@ alwaysApply: true
 
 - **提交说明（commit message）一律使用中文**（与 `locale-zh.mdc` 一致）；仅在用户明确要求英文时使用英文。
 
+## 提交必须原子化（对自动化友好）
+
+- **原子化**：一个 commit 只做**一类最小闭环改动**（一个可验证点），不要把「规则+脚本+大量无关格式化+多主题文档」混在同一个提交里。
+- **可读性**：仅凭 commit message 与 `git show`，应能独立理解**为什么改、改了什么、怎么验证**（尤其是自动化/脚本类变更）。
+- **跨仓边界**：改项目提交项目；改 Kit 提交 Kit。不要在一个提交里跨两个仓库“同时改完”，否则历史难以复盘。
+- 细节与模板见 `content/dev/git-automation.md` 与技能 **git-local-p4-workflow**。
+
 ## 与 Perforce 的关系
 
 - **Perforce 为团队主源**；本地 Git 用于个人高频提交、TDD、Cursor 自动化，**不替代** P4。
