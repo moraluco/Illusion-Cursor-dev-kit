@@ -21,6 +21,7 @@ alwaysApply: true
 - 对文档与知识库的读/写均在 **Kit 根下的 content/**：`content/plan.md`、`content/design/`、`content/dev/`、`content/knowledge/`、`content/reference/`。不写项目路径下的文档目录。
 - 回答与代码相关问题时，引用**项目根**下的代码与资源。具体技术栈、脚本与 API 的参考位置由 **content 内 knowledge/ 或 reference/ 的 README** 说明，本规则不假定具体路径或文件名。
 - 回答与**项目结构、模块划分、实现位置、核心类/蓝图分布**相关的问题时，**先查阅** `content/knowledge/01-project-architecture-overview.md`（若存在），据此建立整体架构后再结合具体代码/蓝图作答。若该文件不存在，则按下一句约定处理。
+- **自动化优先**：凡能由脚本、测试、流水线**稳定、可重复**完成的验证与交付步骤，应通过**自动化**实现（PowerShell、UnrealEditor-Cmd、`Saved/Logs` 等），**不**把「长期依赖人工开 UE、逐条看 Output Log」当作唯一手段。无人值守与日志见 `content/dev/unattended-ue-automation.md`；AS 测试见 **angelscript-tdd-agent-iteration**；本地优先开发入口与 `D:\GitRepo` 约定见 rule **git-local-repos-and-p4** 与技能 **git-local-p4-workflow**。
 - **长程任务**：在修改代码或资产前，宜先查阅 `content/plan.md` 与 `content/knowledge/` 中相关主题，必要时结合 **Git** 历史（见技能 **git-local-p4-workflow**）；细节与命令不在本规则展开。
 - **读/查编辑器内蓝图、行为树、关卡、材质等**：使用 **soft-ue-cli** 与 **SoftUEBridge**（编辑器须已运行且桥可用）。完整流程与命令见技能 **soft-ue-cli-ue-bridge** 与 `content/dev/soft-ue-cli.md`。**不**使用 BlueprintSnapshot 目录或导出 JSON 作为读图权威来源。
 
