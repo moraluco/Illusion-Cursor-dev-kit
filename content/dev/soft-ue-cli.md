@@ -39,6 +39,12 @@ py -3 -m soft_ue_cli query-blueprint /Game/Path/To/BP --include variables,functi
 
 具体参数以 `--help` 为准。
 
+## 与无人值守自动化（CI）的边界
+
+**SoftUEBridge / soft-ue-cli 仅适用于交互式 `UnrealEditor.exe`**：在 `UnrealEditor-Cmd`、Commandlet、`-unattended` 等非交互进程中，桥**不会**启动 HTTP 服务，因此 **CI 不能**用 soft-ue-cli 代替「看日志」。
+
+无人值守时应使用 **`UnrealEditor-Cmd` + 进程退出码 + `Saved/Logs/*.log`（及可选 `-stdout`）**；AngelScript 测试见技能 **angelscript-tdd-agent-iteration**，流水线与日志归档示例见 **[unattended-ue-automation.md](unattended-ue-automation.md)**。
+
 ## 验收
 
 - `check-setup` 全部通过。

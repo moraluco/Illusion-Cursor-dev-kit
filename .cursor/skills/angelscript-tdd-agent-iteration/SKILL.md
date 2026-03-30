@@ -68,3 +68,9 @@ $env:UE_ENGINE_PATH = "D:\UnrealEngine\Engine\Binaries\Win64"
 
 - **write-angelscript** 负责：写代码前的文档查阅、书写约定、保存即验证、输出要求。
 - **本技能** 负责：运行 AngelScript 测试、解析结果、失败时自动迭代修复。写 AS 时若用户要求测试或 TDD，先按 write-angelscript 完成编写，再按本技能运行测试并迭代。
+
+---
+
+## 无人值守 CI 与日志
+
+不依赖打开编辑器：使用 `UnrealEditor-Cmd`、**退出码**与 **`Saved/Logs`**。流水线示例、`Run-UnrealEditorCmd-CollectLog.ps1` 与 GitHub Actions 片段见 **[content/dev/unattended-ue-automation.md](../../content/dev/unattended-ue-automation.md)**。SoftUEBridge 在 Commandlet / `-unattended` 下不启动，**不能**用 soft-ue-cli 代替日志自动化。

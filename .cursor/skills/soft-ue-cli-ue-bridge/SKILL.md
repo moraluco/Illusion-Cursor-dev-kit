@@ -30,8 +30,9 @@ py -3 -m soft_ue_cli check-setup
 
 ## 2. 与无人值守 / TDD 的边界
 
-- **SoftUEBridge** 在 **UnrealEditor-Cmd**、Commandlet、`-unattended` 等**非交互进程**中**不会**启动 HTTP 服务。
-- **AngelScript 测试**（`RunAngelscriptTests.ps1`、Commandlet）按技能 **angelscript-tdd-agent-iteration** 执行，**不**经过本桥。
+- **SoftUEBridge** 在 **UnrealEditor-Cmd**、Commandlet、`-unattended` 等**非交互进程**中**不会**启动 HTTP 服务（见引擎插件中对 `IsRunningCommandlet` / `FApp::IsUnattended()` 的判断）。**不要用 soft-ue-cli 充当 CI 里的「读日志」方案。**
+- **无人值守「看 Log」**：用 **`UnrealEditor-Cmd`** 跑测试或 Commandlets；**以进程退出码为主**；日志在**项目目录**下 **`Saved/Logs/*.log`**（时间戳文件名），可加 **`-stdout`** 把关键输出打到控制台；流水线里**归档日志**、失败时 **tail** 尾部。详见 **[content/dev/unattended-ue-automation.md](../../content/dev/unattended-ue-automation.md)**。
+- **AngelScript 测试**（`RunAngelscriptTests.ps1`、`AngelscriptTest` Commandlet）按技能 **angelscript-tdd-agent-iteration** 执行，**不**经过本桥。
 - 需要**读编辑器内图、关卡内 Actor、PIE 验证**时，必须**交互式编辑器**已运行且桥可用。
 
 ---
