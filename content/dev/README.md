@@ -22,6 +22,7 @@
 | [player-overlay-mode-extension.md](player-overlay-mode-extension.md) | 新增 OverlayMode 的操作步骤、C++ 验证、AS 中调试显示 OverlayMode |
 | [editor-tools/blueprint-export-serializer.md](editor-tools/blueprint-export-serializer.md) | 蓝图导出与 BlueprintSerializer 使用与排错（非 Agent 读图主路径） |
 | [ue-automation-tests.md](ue-automation-tests.md) | UE 自动化测试：Pester Unit/E2E、并发/输出隔离、如何跑与注意事项 |
+| [subagents-workflow-augmentation-runbooks.md](subagents-workflow-augmentation-runbooks.md) | Subagents 旁路增效：入口不变（soft-ue-cli / AS TDD / Retro）的最短 runbook 与统一输出模板 |
 
 ## 编写建议
 

@@ -74,3 +74,9 @@ $env:UE_ENGINE_PATH = "D:\UnrealEngine\Engine\Binaries\Win64"
 ## 无人值守 CI 与日志
 
 不依赖打开编辑器：使用 `UnrealEditor-Cmd`、**退出码**与 **`Saved/Logs`**。流水线示例、`Run-UnrealEditorCmd-CollectLog.ps1` 与 GitHub Actions 片段见 **[content/dev/unattended-ue-automation.md](../../content/dev/unattended-ue-automation.md)**。SoftUEBridge 在 Commandlet / `-unattended` 下不启动，**不能**用 soft-ue-cli 代替日志自动化。
+
+---
+
+## 交叉引用
+
+- 入口不变的 subagents 增效：技能 **subagents-workflow-augmentation**

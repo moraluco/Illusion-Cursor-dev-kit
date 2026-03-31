@@ -92,3 +92,9 @@ description: >-
 | 用户强调**复盘自动化闭环、取证、门禁、Git 原子提交、工作流进化** | **retro-automation-workflow**（可先跑本技能，再让 summarize 补索引话术） |
 
 两者可同时：先本技能结构化复盘，再 **summarize-to-knowledge** 做 README 与收尾。
+
+---
+
+## 交叉引用
+
+- 入口不变的 subagents 增效：技能 **subagents-workflow-augmentation**

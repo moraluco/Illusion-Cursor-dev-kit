@@ -1,0 +1,14 @@
+---
+description: 入口不变的前提下，用 Subagents 做旁路增效（soft-ue-cli / AS 测试 / 复盘）
+alwaysApply: true
+---
+
+# Subagents 旁路增效（指向技能）
+
+当用户强调「入口不变，但想用 subagents 增效」「稳定、可靠、别增加复杂度」或任务涉及：
+
+- soft-ue-cli（在线查询/导出索引/快照取证）
+- AngelScript 测试（TDD、跑测试并修复、按失败用例定位）
+- 复盘沉淀（取证→门禁→提交→写回 Kit）
+
+则按技能 **subagents-workflow-augmentation** 执行：保持主链路入口不变，使用 `shell` + `explore` 作为旁路增强层，产出统一的 6 段结构化报告（Command/Result/EvidencePaths/PrimaryError/Pointers/NextStep），并在桥不可达等情况下按既定口径降级。

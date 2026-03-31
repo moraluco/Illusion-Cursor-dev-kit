@@ -43,6 +43,7 @@ Kit 根 `.cursor/rules/*.mdc` 负责**触发与轻量提醒**；`.cursor/skills/
 | UE 自动化测试 / Bridge / Editor-Cmd | `ue-automation-testing` | `ue-automation-test-harness` | [13-ue-automation-test-playbook.md](13-ue-automation-test-playbook.md) |
 | 蓝图大范围搜索 vs 在线读图 | `blueprint-snapshot-search` | `soft-ue-cli-ue-bridge` | [07-blueprint-query-workflow.md](07-blueprint-query-workflow.md) |
 | 启动 UE、解析编辑器路径 | `ue-editor-path` | `ue-editor-launch` | [../dev/soft-ue-cli.md](../dev/soft-ue-cli.md) |
+| 入口不变的 Subagents 旁路增效 | `subagents-workflow-augmentation` | `subagents-workflow-augmentation` | [../dev/subagents-workflow-augmentation-runbooks.md](../dev/subagents-workflow-augmentation-runbooks.md) |
 | AngelScript 编写、API、保存即生效 | `angelscript-docs-reference`、`angelscript-primary-cpp-fallback` | `write-angelscript`、`angelscript-api-query` | [03-angelscript-ue.md](03-angelscript-ue.md)、[../reference/](../reference/) |
 | 跑 AS 测试并迭代修复 | `angelscript-tdd-agent-iteration` | `angelscript-tdd-agent-iteration` | [13-ue-automation-test-playbook.md](13-ue-automation-test-playbook.md) |
 | Rule/Skill 去重与职责边界 | — | `sync-rules-and-skills` | 本表 |

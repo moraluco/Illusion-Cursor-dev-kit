@@ -83,3 +83,4 @@ py -3 -m soft_ue_cli check-setup
 - 启动 UE：技能 **ue-editor-launch**
 - Git、提交顺序、长程上下文：技能 **git-local-p4-workflow**
 - 经验沉淀：技能 **summarize-to-knowledge**
+- 入口不变的 subagents 增效：技能 **subagents-workflow-augmentation**
