@@ -58,3 +58,39 @@ flowchart LR
 
 - 技能：`retro-automation-workflow`（执行套路）、`summarize-to-knowledge`（写回 content/）
 - Dev：`content/dev/git-automation.md`、`content/dev/pitfall-capture.md`、`content/dev/pitfalls-inbox.md`
+
+---
+
+## 附录：蓝图 `.soft-ue-index` 快照与测试复盘（提要）
+
+本轮（蓝图文本索引 / per-asset / 增量队列 / 深索引 + Pester）可复用的结论：
+
+1. **分层数据源**：快索引（变量/函数/callables）与深图 JSON 分开；默认关图节点以控时延；需要调用点再导出 `graphs/*.graph.json`。
+2. **CLI 输出当「不稳定 API」**：同一命令在不同版本下字段名可能不同（如 `assets` vs `results`）；PowerShell 侧必须 **防御式解析**，避免 `Set-StrictMode` 下访问不存在属性直接失败。
+3. **PS 5.1 硬限制**：`ConvertTo-Json` 深度上限 **100**；深索引写盘前必须钳制 depth，否则脚本级异常。
+4. **测试里 stub 解释器**：不要假设「PATH 里放一个 py.cmd 就能劫持 `py`」；优先 **`Set-Alias py`** 指向 stub。
+5. **跨进程 E2E**：保存队列依赖编辑器内插件；**未重编/未重启** 时队列可能不存在——套件应区分「功能未部署」与「逻辑错误」，避免假阴性阻塞。
+6. **内联 Python 传参**：`run-python-script` 多行内联易碎；**临时文件 + `--script-path`** 更稳。
+7. **统一入口**：`content/dev/scripts/Invoke-UEAutomationTests.ps1`（可选 `-E2E`）；与 [07-blueprint-query-workflow.md](07-blueprint-query-workflow.md)、[13-ue-automation-test-playbook.md](13-ue-automation-test-playbook.md) 交叉引用。
+
+```mermaid
+flowchart TB
+  UE[UnrealEditor + SoftUEBridge]
+  CLI[soft_ue_cli]
+  Fast[Refresh BlueprintTextIndex]
+  Per[Export PerAsset + Rollup]
+  Q[changed_assets.ndjson]
+  Con[Consume ChangeQueue]
+  Deep[Export DeepIndex graphs]
+
+  UE -->|HTTP| CLI
+  CLI --> Fast
+  CLI --> Per
+  CLI --> Deep
+  UE -->|OnObjectSaved hook| Q
+  Q --> Con
+  Con -->|PerAsset refresh| Per
+  Deep --> G[graphs/*.graph.json]
+  Per --> R[rollup + assets/**/summary.*]
+```
+

@@ -32,7 +32,7 @@ param(
     [switch] $Force,
 
     # Include graph nodes (enables comment/title searching; slower)
-    [switch] $IncludeGraphNodes = $true,
+    [switch] $IncludeGraphNodes = $false,
 
     # Also export callable list (recommended)
     [switch] $IncludeCallables = $true,

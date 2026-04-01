@@ -23,9 +23,11 @@
   - 需要**可提交**的“证据/复盘材料”（PR/记录/复现）
 - **代价**：可能滞后于编辑器内最新修改（需要按 freshness/force 刷新）。
 - **入口**：
-  - 简单文本索引：`.soft-ue-index/blueprints.txt|ndjson`
+  - 简单文本索引（全量快、可频繁刷新）：`.soft-ue-index/blueprints.txt|ndjson`（见 `content/dev/scripts/Refresh-BlueprintTextIndex.ps1`）
+  - 结构化文本索引（增量友好）：`.soft-ue-index/assets/**/summary.txt|ndjson` + `.soft-ue-index/blueprints.rollup.txt|ndjson`（见 `content/dev/scripts/Export-BlueprintTextIndex-PerAsset.ps1`）
   - 可提交快照（legacy flat）：`BlueprintSnapshot/blueprints_full.txt|ndjson`
   - 可提交快照（层次化 L1/L2/L3）：`BlueprintSnapshot/assets_index.*` + `BlueprintSnapshot/assets/**`
+  - 离线“函数调用点/引用关系”搜索：必须有 `graphs/*.graph.json`（来自 `BlueprintSnapshot/assets/**/graphs/*.graph.json` 或按需导出的 `.soft-ue-index/assets/**/graphs/*.graph.json`）
 
 ---
 
@@ -34,7 +36,8 @@
 ### 2.1 只要“找位置/候选集合”（不需要精确图结构）
 
 - **优先**：离线索引/快照（Search/Grep）
-  - `.soft-ue-index/blueprints.txt|ndjson`（最快，适合函数/变量名）
+  - `.soft-ue-index/blueprints.rollup.txt`（最快，一把梭搜函数/变量/callables）
+  - `.soft-ue-index/assets/**/summary.txt|ndjson`（需要按资产进一步缩小范围时）
   - `BlueprintSnapshot/blueprints_full.txt|ndjson`（更“可提交”，适合跨资产排查）
 - **如果离线没有**：再用 soft-ue-cli 在线 `query-asset` / `query-blueprint` 扩大范围
 
@@ -60,12 +63,22 @@
 ## 3. 常见任务 → 推荐入口
 
 - **全局搜某个蓝图函数/变量名**：先离线 `.soft-ue-index` / `blueprints_full.*`；必要时再在线确认
+- **全局搜“某函数在哪里被调用 / 某对象被引用”**：
+  - **在线最准**：soft-ue-cli `find-references`
+  - **离线可 grep**：确保有 `graphs/*.graph.json`，再在图 JSON 里搜 `K2Node_CallFunction` / 软对象路径（注意离线文本匹配可能漏掉非字符串化的引用）
 - **确认某个函数里到底怎么连线、默认值是什么**：在线 `query-blueprint-graph`；或离线读 `assets/**/graphs/*.graph.json`
 - **BT/StateTree 结构离线复盘**：优先 `Export-AssetSnapshot.ps1` 的 L2/L3 产物；在线确认以 soft-ue-cli 为准
 
 ---
 
-## 4. 交叉引用
+## 4. 自动化验证（Kit）
+
+- **入口**：`content/dev/scripts/Invoke-UEAutomationTests.ps1`（仅 Unit）或 **`-E2E`**（复用已打开的编辑器 + Bridge，跑快照刷新 / per-asset / 深索引等；全量刷新可能较慢）。
+- **易错点**：Pester 版本、`py` 解析顺序、`ConvertTo-Json` 深度、CLI JSON 字段差异、保存队列依赖插件构建——见 [05-gotchas.md](05-gotchas.md)、[13-ue-automation-test-playbook.md](13-ue-automation-test-playbook.md) §5.1、[15-retro-automation-workflow.md](15-retro-automation-workflow.md) 附录。
+
+---
+
+## 5. 交叉引用
 
 - 技能：`soft-ue-cli-ue-bridge`
 - 文档：`content/dev/soft-ue-cli.md`

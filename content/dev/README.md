@@ -23,6 +23,10 @@
 | [editor-tools/blueprint-export-serializer.md](editor-tools/blueprint-export-serializer.md) | 蓝图导出与 BlueprintSerializer 使用与排错（非 Agent 读图主路径） |
 | [ue-automation-tests.md](ue-automation-tests.md) | UE 自动化测试：Pester Unit/E2E、并发/输出隔离、如何跑与注意事项 |
 | [subagents-workflow-augmentation-runbooks.md](subagents-workflow-augmentation-runbooks.md) | Subagents 旁路增效：入口不变（soft-ue-cli / AS TDD / Retro）的最短 runbook 与统一输出模板 |
+| [scripts/Refresh-BlueprintTextIndex.ps1](scripts/Refresh-BlueprintTextIndex.ps1) | 全量“快路径”刷新 `.soft-ue-index/blueprints.*`（函数/变量/callables），默认不导节点标题/注释 |
+| [scripts/Export-BlueprintTextIndex-PerAsset.ps1](scripts/Export-BlueprintTextIndex-PerAsset.ps1) | 结构化索引：每资产 `summary.*` + 全局 `blueprints.rollup.*`（增量友好） |
+| [scripts/Consume-BlueprintChangeQueue.ps1](scripts/Consume-BlueprintChangeQueue.ps1) | 消费 `.soft-ue-index/changed_assets.ndjson`，只刷新变更蓝图（配合保存事件） |
+| [scripts/Export-BlueprintDeepIndex.ps1](scripts/Export-BlueprintDeepIndex.ps1) | 按需导出单资产 `graphs/*.graph.json`（pins/连线/defaults，可离线 grep） |
 
 ## 编写建议
 

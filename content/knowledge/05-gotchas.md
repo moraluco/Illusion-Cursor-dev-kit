@@ -36,6 +36,12 @@
 | 蓝图节点显示 `GetSlotLocalWeight`，AS 报 `UAnimInstance::GetSlotLocalWeight` 无匹配 | UE 蓝图 DisplayName 与 C++/AS **暴露名**不一致（例：实际为 `Blueprint_GetSlotMontageLocalWeight`） | 以编译器报错为准；查 `content/reference/AS_API` 或引擎头 `AnimInstance.h`；勿凭蓝图显示名猜方法名 |
 | `soft-ue-cli query-blueprint-graph` 终端输出被截断 | 图 JSON 体积大，滚屏丢节点 | **落地到文件**（`%TEMP%` 或仓库外路径），再 Read；见 [07-blueprint-query-workflow.md](07-blueprint-query-workflow.md) |
 | `.soft-ue-index/`、`Script/Binds.Cache*` 被 `git status` 列出 | 本地生成物未忽略或误 `git add` | 确认 `.gitignore`；勿提交生成缓存；复盘时记入 gotchas |
+| `Invoke-Pester -CI` 等参数报错 | 本机为 **Pester 3.x**，与 Pester 5 参数不兼容 | 使用 `content/dev/scripts/Invoke-UEAutomationTests.ps1` 的调用方式；或升级到 Pester 5+ 再统一参数 |
+| `ConvertTo-Json -Depth` 报「序列化深度最大为 100」 | **Windows PowerShell 5.1** 将深度硬限制为 100 | 导出前将 depth **钳制到 ≤100**（蓝图图 JSON 仍可能截断深层嵌套，需知悉）；见 `Export-BlueprintDeepIndex.ps1` |
+| Pester Unit 里把 `py.cmd` 放进 `PATH` 仍调用到真 `py` | Windows 常优先解析 **Python Launcher 的 `py.exe`**，不一定用 PATH 里靠前的 `py.cmd` | 在测试块内 `Set-Alias py <stub.cmd>` 并 finally 恢复；或让 stub 文件名不与 launcher 冲突且脚本显式调用 |
+| `soft-ue-cli run-python-script --script "多行..."` 报 unrecognized arguments | 多行/引号经 shell 传参后 **argparse 收到碎参数** | 将脚本写入临时 `.py`，使用 `--script-path` |
+| `Export-BlueprintTextIndex-PerAsset` 等脚本报「找不到属性 functions/results」 | `ConvertFrom-Json` 得到的对象**无该属性**，在 `Set-StrictMode` 下点属性即抛错 | 读字段前用 `Has-Prop`/`-contains` 判断；缺省当空列表；列表归一化兼容 `assets` / `results` / 根数组 |
+| E2E 期望保存后必有 `.soft-ue-index/changed_assets.ndjson` 失败 | 运行的编辑器**未加载**含保存队列钩子的插件构建；或 save 未触发 `OnObjectSaved`（资产未脏、路径不对） | 插件改动后需 **重编并重启** UE；save 前先 dirty 再 `save_loaded_asset`；套件可对「无队列」做 **skip/早退** 以免误杀整条 E2E（见 `E2E-Snapshot-System.Tests.ps1`） |
 
 
 ---

@@ -73,6 +73,17 @@ py -3 -m soft_ue_cli check-setup
 > - **在线权威**：soft-ue-cli 查询的是“编辑器内 `.uasset` 的实时状态”，用于最终确认与精确结构（图、pins、默认值、引用等）。  
 > - **离线快照**：`BlueprintSnapshot/`、`.soft-ue-index/` 等文本产物用于 **Search/Grep、离线复盘、可提交证据**；但可能滞后于编辑器内最新修改，因此不能替代在线权威。
 
+### 5.1 离线“可 Grep”的蓝图文本快照（推荐）
+
+当目标是“像搜代码一样”全局搜蓝图里的**函数/变量/callables**，优先用 `.soft-ue-index/`（本地缓存，快、可频繁刷新）：
+
+- 全量快速刷新（默认不导节点标题/注释）：`content/dev/scripts/Refresh-BlueprintTextIndex.ps1`
+- 结构化（每资产一份）+ 全局汇总：`content/dev/scripts/Export-BlueprintTextIndex-PerAsset.ps1` → `.soft-ue-index/assets/**/summary.*` + `.soft-ue-index/blueprints.rollup.*`
+- 增量刷新（保存蓝图后秒级更新）：UE 会把变更写到 `.soft-ue-index/changed_assets.ndjson`，然后运行 `content/dev/scripts/Consume-BlueprintChangeQueue.ps1` 消费队列并只刷新变更资产
+- 需要离线看图（pins/links/defaults）时：用 `content/dev/scripts/Export-BlueprintDeepIndex.ps1` 对**单资产**按需导出 `graphs/*.graph.json`
+
+提示：离线快照用于“找位置/候选集/留证”；涉及最新事实与精确结构时以在线 soft-ue-cli 为准（见 `content/knowledge/07-blueprint-query-workflow.md`）。
+
 提示：本项目“启动 UE 并确保能找到 UnrealEditor.exe”的权威入口为技能 **ue-editor-launch**（含路径优先级与桥可达性检查）。
 
 ---

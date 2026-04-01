@@ -95,7 +95,16 @@
 - 解析列表时做归一化（`items/assets/results` 兼容）
 - 把 502/timeout/503 视为 transient，按指数退避重试
 
-对应实现参考：`content/dev/scripts/Export-BlueprintTextIndex.ps1`。
+对应实现参考：`content/dev/scripts/Export-BlueprintTextIndex.ps1`、`Export-BlueprintTextIndex-PerAsset.ps1`、`Export-BlueprintDeepIndex.ps1`。
+
+---
+
+## 5.1) Kit 侧：蓝图文本索引 / 深索引的 E2E 与 Unit 分层
+
+- **Unit（不启 UE）**：用 **stub `py`**（`Set-Alias` 指向 `.cmd` 假实现）模拟 `soft_ue_cli` 的 JSON  stdout，验证落盘路径、rollup 与 per-asset 一致性、无残留 `*.partial`。
+- **E2E（复用 Editor + Bridge）**：`Invoke-UEAutomationTests.ps1 -E2E` 会跑 `Refresh-BlueprintTextIndex`、`Export-BlueprintTextIndex-PerAsset`、`Export-BlueprintDeepIndex` 等；全量刷新可能 **极慢**（资产数量 × HTTP），适合夜间或按需执行。
+- **保存队列**：`changed_assets.ndjson` 依赖 **项目内 SoftUEBridgeEditor 已编译并加载**；未部署该钩子时，应对「队列文件不存在」做 **非致命** 处理，避免整条套件红灯。
+- **证据**：成功/失败都保留 stdout 与 `.soft-ue-index/` 下关键文件路径，便于与 `05-gotchas.md` 对照。
 
 ---
 

@@ -7,8 +7,14 @@ alwaysApply: true
 
 **大范围**搜蓝图（全局找函数/变量/注释/节点、「谁在用 X」）时：
 
-1. 运行 `content/dev/scripts/Ensure-BlueprintSnapshot.ps1` 保证快照存在且尽量新鲜。
-2. 先搜 `BlueprintSnapshot/blueprints_full.txt` 与 `.ndjson`。
-3. 仍不足或要**精确图结构/最新事实**时，再用 soft-ue-cli 在线查询或搜源码。
+1. 先用 **本地快速索引**确保“可 Grep 的名字集”是新的：`content/dev/scripts/Refresh-BlueprintTextIndex.ps1`（写入 `.soft-ue-index/`，默认不导节点标题/注释）。
+2. 需要“全项目 grep 一把梭”时优先搜：
+   - `.soft-ue-index/blueprints.rollup.txt`（函数/变量/callables 汇总）
+   - 或按资产查：`.soft-ue-index/assets/**/summary.txt|ndjson`
+3. 需要“可提交证据 / 全量离线复盘”时，再刷新/使用 `BlueprintSnapshot/`：
+   - `content/dev/scripts/Ensure-BlueprintSnapshot.ps1`（legacy flat：`blueprints_full.*`）
+   - `content/dev/scripts/Export-AssetSnapshot.ps1`（层次化：`assets_index.*` + `assets/**` + `graphs/*.graph.json`）
+4. 要查“函数调用点 / 引用关系（离线）”：必须有 `graphs/*.graph.json`（来自 `BlueprintSnapshot/` 层次化快照或 `content/dev/scripts/Export-BlueprintDeepIndex.ps1` 的按需导出），再用 Search/Grep 在图 JSON 里找 `K2Node_CallFunction` / 软对象路径等关键字段。
+5. 仍不足或要**精确图结构/最新事实**时，再用 soft-ue-cli 在线查询（例如 `query-blueprint-graph` / `find-references`）或搜源码。
 
 在线 vs 离线决策树、取证落地文件：`content/knowledge/07-blueprint-query-workflow.md`。桥不可用时明确说明仅离线+源码。

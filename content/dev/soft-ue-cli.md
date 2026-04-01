@@ -109,6 +109,43 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "<KIT>\\content\\dev\\script
 
 提示：为了让 Cursor 能搜到索引文件，不要把 `.soft-ue-index/` 放进 `.cursorignore`；是否提交到 Git 由项目约定决定（通常建议本地缓存，不进库）。
 
+### 方式 B2：结构化索引（每资产一份）+ 全局 rollup（推荐）
+
+当你希望“全局可搜”同时又要**增量更新**（而不是每次重建一个巨型文件）时，使用 per-asset 布局：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "<KIT>\\content\\dev\\scripts\\Export-BlueprintTextIndex-PerAsset.ps1"
+```
+
+产物：
+
+- `.soft-ue-index/assets/**/summary.txt|ndjson`：每个蓝图一份摘要（函数/变量/callables）
+- `.soft-ue-index/blueprints.rollup.txt|ndjson`：全局汇总（适合 Ctrl+Shift+F 一把梭）
+
+### 方式 B3：保存蓝图后秒级增量更新（队列消费）
+
+编辑器侧会把“已保存的蓝图资产路径”追加写入：
+
+- `.soft-ue-index/changed_assets.ndjson`
+
+然后在需要查询前（或你提示 agent “先刷新快照”时）运行消费脚本：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "<KIT>\\content\\dev\\scripts\\Consume-BlueprintChangeQueue.ps1"
+```
+
+它会去重队列，并只刷新变更资产的 per-asset 索引与 rollup。
+
+### 方式 D：按需导出单个蓝图的图 JSON（pins/连线/defaults + 可离线 grep）
+
+当你要找“函数调用点 / 引用关系 / 精确连线细节”，用按需深索引（只导单资产，避免全量慢）： 
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "<KIT>\\content\\dev\\scripts\\Export-BlueprintDeepIndex.ps1" -AssetPath "/Game/Path/To/ABP_Foo.ABP_Foo"
+```
+
+可选加 `-IncludeNodeTitles` 生成 `*.nodes.txt`，便于搜注释框/节点标题。
+
 ### 方式 C：生成“可提交”的层次化资产快照（推荐：离线可读、可复盘）
 
 当你希望把蓝图/动画蓝图的**完整图细节**（节点、pins、连线、默认值）以及 AI/StateTree 等结构**落盘并提交到项目仓库**时，使用层次化快照脚本：
