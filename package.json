@@ -1,0 +1,12 @@
+{
+  "name": "illusion-cursor-dev-kit",
+  "private": true,
+  "description": "UE 研发知识库 Kit（OpenSpec CLI 通过 devDependency 锁定版本）",
+  "scripts": {
+    "openspec": "openspec",
+    "openspec:validate": "openspec validate --all"
+  },
+  "devDependencies": {
+    "@fission-ai/openspec": "^1.2.0"
+  }
+}

@@ -30,3 +30,6 @@ content/reference/Docs-UE-Angelscript/api/
 
 # --- 编辑器本地配置 ---
 .vscode/
+
+# --- npm（Kit 根 OpenSpec CLI）---
+node_modules/
