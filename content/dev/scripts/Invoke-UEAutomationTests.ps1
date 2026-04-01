@@ -16,7 +16,8 @@
 param(
     [switch] $E2E,
     [string] $TestsPath,
-    [int] $PassThruExitCode = 1
+    [int] $PassThruExitCode = 1,
+    [string] $OutDir
 )
 
 $ErrorActionPreference = 'Stop'
@@ -31,19 +32,62 @@ if (-not (Test-Path -LiteralPath $TestsPath)) {
 
 Import-Module Pester -ErrorAction Stop | Out-Null
 
-$pesterParams = @{
-    Script = $TestsPath
+if ($OutDir) {
+    New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 }
 
-if ($E2E) {
-    Write-Host "Pester: running Unit + E2E"
+$useConfig = $false
+try {
+    if (Get-Command New-PesterConfiguration -ErrorAction SilentlyContinue) {
+        $useConfig = $true
+    }
+}
+catch { }
+
+if ($useConfig) {
+    $config = New-PesterConfiguration
+    $config.Run.Path = $TestsPath
+
+    if ($E2E) {
+        Write-Host "Pester: running Unit + E2E"
+    }
+    else {
+        Write-Host "Pester: running Unit only (excluding -Tag E2E)"
+        $config.Filter.ExcludeTag = @('E2E')
+    }
+
+    if ($OutDir) {
+        $config.TestResult.Enabled = $true
+        $config.TestResult.OutputFormat = 'NUnitXml'
+        $config.TestResult.OutputPath = (Join-Path $OutDir 'pester.nunit.xml')
+        Write-Host "Pester: writing NUnitXml -> $($config.TestResult.OutputPath)"
+    }
+
+    $result = Invoke-Pester -Configuration $config -PassThru
 }
 else {
-    Write-Host "Pester: running Unit only (excluding -Tag E2E)"
-    $pesterParams.ExcludeTag = @('E2E')
-}
+    # Back-compat fallback for older Pester.
+    $pesterParams = @{
+        Script = $TestsPath
+    }
 
-$result = Invoke-Pester @pesterParams -PassThru
+    if ($E2E) {
+        Write-Host "Pester: running Unit + E2E"
+    }
+    else {
+        Write-Host "Pester: running Unit only (excluding -Tag E2E)"
+        $pesterParams.ExcludeTag = @('E2E')
+    }
+
+    if ($OutDir) {
+        $outFile = Join-Path $OutDir 'pester.nunit.xml'
+        Write-Host "Pester: writing NUnitXml -> $outFile"
+        $result = Invoke-Pester @pesterParams -PassThru -OutputFormat NUnitXml -OutputFile $outFile
+    }
+    else {
+        $result = Invoke-Pester @pesterParams -PassThru
+    }
+}
 
 if ($result.FailedCount -gt 0) {
     Write-Host ("Pester failed: {0} failed" -f $result.FailedCount)
