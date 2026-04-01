@@ -28,6 +28,9 @@
 在 Kit 的 `content/dev/scripts/` 目录执行：
 
 ```powershell
+# 推荐：统一入口（能不进 UE 就不进 UE）
+powershell -NoProfile -ExecutionPolicy Bypass -File .\Run-LocalTests.ps1
+
 # Unit only（默认：不启动 UE）
 powershell -NoProfile -ExecutionPolicy Bypass -File .\Invoke-UEAutomationTests.ps1
 

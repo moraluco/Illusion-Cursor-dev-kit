@@ -9,6 +9,18 @@
 
 把所有“进 UE 自动化”分成两条主线，先选对路，后面步骤才稳定。
 
+### 0. 能不进 UE 就不进 UE（本机默认）
+
+很多验证与门禁并不需要 UE（例如脚本落盘逻辑、原子写入、纯 C++ 工具库）。本机开发优先走统一入口：
+
+- `content/dev/scripts/Run-LocalTests.ps1`（L0/L1/L2/L3 分层）
+  - L0：Lint/静态检查（best-effort，工具缺失可跳过）
+  - L1：Pester Unit（默认不启动 UE）
+  - L2：纯 C++ Unit（CMake + doctest，不进 UE）
+  - L3：可选 E2E（需要 UE 时才启用）
+
+只有 L3 才进入下述 “进 UE” 两条主线。
+
 ### A. 交互式 Editor + Bridge（soft-ue-cli / SoftUEBridge）
 
 - **适用**：读编辑器内资产/关卡/Actor、截图、PIE、在线查询 Blueprint 图等。

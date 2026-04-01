@@ -40,7 +40,7 @@ Kit 根 `.cursor/rules/*.mdc` 负责**触发与轻量提醒**；`.cursor/skills/
 |------|----------------|----------|----------------|
 | Git 双仓、中文提交、原子化 | `git-local-repos-and-p4` | `git-local-p4-workflow` | [14-git-atomic-commits-tdd.md](14-git-atomic-commits-tdd.md)、[../dev/git-automation.md](../dev/git-automation.md) |
 | Kit 方法论、总结经验写回 | `ue-dev-kit` | `summarize-to-knowledge`、`retro-automation-workflow` | [METHODOLOGY.md](../../METHODOLOGY.md)、[15-retro-automation-workflow.md](15-retro-automation-workflow.md) |
-| UE 自动化测试 / Bridge / Editor-Cmd | `ue-automation-testing` | `ue-automation-test-harness` | [13-ue-automation-test-playbook.md](13-ue-automation-test-playbook.md) |
+| UE 自动化测试 / Bridge / Editor-Cmd / 本机 no-UE-first | `ue-automation-testing` | `ue-automation-test-harness` | [13-ue-automation-test-playbook.md](13-ue-automation-test-playbook.md)、[../dev/no-ue-first-tests.md](../dev/no-ue-first-tests.md)、[../dev/cpp-tests.md](../dev/cpp-tests.md) |
 | 蓝图大范围搜索 vs 在线读图 | `blueprint-snapshot-search` | `soft-ue-cli-ue-bridge` | [07-blueprint-query-workflow.md](07-blueprint-query-workflow.md) |
 | 启动 UE、解析编辑器路径 | `ue-editor-path` | `ue-editor-launch` | [../dev/soft-ue-cli.md](../dev/soft-ue-cli.md) |
 | 入口不变的 Subagents 旁路增效 | `subagents-workflow-augmentation` | `subagents-workflow-augmentation` | [../dev/subagents-workflow-augmentation-runbooks.md](../dev/subagents-workflow-augmentation-runbooks.md) |

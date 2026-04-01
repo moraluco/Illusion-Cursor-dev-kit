@@ -8,5 +8,6 @@ alwaysApply: true
 当用户要「进 UE 自动化测试」「并发跑 UE」「soft-ue-cli / Bridge」「Editor-Cmd / CI」时：
 
 - **主流程**：技能 **ue-automation-test-harness**（先选 Editor+Bridge vs Editor-Cmd，再谈脚本/并发/证据）。
+- **能不进 UE 就不进 UE**：本机优先用 `content/dev/scripts/Run-LocalTests.ps1`（Lint/Pester Unit/纯 C++），只有需要资产/编辑器能力时才走 UE E2E。
 - **复盘与门禁口径**：`content/knowledge/13-ue-automation-test-playbook.md`、`content/knowledge/15-retro-automation-workflow.md`。
 - **硬约定（摘要）**：统一用 `content/dev/scripts/Start-UnrealEditor.ps1` 管理 UE 启动；并发隔离 **OutDir**；PowerShell 避免用 `$pid` 作变量名。细节以 harness 技能为准。
