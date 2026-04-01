@@ -47,6 +47,7 @@ Kit 根 `.cursor/rules/*.mdc` 负责**触发与轻量提醒**；`.cursor/skills/
 | AngelScript 编写、API、保存即生效 | `angelscript-docs-reference`、`angelscript-primary-cpp-fallback` | `write-angelscript`、`angelscript-api-query` | [03-angelscript-ue.md](03-angelscript-ue.md)、[../reference/](../reference/) |
 | 跑 AS 测试并迭代修复 | `angelscript-tdd-agent-iteration` | `angelscript-tdd-agent-iteration` | [13-ue-automation-test-playbook.md](13-ue-automation-test-playbook.md) |
 | Rule/Skill 去重与职责边界 | — | `sync-rules-and-skills` | 本表 |
+| OpenSpec 规格驱动（Kit 内变更，游戏仓干净） | — | `openspec-propose` 等 `.cursor/skills/openspec-*` | [../dev/openspec-manteum-tower.md](../dev/openspec-manteum-tower.md) |
 
 ---
 

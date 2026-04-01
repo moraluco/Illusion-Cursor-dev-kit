@@ -27,6 +27,7 @@
 | [scripts/Export-BlueprintTextIndex-PerAsset.ps1](scripts/Export-BlueprintTextIndex-PerAsset.ps1) | 结构化索引：每资产 `summary.*` + 全局 `blueprints.rollup.*`（增量友好） |
 | [scripts/Consume-BlueprintChangeQueue.ps1](scripts/Consume-BlueprintChangeQueue.ps1) | 消费 `.soft-ue-index/changed_assets.ndjson`，只刷新变更蓝图（配合保存事件） |
 | [scripts/Export-BlueprintDeepIndex.ps1](scripts/Export-BlueprintDeepIndex.ps1) | 按需导出单资产 `graphs/*.graph.json`（pins/连线/defaults，可离线 grep） |
+| [openspec-manteum-tower.md](openspec-manteum-tower.md) | **OpenSpec**：规格在 Kit、`openspec/` 与 `/opsx:*`；ManteumTower 保持无 OpenSpec 工件；与 TDD/Skills 衔接及 A–D 回归命令 |
 
 ## 编写建议
 
