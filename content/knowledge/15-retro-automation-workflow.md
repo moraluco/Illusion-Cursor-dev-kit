@@ -53,6 +53,8 @@ flowchart LR
 - [ ] **操作步骤**写入 `content/dev/`（如 `git-automation.md`）
 - [ ] **规则/技能**更新后自检：触发语不重复、与 METHODOLOGY 边界一致
 - [ ] 更新 `content/knowledge/README.md`（若新增/重命名本类文档）
+- [ ] **写资产必保存（硬门禁）**：凡通过 soft-ue-cli / UE Python 对 `.uasset` 做了写操作（reparent、删变量、改图/连线、改 defaults 等），必须在同一段操作里 Save，并在关键里程碑重复 Save（至少 reparent 后、compile 通过后各保存一次）。默认 UE 随时可能闪退，未保存改动视为不存在。
+- [ ] **桥不可达时也要能复盘**：输出必须包含桥状态、已尝试恢复步骤（含 502 代理绕过）、以及离线证据路径与 freshness（生成时间/命令或 unknown）。
 
 ## 交叉引用
 
@@ -72,6 +74,8 @@ flowchart LR
 5. **跨进程 E2E**：保存队列依赖编辑器内插件；**未重编/未重启** 时队列可能不存在——套件应区分「功能未部署」与「逻辑错误」，避免假阴性阻塞。
 6. **内联 Python 传参**：`run-python-script` 多行内联易碎；**临时文件 + `--script-path`** 更稳。
 7. **统一入口**：`content/dev/scripts/Invoke-UEAutomationTests.ps1`（可选 `-E2E`）；与 [07-blueprint-query-workflow.md](07-blueprint-query-workflow.md)、[13-ue-automation-test-playbook.md](13-ue-automation-test-playbook.md) 交叉引用。
+
+8. **ThreadSafe 的边界（AS vs 蓝图）**：蓝图里某些节点看似“线程安全可用”，在 AngelScript 绑定/调用路径中可能触发跨线程/锁等待（本轮命中：`GetCurveValue()` 导致 ThreadSafe Call Parent 卡死）。复盘时应把这类“ThreadSafe 禁区 API + 迁移模板（曲线采样挪到 GameThread）”沉淀到 `05-gotchas.md`，避免重复踩坑。
 
 ```mermaid
 flowchart TB

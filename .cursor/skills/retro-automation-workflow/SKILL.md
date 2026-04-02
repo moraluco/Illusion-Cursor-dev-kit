@@ -59,6 +59,41 @@ description: >-
 - Rule：短触发 + 指向 Skill/文档
 - Skill：可执行步骤 + 交叉引用，避免与现有技能重复（必要时改 **sync-rules-and-skills**）
 
+### 2.1) 分步策略复盘（决策点 → 绕路 → 新能力）
+
+当用户强调“仔细看每一步 Agent 的策略、有没有走弯路、下次规避、有没有涌现新能力要沉淀”时，用本段作为固定分析法，避免只做口头总结。
+
+#### A. 按时间线切分「决策点」
+
+把对话/执行过程切成一串 **DecisionPoint**，每个点至少包含：
+
+- **Trigger**：触发条件（用户新指令 / 新报错 / Bridge 502 / UE 卡死 / 编译失败…）
+- **Hypothesis**：当时的主要假设（例如“是工具限制/是线程安全/是缓存/是未保存”）
+- **ActionTaken**：采取了什么动作（命令/脚本/改图/回滚/保存）
+- **Evidence**：证据（stdout/日志关键字/产物路径/退出码/截图）
+- **Result**：结果（通过/失败/部分通过/转向）
+
+#### B. 给每个决策点打 3 个标签（必须）
+
+- **Detour**：是否绕路（是/否）。若是，写“更短路径是什么、当时缺的 guardrail 是什么”。  
+- **Boundary**：是否触及能力边界（例如：桥不可达、CLI JSON 传参易碎、无法稳定删除蓝图 member 变量/函数、ThreadSafe 禁区 API）。  
+- **Emergent**：是否出现可复用的新能力（是/否）。若是，写“以后遇到同类问题可直接复用的模板/规则”。
+
+#### C. 把“绕路”转成 guardrail（写回位置必须明确）
+
+每条绕路至少落到一个写回位置：
+
+- **gotcha**：`content/knowledge/05-gotchas.md`（现象→根因→解决→预防→验证）
+- **dev**：`content/dev/*.md`（可复制命令块、稳写法、反例）
+- **rule/skill**：当它是“触发语/边界提醒/入口选择”时，写成 rule/skill（Rule 只做触发与指向；Skill 承载可执行步骤）
+
+#### D. 典型“涌现能力”清单（本项目常见）
+
+- **对照开关归因**：断开/接回某节点或某步骤（例如 ThreadSafe Call Parent）来定位“卡死/错误”归因。
+- **by-ref 断线诊断**：by-ref pin 断线退化为常量导致编译失败；对照旧资产把 pin 接回 inherited 变量。
+- **ThreadSafe 迁移模板**：ThreadSafe 只做“读 Cache_ + 纯算术/赋值”；曲线采样/可能触发 UObject 访问的 API 挪到 GameThread（`BlueprintUpdateAnimation`）。
+- **写资产 Save 门禁**：任何写 `.uasset` 的步骤后立刻 Save；按里程碑重复 Save；失败回滚并 Save（默认 UE 随时闪退）。
+
 ### 3) 工作流升级动作（最小集）
 
 - 更新 `05-gotchas.md`（新增行）

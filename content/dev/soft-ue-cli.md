@@ -23,6 +23,19 @@ cd D:\Workspace\MT\Engine\ManteumTower
 py -3 -m soft_ue_cli check-setup
 ```
 
+### Windows：502 的快速绕过（系统代理）
+
+当你确认 **UE 已打开**、SoftUEBridge 插件也在跑，但 `check-setup` / `run-python-script` 仍报 **502 Bad Gateway**，优先怀疑是 **系统/全局代理**把 `127.0.0.1` 的请求转发了（`soft-ue-cli` 使用 httpx，默认信任系统代理）。
+
+可先临时绕过再重试：
+
+```powershell
+$env:NO_PROXY = "127.0.0.1,localhost"
+py -3 -m soft_ue_cli check-setup
+```
+
+若生效：把 `127.0.0.1`/`localhost` 加到代理工具绕过列表，再按技能 `soft-ue-cli-ue-bridge` §1.1 排查。
+
 ## Agent：蓝图事实与桥不可达
 
 - **向用户断言「当前编辑器内」**蓝图父类、图结构、节点/连线、默认值等，**仅**以 `check-setup` **成功**后的 `query-blueprint` / `query-blueprint-graph` 等为准（技能 **soft-ue-cli-ue-bridge**）。
@@ -151,6 +164,44 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "<KIT>\\content\\dev\\script
 ```
 
 可选加 `-IncludeNodeTitles` 生成 `*.nodes.txt`，便于搜注释框/节点标题。
+
+## PowerShell：给 soft-ue-cli 传“复杂参数”的稳写法（避免引号/JSON 踩坑）
+
+### 1) `run-python-script`：多行脚本不要内联
+
+多行/引号经 shell 传参很容易碎成多个 argv，推荐写入临时文件再用 `--script-path`：
+
+```powershell
+$tmp = Join-Path $env:TEMP "ue_tmp_script.py"
+@'
+import unreal
+# ... your script ...
+'@ | Set-Content -LiteralPath $tmp -Encoding utf8
+
+py -3 -m soft_ue_cli run-python-script --script-path $tmp
+Remove-Item -LiteralPath $tmp -Force
+```
+
+> 注意：PowerShell 5.1 的 `Set-Content -Encoding utf8` 可能带 BOM；若脚本对 BOM 敏感，改用 `[System.IO.File]::WriteAllText()` + `UTF8Encoding($false)`（参考 `content/dev/git-automation.md` 的写法）。
+
+### 2) 需要 JSON 的参数（例如 `--properties`）：用变量承载成“单一 argv”
+
+当某子命令需要 `--properties <json>` 一类参数时：
+
+- 把 JSON 放进 here-string 变量，确保它作为**一个参数**传入
+
+示例（变量承载）：
+
+```powershell
+$props = @'
+{"b": 1, "note": "json lives in one argv"}
+'@
+
+# 伪示例：把 $props 作为单一参数传入
+py -3 -m soft_ue_cli some-command --properties $props
+```
+
+失败排错时，务必把以下 3 件事一起记录到 `content/dev/pitfalls-inbox.md`：原命令、PowerShell 实际传入的 `$props` 文本、以及 soft-ue-cli 的完整报错。
 
 ### 方式 C：生成“可提交”的层次化资产快照（推荐：离线可读、可复盘）
 
