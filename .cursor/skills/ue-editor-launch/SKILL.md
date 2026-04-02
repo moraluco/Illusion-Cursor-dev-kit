@@ -9,6 +9,7 @@ description: Locate and start UnrealEditor.exe reliably for this project (env ov
 
 - **永远能找到并启动**交互式 `UnrealEditor.exe`。
 - 在执行任何 `soft-ue-cli` 读图/关卡/PIE 操作前，先把 **SoftUEBridge** 恢复为可达状态。
+- **Agent 行为**：当 `py -3 -m soft_ue_cli check-setup` **失败**（含 502）且用户需要**蓝图事实**时，**必须**先走本技能恢复连接（或启动新实例），**再**重试 `check-setup`；**不要**改用对 `.uasset` 扫字符串等未验证方法作为结论依据（见技能 **soft-ue-cli-ue-bridge** §5）。
 
 ## 1) 定位 UnrealEditor.exe（优先级）
 
@@ -26,7 +27,9 @@ description: Locate and start UnrealEditor.exe reliably for this project (env ov
 
 - `D:\Workspace\MT\Engine\ManteumTower\ManteumTower.uproject`
 
-使用 `Start-Process` 启动：
+**优先（推荐）**：在 Kit 仓库中执行 **`content/dev/scripts/Start-UnrealEditor.ps1`**（同工程复用、避免多开、内存门禁，见 `content/dev/soft-ue-cli.md` §自动化）— 将 `ManteumTower.uproject` 传给脚本（按该脚本参数说明）。
+
+**备选**：直接 `Start-Process`：
 
 - `Start-Process -FilePath $UnrealEditorExe -ArgumentList @($UProjectPath)`
 

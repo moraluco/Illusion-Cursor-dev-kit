@@ -2,6 +2,12 @@
 
 本文件用于统一“查询蓝图/行为树/StateTree”的入口选择，避免在 **soft-ue-cli（在线）** 与 **BlueprintSnapshot（离线）** 之间口径冲突。
 
+## 0. Agent 取证原则（事实 vs 搜索）
+
+- **事实**：凡向用户陈述「某蓝图当前父类、变量、节点、连线、pins、默认值、引用」等**编辑器内状态**，**必须**来自 **`py -3 -m soft_ue_cli check-setup` 成功**之后的 `query-blueprint` / `query-blueprint-graph` / `find-references` 等。**禁止**用对 `.uasset` 的二进制/ASCII 启发式扫描、未解析 UObject 的猜测作为唯一依据。
+- **桥不可达**：**先**恢复交互式 UE 与 **SoftUEBridge**（技能 **ue-editor-launch**、Kit **`content/dev/scripts/Start-UnrealEditor.ps1`**，见 `content/dev/soft-ue-cli.md`），再重试 `check-setup`；**不要**在未经恢复桥的情况下把离线快照当作“已确认的最新事实”。
+- **离线索引/快照**：用于**全项目搜索、候选定位、复盘、PR 旁证**；可能滞后，**不能**单独作为对“当前编辑器里到底是什么”的终裁。
+
 ---
 
 ## 1. 两类数据源（各自的“擅长场景”）
@@ -43,8 +49,8 @@
 
 ### 2.2 需要“精确图细节”（pins/连线/default_value）
 
-- **优先**：soft-ue-cli 在线 `query-blueprint-graph`
-- **若 UE 不可用但已有层次化快照**：从 `BlueprintSnapshot/assets/<asset>/graphs/*.graph.json` 离线读取（注意可能不是最新）
+- **优先**：soft-ue-cli 在线 `query-blueprint-graph`（桥须先可用；不可用则先恢复 UE + Bridge，见 §0）。
+- **若暂时无法恢复桥且已有层次化快照**：可从 `BlueprintSnapshot/assets/<asset>/graphs/*.graph.json` 离线读取（**必须标注**可能不是最新，且**不是**首选事实源）。
 
 ### 2.2.1 取证输出必须落地（避免终端截断）
 

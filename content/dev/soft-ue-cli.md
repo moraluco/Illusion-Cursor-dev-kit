@@ -23,6 +23,11 @@ cd D:\Workspace\MT\Engine\ManteumTower
 py -3 -m soft_ue_cli check-setup
 ```
 
+## Agent：蓝图事实与桥不可达
+
+- **向用户断言**蓝图父类、图结构、节点/连线、默认值等，**仅**以 `check-setup` **成功**后的 `query-blueprint` / `query-blueprint-graph` 等为准（技能 **soft-ue-cli-ue-bridge**）。
+- **`check-setup` 失败**（含 502）：**先**用 **`content/dev/scripts/Start-UnrealEditor.ps1`** 或技能 **ue-editor-launch** 启动/复用交互式 UE，再重试；**禁止**用对 `.uasset` 二进制扫字符串等未验证方法作为事实依据。
+
 ## 端口与多实例
 
 - 默认 `http://127.0.0.1:8080`。

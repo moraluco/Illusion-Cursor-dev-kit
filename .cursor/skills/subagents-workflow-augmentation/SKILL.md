@@ -19,8 +19,10 @@ description: >-
 - **旁路默认只启用两类**：
   - `shell`：执行/复跑命令、抓取 stdout/退出码/日志路径、抽取首要错误段
   - `explore`：基于错误关键字/失败用例/资产路径，定位源码与文档入口（不猜测在线事实）
-- **失败可降级**：
-  - soft-ue-cli 桥不可达（502/timeout）时，只输出“降级判定 + 恢复入口”，不尝试替代在线查询事实。
+- **桥不可达**（502/timeout）时：
+  - **不要**用离线快照或未验证手段（如对 `.uasset` 扫字符串）冒充已核实的蓝图事实。
+  - 主链路应指向 **恢复 SoftUEBridge**：技能 **ue-editor-launch** 或 Kit **`content/dev/scripts/Start-UnrealEditor.ps1`**，然后重试 `check-setup` 与 `query-*`。
+  - 旁路只产出“阻塞原因 + 已尝试步骤 + 日志路径”，不替代在线事实。
 
 ---
 
@@ -51,12 +53,13 @@ description: >-
 - `explore` 产出：
   - 资产路径/类名/函数名所对应的源码/AS/文档入口；并附“在线/离线边界提示”（来自 `soft-ue-cli-ue-bridge`）
 
-### 降级策略（桥不可达）
+### 恢复策略（桥不可达）
 
-- 明确标注“无法在线读取编辑器内事实”
-- 指向恢复入口（不要绕路）：
-  - `content/dev/scripts/Start-UnrealEditor.ps1`（可选 `-WaitForBridge`）
+- 明确标注“当前尚未通过桥取得编辑器内事实”
+- **恢复入口（必须优先）**：
+  - `content/dev/scripts/Start-UnrealEditor.ps1`（同工程复用、少多开）
   - 技能 `ue-editor-launch`
+- 恢复后重跑 `check-setup` → 成功再执行 `query-*`
 
 ---
 

@@ -13,8 +13,8 @@ alwaysApply: true
 - **读/写**：仅在 Kit 下 `content/`（`plan`、`design`、`dev`、`knowledge`、`reference`），不在项目根建文档目录。
 - **架构总览**：优先 `content/knowledge/01-project-architecture-overview.md`（若存在）。
 - **自动化优先**：可脚本/测试/流水线重复的步骤应自动化；无人值守见 `content/dev/unattended-ue-automation.md`；AS 测试见 **angelscript-tdd-agent-iteration**；Git 长程上下文见 **git-local-p4-workflow**。
-- **蓝图在线权威**：**soft-ue-cli** + SoftUEBridge → 技能 **soft-ue-cli-ue-bridge**、`content/dev/soft-ue-cli.md`；决策树见 `content/knowledge/07-blueprint-query-workflow.md`。
-- **离线快照检索**：`BlueprintSnapshot/`、`.soft-ue-index/` 等（可能滞后）— 与 rule **blueprint-snapshot-search** 配合。
+- **蓝图事实（父类、变量、图节点/连线、默认值、引用）**：**仅**以 **soft-ue-cli** + SoftUEBridge 在 `check-setup` **成功**后的查询为准 → 技能 **soft-ue-cli-ue-bridge**、`content/dev/soft-ue-cli.md`；决策树见 `content/knowledge/07-blueprint-query-workflow.md`。**桥不可达时先** 技能 **ue-editor-launch** 或 Kit **`content/dev/scripts/Start-UnrealEditor.ps1`** 恢复交互式编辑器并重试，**禁止**用未验证离线手段（如对 `.uasset` 扫字符串）冒充已核实事实。
+- **离线快照检索（大范围搜索/候选/复盘）**：`BlueprintSnapshot/`、`.soft-ue-index/`（可能滞后）— 与 rule **blueprint-snapshot-search** 配合；**不**替代上述在线事实。
 
 ## 缺少 content 时
 

@@ -5,4 +5,4 @@ alwaysApply: true
 
 # UE Editor 路径（指向技能）
 
-涉及**启动 UE**、soft-ue-cli、读蓝图/关卡、PIE 时：先按技能 **ue-editor-launch** 解析 `UnrealEditor.exe`（`UE_EDITOR_EXE` 优先，其次项目约定路径）。找不到可执行文件则不要继续调桥；细节与失败处理以该技能为准。
+涉及**启动 UE**、soft-ue-cli、读蓝图/关卡、PIE 时：先按技能 **ue-editor-launch** 解析 `UnrealEditor.exe`（`UE_EDITOR_EXE` 优先，其次项目约定路径），或 Kit **`content/dev/scripts/Start-UnrealEditor.ps1`**。`check-setup` 失败（含 502）时需**交互式**编辑器与 **SoftUEBridge** 就绪后再查图。找不到可执行文件则不要继续调桥；细节与失败处理以该技能为准。

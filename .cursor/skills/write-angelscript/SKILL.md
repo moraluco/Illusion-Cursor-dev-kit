@@ -41,7 +41,7 @@ description: 编写或编辑 AngelScript(.as) 的单一入口：写前查阅 Kit
 
 - **AS 优先，C++ 仅必要时**：在 `.as` 中实现；仅当 AS 无法满足（API 未暴露、性能、引擎/插件改动）时再用 C++，并由 AS 调用。
 - **保存即生效**：AS 脚本保存后即热重载生效，无需单独「编译」。编辑器中保存 .as 后改动会立即反映（Immediate Hot Reload）；非结构性改动可在运行中热重载。不要建议用户「先编译再运行」；修改 .as 并保存即可验证。仅改 C++ 或引擎/插件时才需编译。
-- **Blueprint**：用于资产/数据与父类选择（AS 暴露的类）；核心逻辑不放在 Blueprint 事件图里。需要**读**现有蓝图/图结构时，用技能 **soft-ue-cli-ue-bridge**（不是读 JSON 快照）。
+- **Blueprint**：用于资产/数据与父类选择（AS 暴露的类）；核心逻辑不放在 Blueprint 事件图里。需要**读**现有蓝图/图结构时，用技能 **soft-ue-cli-ue-bridge**（`check-setup` 成功后 `query-blueprint` / `query-blueprint-graph`）；桥不可达时先 **ue-editor-launch** 或 Kit **`content/dev/scripts/Start-UnrealEditor.ps1`**。**不要**把 JSON 快照、离线索引或对 `.uasset` 扫字符串当作已向用户确认的编辑器内事实。
 - **多文件与引用**：**不要使用 `#include`**。UE-AS 会将 `Script/` 下所有 `.as` 一并编译，类型在同一编译单元内自动可见；写 `#include` 会触发 "Unexpected token" 等错误。
 
 更多写法速查与常见坑见本技能目录下的 **reference.md**。
