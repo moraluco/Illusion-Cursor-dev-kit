@@ -73,6 +73,17 @@ py -3 -m soft_ue_cli check-setup
 
 ---
 
+## 3.1 写操作的“落盘门禁”（必须遵守）
+
+当使用 soft-ue-cli / UE Python 对蓝图/AnimBP/关卡等进行**任何会改变资产状态**的操作（例如：reparent、增删变量、改图节点/连线、改 defaults、rename/remove graph 等）：
+
+1. **立刻保存**：在同一个动作序列里必须调用保存（例如 `unreal.EditorAssetLibrary.save_loaded_asset(bp)`，或 soft-ue-cli 的 `save-asset` / 自动保存步骤）。
+2. **每个里程碑都保存**：尤其是 reparent 完成、删冲突变量完成、连线修复完成、compile 通过后，都要保存一次。
+3. **崩溃假设**：默认 UE 随时可能闪退；未保存的改动视为不存在。不要把“已修改但未保存”的状态当作事实输出给用户。
+4. **冲突规避**：当父类（C++/AS）新增了 UPROPERTY/UFUNCTION 时，必须先确保子蓝图里没有同名本地变量/函数；否则 compile 会直接炸（Internal Compiler Error / function name already used）。
+
+---
+
 ## 4. 与 write-angelscript / 代码
 
 - **C++ / AngelScript 源码**仍以项目树与 `content/reference/` 为准。

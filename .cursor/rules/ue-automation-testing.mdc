@@ -11,3 +11,5 @@ alwaysApply: true
 - **能不进 UE 就不进 UE**：本机优先用 `content/dev/scripts/Run-LocalTests.ps1`（Lint/Pester Unit/纯 C++），只有需要资产/编辑器能力时才走 UE E2E。
 - **复盘与门禁口径**：`content/knowledge/13-ue-automation-test-playbook.md`、`content/knowledge/15-retro-automation-workflow.md`。
 - **硬约定（摘要）**：统一用 `content/dev/scripts/Start-UnrealEditor.ps1` 管理 UE 启动；并发隔离 **OutDir**；PowerShell 避免用 `$pid` 作变量名。细节以 harness 技能为准。
+
+- **硬门禁：写资产必须保存**：只要通过 soft-ue-cli / UE Python 对 `.uasset` 做了任何写操作（reparent、改图、删变量、改 defaults 等），就必须在同一段操作里 `Save`（并在关键里程碑重复 Save）。默认 UE 可能闪退，未保存改动视为不存在。
