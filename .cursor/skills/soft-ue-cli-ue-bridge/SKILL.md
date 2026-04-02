@@ -88,6 +88,7 @@ py -3 -m soft_ue_cli check-setup
 
 - **C++ / AngelScript 源码**仍以项目树与 `content/reference/` 为准。
 - 本技能解决 **编辑器内 .uasset 状态**（蓝图图、关卡实例等），与 `.as`/`.cpp` 互补。
+- **改了 C++（含 SoftUEBridge 等编辑器插件）**：须按 **ue-automation-test-harness §2.2** 用 VS 或 UBT 编 **ManteumTowerEditor**，避免依赖 Live Coding；编完常需 **重启 UE** 再 `check-setup`。
 
 ---
 

@@ -113,7 +113,7 @@ description: >-
 ## 输出模板（回复用户）
 
 1. **经验小结**（5–10 条，可执行）
-2. **踩坑清单**（按：终端/编码、桥与 CLI、AS 编译与门禁、Git、生成物）
+2. **踩坑清单**（按：终端/编码、桥与 CLI、AS 编译与门禁、**C++ 编译（VS 单项目 / Live Coding / 插件与 UObject 钩子 / 头文件）**、Git、生成物）
 3. **本次写回的文件列表**（路径）
 4. **Mermaid**：复制 `content/knowledge/15-retro-automation-workflow.md` 中的 flowchart，或按本轮微调一版
 
@@ -133,3 +133,5 @@ description: >-
 ## 交叉引用
 
 - 入口不变的 subagents 增效：技能 **subagents-workflow-augmentation**
+- **C++（ManteumTower）编译工作流**：VS 只编 Games/ManteumTower、勿以 Live Coding 为唯一验收、UBT 与 LC 冲突处理 — 技能 **ue-automation-test-harness** §2.2；易错表 **content/knowledge/05-gotchas.md**
+- **AnimInstance / Chooser / MotionMatching / 线程安全 Anim 图**（叙事索引，非 API 大全）：**content/knowledge/15-retro-automation-workflow.md** 附录 [UMTAnimInstance + Chooser / MotionMatching](content/knowledge/15-retro-automation-workflow.md#retro-appendix-umt-chooser)（锚点 `retro-appendix-umt-chooser`）；易错点仍以 **05-gotchas.md** 表格为准。

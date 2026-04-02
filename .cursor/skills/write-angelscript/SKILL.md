@@ -46,6 +46,12 @@ description: 编写或编辑 AngelScript(.as) 的单一入口：写前查阅 Kit
 
 更多写法速查与常见坑见本技能目录下的 **reference.md**。
 
+### UAnimInstance 与 AnimBP / 组件协作
+
+- 实现 **`UAnimInstance` 子类**（如项目中的 `UMTAnimInstance`）、与 **AnimBP**、**动画组件（BPC）** 分工时：**游戏线程采样 → Cache_ → `BlueprintThreadSafeUpdateAnimation` 只读缓存**，勿在线程安全路径访问 `MovementComp`/未声明 ThreadSafe 的 API；易错表见 **content/knowledge/05-gotchas.md**（ThreadSafe、`GetCurveValue`、主从骨骼网格等）。
+- **叙事级索引**（重构顺序、Chooser、BPC 双引用）：**content/knowledge/15-retro-automation-workflow.md** 附录 [UMTAnimInstance + Chooser / MotionMatching](content/knowledge/15-retro-automation-workflow.md#retro-appendix-umt-chooser)。
+- **Chooser / PoseSearch 评估**：若在 `Script/` 侧搜不到 `EvaluateChooser` / `ChooserTable` 等绑定，**不要硬撑 AS** — 用 C++（如 `UChooserFunctionLibrary::EvaluateChooserMulti` 包装）再由蓝图或薄层调用；详见上述附录与 gotchas。
+
 ---
 
 ## 工作流

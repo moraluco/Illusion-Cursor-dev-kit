@@ -61,6 +61,34 @@ description: >-
 
 ---
 
+### 2.2 C++ 编译（ManteumTower / 游戏模块与插件）
+
+与 **仅改 AngelScript**（保存即热重载）不同：改 **`.cpp` / `.h` / `Build.cs` / `.uproject` 插件开关** 后必须走 **正式 C++ 编译** 才能加载新符号。
+
+**约定（本团队 / ManteumTower）**
+
+1. **不要用编辑器 Live Coding 当作「唯一可信」的 C++ 验证**  
+   Live Coding 易失败、与 **UnrealBuildTool（UBT）** 冲突：若提示 `Unable to build while Live Coding is active`，须 **关闭 UE** 或 **关闭 Live Coding**（例如 **Ctrl+Alt+F11**）后再编。  
+   **Agent**：不要默认建议用户依赖 Live Coding 完成项目侧 C++ 变更的验收；需要「编过」时以 **VS 或 UBT** 为准。
+
+2. **Visual Studio：只编游戏项目，不要整解决方案**  
+   在解决方案资源管理器中 **仅生成** **Games → ManteumTower**（对应目标一般为 **`ManteumTowerEditor` + `Development_Editor` + `x64`**），**避免**无必要地「生成整个解决方案」（引擎/ShaderCompileWorker 等），除非用户明确要求。
+
+3. **命令行等价（Agent 自动化 / CI）**（需在 **未占用 Live Coding** 时执行）  
+   使用引擎 `Build.bat` 只打 **ManteumTowerEditor** 目标，例如：
+
+   ```text
+   <EngineRoot>\Build\BatchFiles\Build.bat ManteumTowerEditor Win64 Development -Project="<...>\ManteumTower.uproject" -WaitMutex
+   ```
+
+4. **编过后**  
+   若改了 **编辑器插件**（如 SoftUEBridge）或 **模块加载顺序**，通常需 **重启 UE** 才能与 soft-ue-cli / 桥行为一致；不要假设 Live Coding 已覆盖所有二进制边界。
+
+5. **编辑器插件中的 UObject 委托与头文件**  
+   改 **保存/预保存** 等钩子时，UE 大版本可能变更 **`FCoreUObjectDelegates`** 等 API（例如保存相关从 `OnObjectSaved` 迁移为 `OnObjectPreSave`）。回调若使用 **`FObjectPreSaveContext`** 等类型，不能仅依赖 `UObjectGlobals.h` 里的前向声明，须 **`#include "UObject/ObjectSaveContext.h"`**，否则 **C2027**；更多见 **content/knowledge/05-gotchas.md**。其余符号以引擎/插件 **Public** 头为准，勿猜不存在的路径（如误用不存在的 `ChooserTable.h`，见 gotchas）。
+
+---
+
 ## 3) 并发与资源治理（必须项）
 
 - **不要多开**：互斥拿不到不要继续启动（等待或失败）。

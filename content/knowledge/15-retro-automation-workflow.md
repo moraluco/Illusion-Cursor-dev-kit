@@ -2,6 +2,18 @@
 
 本文件沉淀「**复盘踩坑 → 迭代自动化工作流 → 写回 Kit**」的**可重复套路**，与技能 **retro-automation-workflow** 配套；易错点摘要仍在 [05-gotchas.md](05-gotchas.md)。
 
+## 文档结构
+
+| 章节 | 说明 |
+|------|------|
+| [何时做](#何时做) | 何时做 Retro |
+| [输出物（最小集）](#输出物最小集) | 复盘交付物模板 |
+| [数据流（总览）](#数据流总览) | 取证→实现→门禁→提交的 Mermaid |
+| [检查清单（Agent）](#检查清单agent) | Agent 写回前自检 |
+| [交叉引用](#交叉引用) | 相关 skill / dev |
+| [附录 A：`.soft-ue-index`](#retro-appendix-soft-ue-index) | 蓝图索引快照与 Pester/E2E 提要 |
+| [附录 B：UMTAnimInstance + Chooser](#retro-appendix-umt-chooser) | AnimInstance、Chooser/MM、C++ 与线程安全图提要 |
+
 ## 何时做
 
 - 一段 **UE 自动化 / soft-ue-cli / 蓝图取证 / AS TDD / runner** 相关任务结束
@@ -11,7 +23,7 @@
 ## 输出物（最小集）
 
 1. **经验小结**（5–10 条可执行要点）
-2. **踩坑清单**（按类别：终端/编码、桥与 CLI、AS 编译与门禁、Git、生成物）
+2. **踩坑清单**（按类别：终端/编码、桥与 CLI、AS 编译与门禁、**C++ 编译（VS 单项目 / UBT、勿依赖 Live Coding 为唯一验收）**、Git、生成物）
 3. **工作流变更清单**：更新了哪些 `rules` / `skills` / `content/knowledge` / `content/dev`
 4. **验证**：指明项目侧门禁（如 `Scripts\Run-UnattendedTests-Min.ps1 -Mode AS`）或 Kit 侧脚本测试（若有）
 
@@ -63,6 +75,8 @@ flowchart LR
 
 ---
 
+<a id="retro-appendix-soft-ue-index"></a>
+
 ## 附录：蓝图 `.soft-ue-index` 快照与测试复盘（提要）
 
 本轮（蓝图文本索引 / per-asset / 增量队列 / 深索引 + Pester）可复用的结论：
@@ -97,4 +111,18 @@ flowchart TB
   Deep --> G[graphs/*.graph.json]
   Per --> R[rollup + assets/**/summary.*]
 ```
+
+<a id="retro-appendix-umt-chooser"></a>
+
+## 附录：UMTAnimInstance + Chooser / MotionMatching（提要）
+
+从「ABP 快照 → AS `UMTAnimInstance` → C++ 包装 Chooser → 线程安全 `OnUpdate_MM`」一类任务可复用的结论：
+
+1. **桥 502**：深索引/在线快照失败时，用专用 **rollup + 日期 meta** 对齐离线条目，并记录「桥恢复后补跑 `Export-BlueprintDeepIndex`」；`NO_PROXY` 见 [05-gotchas.md](05-gotchas.md)。
+2. **BPC ↔ AnimInstance**：在 ABP 尚未改为继承 `UMTAnimInstance` 前，**不要**让 BPC 只持强类型引用导致 `AnimInstance` 恒 null；可保留 `UAnimInstance` + 可选 `UMTAnimInstance` 双引用（见 transcript 决策）。
+3. **TDD 与「用不到的逻辑」**：计划中的 `UpdateEssentialProperties` / `UpdateStates` 若 Anim 图根本不消费，应**删掉**而非为测而测；单测签名与实现需同步，避免「改了 helper 未改调用」。
+4. **变量来源以 AnimGraph 数据流为准**：清理变量时**不要**以 AnimInstance 成员列表为准；以**动画图表里实际连线**为准；找不到原连接可对照**重构前 ABP**。
+5. **Chooser 从 AS 暴露**：若脚本侧搜不到 `EvaluateChooser`/`ChooserTable` 绑定，**不要硬撑 AS**；走 **C++ `UChooserFunctionLibrary::EvaluateChooserMulti`** 包装（并处理线程安全图对 **Pure + ThreadSafe** 的要求）。
+6. **UE5.7 插件与 API**：`FCoreUObjectDelegates::OnObjectSaved` 变更时改用 **`OnObjectPreSave`**，回调参数需 **`ObjectSaveContext.h`** 完整类型；与 **ue-automation-test-harness §2.2** 一致：**关 UE / 停 Live Coding 后用 VS 只编 `ManteumTower`**，不以 Live Coding 为唯一验收。
+7. **写 `.uasset` / 编辑器大改后**：**立即 Save** 并在里程碑重复保存；闪退即丢（用户明确要求时把约定写回 rule/skill）。
 
