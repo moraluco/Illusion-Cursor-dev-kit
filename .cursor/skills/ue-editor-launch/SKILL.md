@@ -42,8 +42,8 @@ description: Locate and start UnrealEditor.exe reliably for this project (env ov
 
 若出现 `502 Bad Gateway` / `timed out`：
 
-- 视为 UE/桥处于异常态（未完全启动、端口被占用、桥崩溃等）
-- 采取“重启编辑器 → 再 check-setup”的恢复策略
+- **502 且 UE 已打开**：先按技能 **soft-ue-cli-ue-bridge** §**1.1** **提醒用户检查系统代理**（全局代理可能导致 httpx 访问 `127.0.0.1` 被转发而误报 502）；可试 `NO_PROXY=127.0.0.1,localhost` 后重试 `check-setup`。
+- 否则视为 UE/桥处于异常态（未完全启动、端口被占用、桥崩溃等），采取“重启编辑器 → 再 check-setup”的恢复策略。
 
 ## 4) 与索引/搜索联动
 

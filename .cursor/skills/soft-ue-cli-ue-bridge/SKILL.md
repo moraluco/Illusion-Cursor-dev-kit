@@ -33,7 +33,13 @@ cd D:\Workspace\MT\Engine\ManteumTower
 py -3 -m soft_ue_cli check-setup
 ```
 
-期望：插件文件存在、`.uproject` 已启用 SoftUEBridge、桥可访问。若 **失败（含 502 / timeout）**：**先恢复桥再查图**——按技能 **ue-editor-launch**（优先使用 Kit 的 `content/dev/scripts/Start-UnrealEditor.ps1` 复用或启动交互式编辑器），待工程加载后再次 `check-setup`；仍失败再排查端口、`SOFT_UE_BRIDGE_URL` / `SOFT_UE_BRIDGE_PORT`、或查看 `Saved/Logs`（见 `content/dev/soft-ue-cli.md`）。**不要**用**原始 `.uasset` 启发式扫描**冒充“已核实”的编辑器内事实；**正规离线索引/快照**仍可用于搜索与复盘（见 §5）。
+期望：插件文件存在、`.uproject` 已启用 SoftUEBridge、桥可访问。若 **失败（含 502 / timeout）**：**先恢复桥再查图**——按技能 **ue-editor-launch**（优先使用 Kit 的 `content/dev/scripts/Start-UnrealEditor.ps1` 复用或启动交互式编辑器），待工程加载后再次 `check-setup`；仍失败再排查端口、`SOFT_UE_BRIDGE_URL` / `SOFT_UE_BRIDGE_PORT`、或查看 `Saved/Logs`（见 `content/dev/soft-ue-cli.md`）。**502** 在 UE 已打开时常见原因见 **§1.1（系统代理）**。**不要**用**原始 `.uasset` 启发式扫描**冒充“已核实”的编辑器内事实；**正规离线索引/快照**仍可用于搜索与复盘（见 §5）。
+
+### 1.1 502 与系统代理（Windows）
+
+`soft-ue-cli` 使用 **httpx**，默认会信任**系统代理**。若 Windows 或 Clash 等工具使用**全局代理**，访问 `http://127.0.0.1:<端口>/bridge` 可能被错误转发，表现为 **502 Bad Gateway** 或超时，而编辑器内 **SoftUEBridge 实际正常**。
+
+**再次遇到 502 时**：在已确认交互式 UE 已打开、仍失败的前提下，**提醒用户**检查：系统代理设置、代理工具是否为全局、是否将 `127.0.0.1` / `localhost` 加入绕过；可临时设 `NO_PROXY=127.0.0.1,localhost` 后重试 `check-setup`。然后再按 **ue-editor-launch** 做端口占用、重启编辑器等排查。
 
 ---
 
@@ -80,7 +86,7 @@ py -3 -m soft_ue_cli check-setup
    - 技能 **ue-editor-launch**；或
    - Kit 脚本 **`content/dev/scripts/Start-UnrealEditor.ps1`**（同工程复用、避免多开，见 `content/dev/soft-ue-cli.md` §自动化）  
    启动或复用**交互式** `UnrealEditor`，加载目标 `.uproject`，等待工程就绪后**再次** `py -3 -m soft_ue_cli check-setup`，成功后再跑 `query-*`。
-2. **仍不可达**：明确告知用户当前**无法**通过桥读取编辑器内事实，并给出已尝试的步骤（启动/端口/日志）；可同时使用**已有** `BlueprintSnapshot/`、`.soft-ue-index/`（或历史 `graphs/*.graph.json`）推进**搜索、候选与复盘**，并在输出中标注**可能滞后于当前编辑器**。
+2. **仍不可达**：明确告知用户当前**无法**通过桥读取编辑器内事实，并给出已尝试的步骤（**502 时含 §1.1 系统代理**、启动/端口/日志）；可同时使用**已有** `BlueprintSnapshot/`、`.soft-ue-index/`（或历史 `graphs/*.graph.json`）推进**搜索、候选与复盘**，并在输出中标注**可能滞后于当前编辑器**。
 3. **离线快照的定位**：`BlueprintSnapshot/`、`.soft-ue-index/` 是**推荐使用的**正规离线产物，用于 **Search/Grep、离线复盘、PR 旁证**；**可能滞后**，在需要「当前编辑器内最新状态」时不能单独替代在线权威，但与**手搓读原始 uasset**无关。
 
 ### 5.1 离线蓝图文本索引与快照（继续使用）

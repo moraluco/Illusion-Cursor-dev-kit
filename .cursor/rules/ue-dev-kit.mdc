@@ -13,7 +13,7 @@ alwaysApply: true
 - **读/写**：仅在 Kit 下 `content/`（`plan`、`design`、`dev`、`knowledge`、`reference`），不在项目根建文档目录。
 - **架构总览**：优先 `content/knowledge/01-project-architecture-overview.md`（若存在）。
 - **自动化优先**：可脚本/测试/流水线重复的步骤应自动化；无人值守见 `content/dev/unattended-ue-automation.md`；AS 测试见 **angelscript-tdd-agent-iteration**；Git 长程上下文见 **git-local-p4-workflow**。
-- **蓝图事实（父类、变量、图节点/连线、默认值、引用）**：断言「**当前编辑器内**」状态时，**仅**以 **soft-ue-cli** + SoftUEBridge 在 `check-setup` **成功**后的查询为准 → 技能 **soft-ue-cli-ue-bridge**、`content/dev/soft-ue-cli.md`；决策树见 `content/knowledge/07-blueprint-query-workflow.md`。**桥不可达时先** 技能 **ue-editor-launch** 或 Kit **`content/dev/scripts/Start-UnrealEditor.ps1`** 恢复交互式编辑器并重试。**禁止**用**原始 `.uasset` 启发式扫描**冒充已核实事实（这与下面「正规离线快照」不是一回事）。
+- **蓝图事实（父类、变量、图节点/连线、默认值、引用）**：断言「**当前编辑器内**」状态时，**仅**以 **soft-ue-cli** + SoftUEBridge 在 `check-setup` **成功**后的查询为准 → 技能 **soft-ue-cli-ue-bridge**、`content/dev/soft-ue-cli.md`；决策树见 `content/knowledge/07-blueprint-query-workflow.md`。**桥不可达时**：**502 且 UE 已开先查系统代理**（技能 **soft-ue-cli-ue-bridge** §1.1），否则 **先** 技能 **ue-editor-launch** 或 Kit **`content/dev/scripts/Start-UnrealEditor.ps1`** 恢复交互式编辑器并重试。**禁止**用**原始 `.uasset` 启发式扫描**冒充已核实事实（这与下面「正规离线快照」不是一回事）。
 - **离线快照与索引（应继续使用）**：`BlueprintSnapshot/`、`.soft-ue-index/`、脚本导出的 `graphs/*.graph.json` — 与 rule **blueprint-snapshot-search** 配合，用于大范围搜索、候选、复盘、PR 证据；可能滞后，**不**替代上述「当前编辑器」在线事实，但**不是**禁用项。
 
 ## 缺少 content 时
