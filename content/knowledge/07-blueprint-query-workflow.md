@@ -4,9 +4,10 @@
 
 ## 0. Agent 取证原则（事实 vs 搜索）
 
-- **事实**：凡向用户陈述「某蓝图当前父类、变量、节点、连线、pins、默认值、引用」等**编辑器内状态**，**必须**来自 **`py -3 -m soft_ue_cli check-setup` 成功**之后的 `query-blueprint` / `query-blueprint-graph` / `find-references` 等。**禁止**用对 `.uasset` 的二进制/ASCII 启发式扫描、未解析 UObject 的猜测作为唯一依据。
-- **桥不可达**：**先**恢复交互式 UE 与 **SoftUEBridge**（技能 **ue-editor-launch**、Kit **`content/dev/scripts/Start-UnrealEditor.ps1`**，见 `content/dev/soft-ue-cli.md`），再重试 `check-setup`；**不要**在未经恢复桥的情况下把离线快照当作“已确认的最新事实”。
-- **离线索引/快照**：用于**全项目搜索、候选定位、复盘、PR 旁证**；可能滞后，**不能**单独作为对“当前编辑器里到底是什么”的终裁。
+- **事实（「当前编辑器里」）**：凡向用户**断言**「某蓝图此刻的父类、变量、节点、连线、pins、默认值、引用」等，**必须**来自 **`py -3 -m soft_ue_cli check-setup` 成功**之后的 `query-blueprint` / `query-blueprint-graph` / `find-references` 等。
+- **禁止与离线快照混为一谈**：**禁止**用对**原始 `.uasset` 文件**的二进制/ASCII 启发式扫描、或未解析 UObject 就猜结构，作为上述断言的**唯一依据**。这与 **`BlueprintSnapshot/`、`.soft-ue-index/`、脚本导出的 `graphs/*.json`** 无关——后者是**正规离线工作流，应当使用**。
+- **桥不可达**：**先**恢复交互式 UE 与 **SoftUEBridge**（技能 **ue-editor-launch**、Kit **`content/dev/scripts/Start-UnrealEditor.ps1`**，见 `content/dev/soft-ue-cli.md`），再重试 `check-setup`。在等待或无法立即在线时，**仍可使用**已有离线索引/快照推进搜索，并**标注**可能滞后。
+- **离线索引/快照**：用于**全项目搜索、候选定位、复盘、PR 旁证**；可能滞后，在需要「**最新**编辑器状态」时不能**单独**终裁，但**不是**禁用项。
 
 ---
 

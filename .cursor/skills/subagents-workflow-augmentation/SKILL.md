@@ -20,9 +20,9 @@ description: >-
   - `shell`：执行/复跑命令、抓取 stdout/退出码/日志路径、抽取首要错误段
   - `explore`：基于错误关键字/失败用例/资产路径，定位源码与文档入口（不猜测在线事实）
 - **桥不可达**（502/timeout）时：
-  - **不要**用离线快照或未验证手段（如对 `.uasset` 扫字符串）冒充已核实的蓝图事实。
-  - 主链路应指向 **恢复 SoftUEBridge**：技能 **ue-editor-launch** 或 Kit **`content/dev/scripts/Start-UnrealEditor.ps1`**，然后重试 `check-setup` 与 `query-*`。
-  - 旁路只产出“阻塞原因 + 已尝试步骤 + 日志路径”，不替代在线事实。
+  - **不要**用**原始 `.uasset` 扫字符串**冒充「当前编辑器内」已核实的蓝图事实。
+  - **离线索引 / BlueprintSnapshot** 仍可用于搜索与复盘（标注可能滞后）；主链路应 **恢复 SoftUEBridge**：技能 **ue-editor-launch** 或 **`Start-UnrealEditor.ps1`**，然后重试 `check-setup` 与 `query-*`。
+  - 旁路产出“阻塞原因 + 已尝试步骤 + 日志路径 + 可用离线产物路径”。
 
 ---
 

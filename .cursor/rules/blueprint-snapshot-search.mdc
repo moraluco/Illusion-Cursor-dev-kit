@@ -9,7 +9,7 @@ alwaysApply: true
 
 - **管**：在**全项目范围**用 `.soft-ue-index/`、`BlueprintSnapshot/` **搜名字、找候选、离线复盘**（函数/变量/callables、谁可能引用谁）。
 - **不管**：**不**替代 **SoftUEBridge + soft-ue-cli** 对编辑器内蓝图**当前事实**的查询。凡要向用户断言「某蓝图父类、某图节点与连线、默认值、精确引用」等，**必须**在 `py -3 -m soft_ue_cli check-setup` **成功**后使用 `query-blueprint` / `query-blueprint-graph` 等（技能 **soft-ue-cli-ue-bridge**）。
-- **桥不可达（502 / timeout / check-setup 失败）**：**先**按技能 **ue-editor-launch** 或 Kit **`content/dev/scripts/Start-UnrealEditor.ps1`** 启动/复用交互式 UE 并重试 `check-setup`；**禁止**用对 `.uasset` 二进制扫字符串等未验证手段充当已核实事实。
+- **桥不可达（502 / timeout / check-setup 失败）**：**先**按技能 **ue-editor-launch** 或 Kit **`content/dev/scripts/Start-UnrealEditor.ps1`** 启动/复用交互式 UE 并重试 `check-setup`。在此之前/同时，**仍可使用**已有 `.soft-ue-index/`、`BlueprintSnapshot/` 推进搜索（标注可能滞后）。**禁止**的是：对**原始 `.uasset`** 做二进制扫字符串冒充「已核实编辑器事实」— **不是**禁止离线索引本身。
 
 ## 大范围搜索时的推荐顺序
 

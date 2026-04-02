@@ -11,4 +11,4 @@ alwaysApply: true
 - AngelScript 测试（TDD、跑测试并修复、按失败用例定位）
 - 复盘沉淀（取证→门禁→提交→写回 Kit）
 
-则按技能 **subagents-workflow-augmentation** 执行：保持主链路入口不变，使用 `shell` + `explore` 作为旁路增强层，产出统一的 6 段结构化报告（Command/Result/EvidencePaths/PrimaryError/Pointers/NextStep）。**桥不可达时**：主链路应**先恢复 SoftUEBridge**（技能 **ue-editor-launch**、`Start-UnrealEditor.ps1`）再查图；**不**用不可靠离线手段替代 soft-ue-cli 的蓝图事实。
+则按技能 **subagents-workflow-augmentation** 执行：保持主链路入口不变，使用 `shell` + `explore` 作为旁路增强层，产出统一的 6 段结构化报告（Command/Result/EvidencePaths/PrimaryError/Pointers/NextStep）。**桥不可达时**：主链路应**先恢复 SoftUEBridge**（技能 **ue-editor-launch**、`Start-UnrealEditor.ps1`）再跑在线 `query-*`；**离线索引/BlueprintSnapshot 仍可用**于搜索与复盘。**禁止**用**原始 `.uasset` 扫字符串**替代 soft-ue-cli 对「当前编辑器事实」的断言。
