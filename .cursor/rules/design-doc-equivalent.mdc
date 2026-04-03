@@ -1,0 +1,15 @@
+---
+description: 等效 `*.design.md`、从代码撰写规格、末尾计划小节、严格对齐实现；完整流程见技能 design-doc-code-parity
+globs: "**/*.design.md"
+alwaysApply: false
+---
+
+# 代码等效设计文档（指向技能）
+
+涉及 **`*.design.md`**（与源码同目录的逻辑规格）、**严格等效**改代码、**撰写/更新**规格、**拆分** `*-deferred.design.md`、或按文档末尾 **「计划」** 小节分阶段改 AS/测试时：
+
+- **完整步骤、模板、引用门禁、归档与 TDD 提交节奏**：技能 **design-doc-code-parity**（Kit：`.cursor/skills/design-doc-code-parity/SKILL.md`）。
+- **编写/编辑 `.as`**：技能 **write-angelscript**；跑测：**angelscript-tdd-agent-iteration**；**Git 根与中文原子提交**：**git-local-p4-workflow**、**git-commit-zh**（项目脚本仓在 `Engine\ManteumTower`，勿与 Kit 混提交）。
+- **删成员/API 前引用检索**：离线索引 **blueprint-snapshot-search**；「当前编辑器内」蓝图事实以 **soft-ue-cli-ue-bridge** 在 `check-setup` 成功后为准。
+
+概念索引（可选阅读）：`content/knowledge/16-design-doc-equivalent-workflow.md`。
