@@ -75,7 +75,8 @@
 8. **脚本逻辑再走蓝图**：脚本里写逻辑并调用一个 `UFUNCTION(BlueprintEvent)` 空实现，子类 Blueprint 只实现该事件。
 9. **C++ BlueprintNativeEvent 在 AS 中重写**：重写后**不能调用 C++ Super**；倾向用 BlueprintImplementableEvent 或把基础逻辑放到单独可调用函数。
 10. **编辑器专用 API**：必须用 `#if EDITOR` … `#endif`，否则打包失败。
-11. **调试**：`Print`/`Log`/`LogInfo`；可用 Unreal AngelScript 扩展下断点；`GetAngelscriptCallstack`/`FormatAngelscriptCallstack` 可打脚本栈。
+11. **调试（日志）**：`Print`/`Log`/`LogInfo`；可用 Unreal AngelScript 扩展下断点；`GetAngelscriptCallstack`/`FormatAngelscriptCallstack` 可打脚本栈。
+12. **调试（屏显，避免刷屏）**：需要 **PIE/屏幕上** 的调试信息时，使用 **`System::PrintString`** 或 **`System::PrintText`**，并传入**非空**的 **`FName Key`**（最后一参）。同 Key 的消息会被**替换**，不会每一帧叠一行；**禁止**在 Tick 里反复 `PrintString` 且**不传 Key**（默认 `NAME_None`）——会刷屏。签名与参数说明见 `content/reference/AS_API/API_Docs/System.md`（`PrintString` / `PrintText`）。**不要**为此新增 C++ `UE_LOG` 包装或改引擎 Logging；AS 侧足够。
 
 ---
 

@@ -9,5 +9,6 @@ alwaysApply: true
 本 Rule 只负责在实现功能时提醒以下硬性约定，具体写作流程与参考见技能 **write-angelscript**：
 
 - **新增或实现游戏功能时，默认必须使用 AngelScript（.as）**。未明确要求用 C++/蓝图写逻辑时，一律在 AS 中实现。
+- **调试与屏显输出**：优先在 AS 中用 **`System::PrintString` / `System::PrintText` 且为每条逻辑线传入独立 `Key`**，避免无 Key 刷屏；**不要**为打印调试信息去造 C++ 轮子或修改引擎源码（见 rule **no-edit-engine-source**）。细节见技能 **write-angelscript** §「调试与屏显打印」。
 - 仅当确认 AngelScript 无法满足（如引擎 API 未暴露、性能瓶颈、需改插件/引擎代码）时，才改用 C++ 或说明原因，并由 AS 调用 C++ 扩展。
 - 具体查阅路径、书写约定、写法速查与测试流程，以 `.cursor/skills/write-angelscript/SKILL.md` 为唯一权威来源。

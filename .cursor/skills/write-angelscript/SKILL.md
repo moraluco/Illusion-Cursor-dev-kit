@@ -46,6 +46,14 @@ description: 编写或编辑 AngelScript(.as) 的单一入口：写前查阅 Kit
 
 更多写法速查与常见坑见本技能目录下的 **reference.md**。
 
+### 调试与屏显打印（`System::PrintString` / `PrintText`）
+
+- **默认用引擎已绑定的 `System::PrintString` 或 `System::PrintText`**（见 Kit `content/reference/AS_API/API_Docs/System.md`），**不要**为「打一行字」去写 C++ 宏、改 Logging 模块或改引擎源码；rule **no-edit-engine-source** 禁止动 `Engine/Engine/`。
+- **禁止**在 Tick/高频路径里用**无 Key** 的屏显调用刷屏：未传有效 `Key`（`NAME_None`）时，每次调用都会在屏幕上**叠加**新行，极易淹没视口与日志。
+- **每个逻辑条目使用稳定、互不相同的 `FName` Key**（如 `n"MTAnim|Speed"`、`n"BPC|Locomotion"`）：文档说明——若 Key **非空**，同 Key 的屏显消息会被**替换**而非无限堆叠，便于总开关 + 分条目开关的调试 UX。
+- 需要时再配合**节流**（如累计 `DeltaTime` 后每 N 秒刷新一次），与 Key 策略一起避免噪声。
+- 历史上若文档提到 `PrintToScreenKeyed` 等**插件专用** API，实现屏显时应**优先对齐**上述 `System::PrintString(..., Key)` 语义，避免依赖额外重编 AngelScript 插件的路径，除非需求明确且已纳入构建流程。
+
 ### UAnimInstance 与 AnimBP / 组件协作
 
 - 实现 **`UAnimInstance` 子类**（如项目中的 `UMTAnimInstance`）、与 **AnimBP**、**动画组件（BPC）** 分工时：**游戏线程采样 → Cache_ → `BlueprintThreadSafeUpdateAnimation` 只读缓存**，勿在线程安全路径访问 `MovementComp`/未声明 ThreadSafe 的 API；易错表见 **content/knowledge/05-gotchas.md**（ThreadSafe、`GetCurveValue`、主从骨骼网格等）。
@@ -88,3 +96,4 @@ description: 编写或编辑 AngelScript(.as) 的单一入口：写前查阅 Kit
 - [ ] 在 `.as` 中编写/修改，无正当理由不把游戏逻辑放在 C++/Blueprint
 - [ ] 已告知用户保存并验证，未要求对仅 AS 改动做「编译」
 - [ ] 若需测试，已按技能 angelscript-tdd-agent-iteration 执行
+- [ ] 若在 Tick/高频路径做屏显调试：已用 `System::PrintString`/`PrintText` 并为每条逻辑线传入**非空 `Key`**，未用无 Key 调用刷屏

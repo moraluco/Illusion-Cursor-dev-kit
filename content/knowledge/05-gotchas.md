@@ -11,6 +11,7 @@
 
 | 现象/错误            | 可能原因                                               | 处理方式                                     |
 | ---------------- | -------------------------------------------------- | ---------------------------------------- |
+| PIE 屏显被 `PrintString` 刷满、无法读数 | Tick/高频路径里调用 **`System::PrintString` 且未传 `Key`**（`NAME_None`），每条叠加一行 | 每条逻辑调试线使用**稳定且互不相同**的 `FName Key`（最后一参），同 Key **替换**而非堆叠；必要时加节流。见技能 **write-angelscript** §「调试与屏显打印」、`content/reference/AS_API/API_Docs/System.md` |
 | 找不到 AS API 或用法不对 | 未查阅 content/reference/AS_API 或 Docs-UE-Angelscript | 先查 reference 下对应文档；AI 回答时 @ 引用 reference |
 | 文档写在了项目根         | 与 Kit 约定不符                                         | 文档与知识库统一放在 Kit 的 content/                |
 | 阶段/任务状态未更新       | 忘记更新 plan.md                                       | 完成小目标或验证后更新 plan 中对应阶段与任务状态              |
@@ -49,10 +50,6 @@
 | E2E 期望保存后必有 `.soft-ue-index/changed_assets.ndjson` 失败 | 运行的编辑器**未加载**含保存队列钩子的插件构建；或 save 未触发 `OnObjectSaved`（资产未脏、路径不对） | 插件改动后需 **重编并重启** UE；save 前先 dirty 再 `save_loaded_asset`；套件可对「无队列」做 **skip/早退** 以免误杀整条 E2E（见 `E2E-Snapshot-System.Tests.ps1`） |
 | UBT / VS 编 `ManteumTowerEditor` 报 **`Unable to build while Live Coding is active`** | 交互式 UE 已开且 **Live Coding** 占用，UBT 拒绝并行构建 | **关闭 UE** 或 **Ctrl+Alt+F11** 关闭 Live Coding 后再编；**不要**把 Live Coding 当项目 C++ 的**唯一**正式验收（以 VS 或 `Build.bat` 为准）。见 **ue-automation-test-harness** §2.2 |
 | 回调签名里 **`FObjectPreSaveContext`** 报 **C2027 使用了未定义类型** | `UObjectGlobals.h` 只有前向声明，按值使用需要完整类型 | `#include "UObject/ObjectSaveContext.h"`（定义见该头） |
-| **线程安全 Anim 图**（如 `OnUpdate_MM`）里**搜不到**自封装函数 | `BlueprintCallable` 带 **exec**（Impure），线程安全图默认 `DoesGraphSupportImpureFunctions == false`，上下文关联会过滤 | 与引擎 `UChooserFunctionLibrary::EvaluateChooserMulti` 一致：用 **`BlueprintPure` + `BlueprintThreadSafe`**，可加 `Keywords` 便于搜索 |
-| **包装 Chooser** 的 C++ 报 **找不到 `ChooserTable.h`** 或 UBT 提示模块依赖 Chooser | 引擎侧公开入口在 **`ChooserFunctionLibrary.h`**，不存在独立 `ChooserTable.h`；模块需链接 Chooser 插件 | `#include` 用 `ChooserFunctionLibrary.h`（或经其间接包含的 `Chooser.h`）；**`.uproject` 启用 Chooser 插件**；若 Agent 需读引擎插件源码，在 **`.cursorignore` 里否定放行**对应 `Engine/.../Plugins/Chooser/` 等路径 |
-| **`OnUpdate_MM` 的 Context** 接到 **Chooser 的 Context** | 前者是 **动画更新上下文**（如 `FAnimUpdateContext` 引用），后者是 **`UObject*`**（Chooser 读参数的对象） | Chooser 侧填 **`Self`（AnimInstance）**、**Owning Actor** 或 **Pawn**，按 Chooser 表里 Input 的实际来源选，**不要**接 `OnUpdate_MM` 的 Context 引脚 |
-| 角色「不动」、调试 Speed 无效 | 搞错**哪块骨骼网格在驱动动画**（例如 RTG/Puppet 跟随主 Mesh） | 以**真正挂目标 AnimBP 的 SkeletalMesh**（如 `CharacterMesh0`）为权威；跟随/重定向网格只跟主网格动，不反向当动画源 |
 
 
 ---

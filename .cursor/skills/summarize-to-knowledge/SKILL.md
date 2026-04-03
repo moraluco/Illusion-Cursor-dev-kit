@@ -55,6 +55,12 @@ All paths below are relative to **Kit root** (the repo containing this skill and
 
 ---
 
+## Step 4: 提交（工作流 / 知识沉淀须入库）
+
+当本次 **写回** 涉及 Kit 的 `content/`、`.cursor/rules`、`.cursor/skills` 等且用户期望经验可复现、可协作时：在 **Kit 仓库根** 对相应变更执行 **`git commit`**（**原子化**、**中文 subject**，技能 **git-commit-zh**）。**工作流迭代**（改规则/技能/方法论文档）与 **知识沉淀** 同理：**落盘即应提交**，避免仅停留在本机编辑器。
+
+---
+
 ## Output to the user
 
 1. A short **经验小结** (experience summary) of what was captured.

@@ -1,0 +1,21 @@
+---
+description: 凡涉及编写/修改代码的技能须遵守：禁止修改工作区内 Unreal 引擎源码树（Engine/Engine/）；游戏项目 Engine/ManteumTower/ 等不在此限。
+alwaysApply: true
+---
+
+# 禁止修改引擎源码（写代码类技能）
+
+凡 **Skill 流程涉及编写、编辑、生成或替换代码**（例如 **write-angelscript**、**angelscript-tdd-agent-iteration**、**design-doc-code-parity**、**openspec-apply-change**、**angelscript-api-query** 中写回引擎侧文件、以及其它会改源码的自动化技能），须遵守：
+
+## 硬性边界
+
+- **禁止**修改工作区内 **Unreal 引擎源码树** 下的任何代码文件：路径以 **`Engine/Engine/`** 为前缀（含其下 `Source/`、`Plugins/` 等引擎侧 C++、脚本与构建文件）。**只读查阅、搜索、对照范例**（如 `Script-Examples`）允许。
+- **允许**修改 **游戏与项目代码**，例如本工作区常见的 **`Engine/ManteumTower/`**（含 `Script/`、`Source/`、`Plugins/` 下项目插件等）。若工作区根布局不同，以「**非** `Engine/Engine/` 引擎树」下的项目目录为准。
+
+## 例外
+
+- 仅在用户 **明确书面要求** 修改引擎源码（极少见）时，可按指示操作；否则一律视为越界。
+
+## 与 Kit 的关系
+
+- 本 Rule 约束 **Agent 落盘改代码** 的范围；Kit 的 `content/`、`.cursor/` 等文档与规则不在「引擎源码树」定义内。

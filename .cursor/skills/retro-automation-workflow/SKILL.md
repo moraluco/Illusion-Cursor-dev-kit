@@ -1,7 +1,8 @@
 ---
 name: retro-automation-workflow
 description: >-
-  复盘自动化/TDD/UE/soft-ue-cli 相关工作后，把踩坑与改进写回 Kit（knowledge/dev/rules/skills）并产出可复用小结与 Mermaid 数据流图。
+  复盘自动化/TDD/UE/soft-ue-cli 相关工作后，把踩坑与改进写回 Kit（knowledge/dev/rules/skills）并产出可复用小结与 Mermaid 数据流图；
+  工作流迭代落盘后须在 Kit 仓库 git 提交（git-commit-zh）。
   Use when the user says 复盘、总结经验、迭代工作流、工作流进化、沉淀成 skill、promote pitfalls-inbox，或一段自动化任务结束需要结构化沉淀。
 ---
 
@@ -103,6 +104,12 @@ description: >-
 - 更新 `content/knowledge/README.md`（若新增 knowledge 文件）
 - 从 `pitfalls-inbox` **晋升**的条目：在 inbox 条目标注 **Promote to** 指向
 
+#### 3.1) Git 提交（工作流迭代必须入库）
+
+凡本轮对 Kit 的 **工作流迭代** 产生落盘变更（`.cursor/rules/*.mdc`、`.cursor/skills/*/SKILL.md`、`content/knowledge/`、`content/dev/` 等），须在 **Kit 仓库根** **`git add` + `git commit`**：**原子化**、**中文 UTF-8 subject**（技能 **git-commit-zh**）。**禁止**只改本地不提交，导致规则/技能与团队仓库脱节、历史不可追溯。
+
+若用户在本轮明确要求「提交」，应执行提交并回报 **commit hash** 与 subject。
+
 ### 4) 验证「升级有效」
 
 - 下一次同类任务：Agent 能 **@** 到正确文档；命令片段**无 BOM/cmd 混用**；取证步骤要求**落地文件**
@@ -113,7 +120,7 @@ description: >-
 ## 输出模板（回复用户）
 
 1. **经验小结**（5–10 条，可执行）
-2. **踩坑清单**（按：终端/编码、桥与 CLI、AS 编译与门禁、**C++ 编译（VS 单项目 / Live Coding / 插件与 UObject 钩子 / 头文件）**、Git、生成物）
+2. **踩坑清单**（按：终端/编码、桥与 CLI、AS 编译与门禁、Git、生成物）
 3. **本次写回的文件列表**（路径）
 4. **Mermaid**：复制 `content/knowledge/15-retro-automation-workflow.md` 中的 flowchart，或按本轮微调一版
 
@@ -134,4 +141,3 @@ description: >-
 
 - 入口不变的 subagents 增效：技能 **subagents-workflow-augmentation**
 - **C++（ManteumTower）编译工作流**：VS 只编 Games/ManteumTower、勿以 Live Coding 为唯一验收、UBT 与 LC 冲突处理 — 技能 **ue-automation-test-harness** §2.2；易错表 **content/knowledge/05-gotchas.md**
-- **AnimInstance / Chooser / MotionMatching / 线程安全 Anim 图**（叙事索引，非 API 大全）：**content/knowledge/15-retro-automation-workflow.md** 附录 [UMTAnimInstance + Chooser / MotionMatching](content/knowledge/15-retro-automation-workflow.md#retro-appendix-umt-chooser)（锚点 `retro-appendix-umt-chooser`）；易错点仍以 **05-gotchas.md** 表格为准。

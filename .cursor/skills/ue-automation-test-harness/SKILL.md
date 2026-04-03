@@ -84,8 +84,8 @@ description: >-
 4. **编过后**  
    若改了 **编辑器插件**（如 SoftUEBridge）或 **模块加载顺序**，通常需 **重启 UE** 才能与 soft-ue-cli / 桥行为一致；不要假设 Live Coding 已覆盖所有二进制边界。
 
-5. **编辑器插件中的 UObject 委托与头文件**  
-   改 **保存/预保存** 等钩子时，UE 大版本可能变更 **`FCoreUObjectDelegates`** 等 API（例如保存相关从 `OnObjectSaved` 迁移为 `OnObjectPreSave`）。回调若使用 **`FObjectPreSaveContext`** 等类型，不能仅依赖 `UObjectGlobals.h` 里的前向声明，须 **`#include "UObject/ObjectSaveContext.h"`**，否则 **C2027**；更多见 **content/knowledge/05-gotchas.md**。其余符号以引擎/插件 **Public** 头为准，勿猜不存在的路径（如误用不存在的 `ChooserTable.h`，见 gotchas）。
+5. **头文件**  
+   使用 `FObjectPreSaveContext` 等类型时，若仅前向声明会报 **C2027**，需包含定义所在头文件（例如 **`#include "UObject/ObjectSaveContext.h"`**）。以引擎/插件 **Public** 头为准，勿猜不存在的路径。
 
 ---
 
