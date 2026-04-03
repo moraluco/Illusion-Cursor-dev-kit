@@ -2,7 +2,7 @@
 name: design-doc-code-parity
 description: >-
   Code-equivalent `*.design.md`: **author** from source, **parity** spec vs code, execute end-of-doc
-  **plan** sections (with ref gates + archive), split deferred docs, TDD + atomic Chinese commits.
+  **plan** sections (with ref gates; **remove completed plans** from doc), split deferred docs, TDD + atomic Chinese commits.
   Use for UMTAnimInstance.design.md-style specs, strict equivalence, `.movement-deferred.design.md`,
   or design-doc-driven iteration with write-angelscript / angelscript-tdd-agent-iteration.
 ---
@@ -74,7 +74,7 @@ description: >-
 1. **通读**目标 `.as`（及相关类），按 **§6 附录** 结构起草或**增量更新**现有 `.design.md`。
 2. **不发明**代码中不存在的分支、阈值或 API；若仅存在于注释，在文档中标注 **「规格与实现差异」** 或推动收窄注释（与 §2.3 一致）。
 3. **拆分前**：先明确**主文档服务的数据链**（例如「仅 Anim 前数据 / 与 `UMTAnimInstance` 的契约」），再把无关切面迁到 **`<Base>.<concern>-deferred.design.md`**，主文档文首写清范围与链接。
-4. 复杂类可保留 **变更记录**表或 **「已落地计划」**摘要（见 §5.3），避免正文与历史计划双轨。
+4. 复杂类可保留 **变更记录**表（日期/摘要/可选 commit 指针）；**勿**在正文长期保留已执行完毕的整段「计划」正文（见 §5.3）。
 
 ---
 
@@ -92,10 +92,12 @@ description: >-
 - 按文档给出的 **阶段顺序**（如先 UMT §8 再 §9.1 再 BPC §15）分别改 **代码、测试、design 正文**；每阶段 **TDD 全绿** 后再下一阶。
 - 文档要求 **「非必要不简化」** 的数学（如 Locomotion **滞回、阈值、死区、`UpdateDesiredLocomotionState` 全链路**）：默认**不**合并、不「顺手优化」；仅删除文档明确允许删除的占位 API（如历史上的无状态 `CalculateSpeedRange()`），且**不**连带改掉内部 `GetSpeedRangeBoundsFromLocomotionState` 实现。
 
-### 5.3 执行后：归档
+### 5.3 执行后：从文档中移除已完成计划
 
-- 将已完成计划从「待执行」长文 **折叠**为 **「已落地摘要」** 小节（如 §13），并更新正文 §0–§7 与 **数据契约表**，避免 **计划条款** 与 **当前正文** 长期两套真值。
-- 需在 **AnimBP** 绑定的步骤（如 MM 选择器绑到新 Tag/枚举）在文档中标 **人工 / 编辑器**，与自动化门禁分开验收。
+- **默认**：某一阶段或整份「计划」已落地（代码/测试/正文已对齐）后，从 `.design.md`（及涉及的拆分文档）中 **删除** 对应 **「计划」小节全文**（含 §8 / §9 / §15 等**待执行**清单），**不要**长期保留可勾选的旧任务列表——避免读者误以为仍待做、与当前规格双轨。
+- **合并真值**：计划里承诺的行为须已写回 **前面各节正文**（§0–§7、数据契约表、线程与 Tick 顺序等）；移除计划前确认这些段落**已**反映最新实现。
+- **审计**：历史以 **Git 提交说明与 diff** 为准；若团队需要一行追溯，可在文首 **变更记录** 表增一行（日期 + 一句摘要 + 可选 commit），**不**恢复整段计划正文。
+- 需在 **AnimBP** 绑定的步骤（如 MM 选择器绑到新 Tag/枚举）：若仍属未完成的**人工验收**，可保留 **单独一句**「待编辑器：…」或迁入 issue/任务单；**不要**用整节「计划」占位。
 
 ---
 
@@ -105,7 +107,7 @@ description: >-
 2. **文首元信息**：一两句说明「可据此改代码」、权威侧（改代码后是否必须同步本文档）。
 3. **正文编号**：`§0` 约束；`§1` 初始化；`§2` 每帧或 Tick **子序列（顺序固定）**；公式节写清 **常量、分支、早退**；调试或屏显单独成章，或用 **「规格与实现差异」**。
 4. **数据契约表**（跨类时）：列 **写入方 / 只读方**（如 BPC → `LocomotionState` → UMT 仅镜像），避免 AnimInstance **重复** BPC 速度带数学。
-5. **「计划」小节**：每条写清 **对前文哪一节、哪张表的修改动作**；含 **前置引用检索**；完成后 **归档**（见 §5.3）。
+5. **「计划」小节**：每条写清 **对前文哪一节、哪张表的修改动作**；含 **前置引用检索**；**全部执行完毕后从文档删除该小节**（见 §5.3），正文只保留当前规格。
 6. **硬约束短节**（按需）：如滞回/死区非必要不简化；§x.x 仅只读镜像、不重复某函数——便于在执行阶段拒绝跑题「优化」。
 
 ---
@@ -116,7 +118,7 @@ description: >-
 - [ ] 已逐项对照源码，差异有明确归类（代码 / 文档 / 注释）
 - [ ] 行为变更走 TDD 基线与 `RunAngelscriptTests.ps1` 全绿
 - [ ] 提交原子、中文 subject、仓库根正确
-- [ ] 回复中说明**改了哪些文件**、与 design **哪一节**对齐；若归档计划，已更新摘要与契约表
+- [ ] 回复中说明**改了哪些文件**、与 design **哪一节**对齐；若已执行计划，**已删除**文档中对应已完成「计划」小节，且前面正文/契约表已合并为唯一真值
 
 ---
 
