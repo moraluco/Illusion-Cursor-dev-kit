@@ -34,10 +34,13 @@ Invoke-RestMethod -Uri "http://127.0.0.1:18080/as-api/v1/query" -Method Post -Co
 
 ## 流程（已集成时）
 
-1. 用编辑器打开 **ManteumTower**（非 Commandlet、非无人值守；否则 HTTP 不启动）。
-2. 确认存在 **`Engine/ManteumTower/.as-api-query/instance.json`**。
-3. 访问 health / POST query（见上表）。
-4. **失败时**：回落 **`angelscript-api-query`**（`content/reference/AS_API/` → https://angelscript.hazelight.se/api/）。
+1. **默认优先动态查询**：先用 ASApiQuery 查“当前会话已注册符号”。只有动态查询不可用才回落静态文档（`angelscript-api-query`）。
+2. 若 UE 未开启或服务未就绪：**启动编辑器并等待**。
+   - UnrealEditor：`D:\Workspace\MT\Engine\Engine\Engine\Binaries\Win64\UnrealEditor.exe`
+   - uproject：`D:\Workspace\MT\Engine\ManteumTower\ManteumTower.uproject`
+   - 等待条件：生成 `Engine/ManteumTower/.as-api-query/instance.json`，并且 `GET /as-api/health` 返回 `ok=true`
+3. 用 `instance.json` 的 `host/port/basePath` 访问 health / query（见上表与 PowerShell 示例）。
+4. **失败回落**：无实例文件/连接拒绝/AS 未初始化（`not_initialized`）时，回落 **`angelscript-api-query`**（Kit `content/reference/AS_API/` → Hazelight）。
 
 ## 与 write-angelscript
 
