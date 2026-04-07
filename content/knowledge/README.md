@@ -29,7 +29,6 @@
 | [13-ue-automation-test-playbook.md](13-ue-automation-test-playbook.md) | UE 自动化测试通用 Playbook：Editor+Bridge vs Editor-Cmd、启动与等待、并发/资源治理、证据采集与清理 |
 | [14-git-atomic-commits-tdd.md](14-git-atomic-commits-tdd.md) | Git 原子提交与 TDD：单测门禁、一次提交一个可验证点、误合成大提交后的拆分思路 |
 | [15-retro-automation-workflow.md](15-retro-automation-workflow.md) | 复盘与自动化工作流进化：取证→实现→门禁→原子提交的数据流（Mermaid）、检查清单；含 `.soft-ue-index` 与 UMTAnimInstance/Chooser 附录；与技能 **retro-automation-workflow** 配套 |
-| [16-design-doc-equivalent-workflow.md](16-design-doc-equivalent-workflow.md) | 代码等效 `*.design.md` 工作流索引（撰写/拆分/对齐/末尾计划）；权威步骤见技能 **design-doc-code-parity**；与 Rule **design-doc-equivalent** 配套 |
 
 ---
 
@@ -47,7 +46,6 @@ Kit 根 `.cursor/rules/*.mdc` 负责**触发与轻量提醒**；`.cursor/skills/
 | 入口不变的 Subagents 旁路增效 | `subagents-workflow-augmentation` | `subagents-workflow-augmentation` | [../dev/subagents-workflow-augmentation-runbooks.md](../dev/subagents-workflow-augmentation-runbooks.md) |
 | AngelScript 编写、API、保存即生效 | `angelscript-docs-reference`、`angelscript-primary-cpp-fallback` | `write-angelscript`、`angelscript-api-query` | [03-angelscript-ue.md](03-angelscript-ue.md)、[../reference/](../reference/) |
 | 跑 AS 测试并迭代修复 | `angelscript-tdd-agent-iteration` | `angelscript-tdd-agent-iteration` | [13-ue-automation-test-playbook.md](13-ue-automation-test-playbook.md) |
-| 等效 `*.design.md`、撰写/拆分、末尾计划对齐 | `design-doc-equivalent` | `design-doc-code-parity` | [16-design-doc-equivalent-workflow.md](16-design-doc-equivalent-workflow.md) |
 | Rule/Skill 去重与职责边界 | — | `sync-rules-and-skills` | 本表 |
 
 ---
