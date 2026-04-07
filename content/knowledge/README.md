@@ -29,6 +29,7 @@
 | [13-ue-automation-test-playbook.md](13-ue-automation-test-playbook.md) | UE 自动化测试通用 Playbook：Editor+Bridge vs Editor-Cmd、启动与等待、并发/资源治理、证据采集与清理 |
 | [14-git-atomic-commits-tdd.md](14-git-atomic-commits-tdd.md) | Git 原子提交与 TDD：单测门禁、一次提交一个可验证点、误合成大提交后的拆分思路 |
 | [15-retro-automation-workflow.md](15-retro-automation-workflow.md) | 复盘与自动化工作流进化：取证→实现→门禁→原子提交的数据流（Mermaid）、检查清单；含 `.soft-ue-index` 与 UMTAnimInstance/Chooser 附录；与技能 **retro-automation-workflow** 配套 |
+| [16-blueprint-query-fast-indexer-retro.md](16-blueprint-query-fast-indexer-retro.md) | 复盘：Blueprint 在线查询与 Indexer 的综合测试、性能评估与下一步优化方向（含常驻 client 等） |
 
 ---
 

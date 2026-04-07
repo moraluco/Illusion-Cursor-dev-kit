@@ -30,6 +30,18 @@
 - **代价**：必须启动交互式 UE，桥可达。
 - **入口**：技能 `soft-ue-cli-ue-bridge`，文档 `content/dev/soft-ue-cli.md`。
 
+#### 1.1.1 在线工具分层（Fast vs Full vs Index）
+
+- **Fast（元信息/强投影）**：适合 Agent 快速拿“路径/父类/生成类/符号概览/可调用列表”，默认不读图。
+  - `query-blueprint-fast`：AssetRegistry tags（不加载包）
+  - `query-blueprint-symbols-fast` / `query-blueprint-callables-fast`：轻量投影（可能加载 Blueprint，但不导出 nodes/pins/connections）
+- **Full（结构/默认值/图）**：需要 nodes/pins/连线/默认值时用，最权威但更慢。
+  - `query-blueprint` / `query-blueprint-graph`
+- **Index（全量/增量可续跑）**：需要“范围刷新 + 分页查询 + 可解释的新鲜度”时用（由编辑器插件维护）。
+  - `bp-index-refresh` / `bp-index-query` / `bp-index-get`
+
+> 注意：若“毫秒级”目标指端到端交互，需区分 Bridge 处理时间与调用端进程启动时间；常驻 client 能显著降低端到端延迟（见 gotchas）。
+
 ### 1.2 离线快照：`BlueprintSnapshot/`、`.soft-ue-index/`（Search/Grep 与复盘）
 
 - **适用**：

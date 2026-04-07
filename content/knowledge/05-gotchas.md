@@ -50,6 +50,8 @@
 | E2E 期望保存后必有 `.soft-ue-index/changed_assets.ndjson` 失败 | 运行的编辑器**未加载**含保存队列钩子的插件构建；或 save 未触发 `OnObjectSaved`（资产未脏、路径不对） | 插件改动后需 **重编并重启** UE；save 前先 dirty 再 `save_loaded_asset`；套件可对「无队列」做 **skip/早退** 以免误杀整条 E2E（见 `E2E-Snapshot-System.Tests.ps1`） |
 | UBT / VS 编 `ManteumTowerEditor` 报 **`Unable to build while Live Coding is active`** | 交互式 UE 已开且 **Live Coding** 占用，UBT 拒绝并行构建 | **关闭 UE** 或 **Ctrl+Alt+F11** 关闭 Live Coding 后再编；**不要**把 Live Coding 当项目 C++ 的**唯一**正式验收（以 VS 或 `Build.bat` 为准）。见 **ue-automation-test-harness** §2.2 |
 | 回调签名里 **`FObjectPreSaveContext`** 报 **C2027 使用了未定义类型** | `UObjectGlobals.h` 只有前向声明，按值使用需要完整类型 | `#include "UObject/ObjectSaveContext.h"`（定义见该头） |
+| PowerShell 脚本在本机直接报 ParserError（看似“`- xxx` 需要值”“L2 解析成 token”） | 脚本里混入了**智能引号/全角标点**（例如 `“ ”`、`（ ）`），或依赖反引号/转义在 **Windows PowerShell 5.1** 下表现不稳定 | 在脚本中**只用 ASCII 标点**与普通引号；避免把说明文字复制进可执行行；出现 ParserError 先检查最近改动行是否含非 ASCII 符号 |
+| Blueprint fast 工具端到端耗时远高于“毫秒级” | 当前基准是**每次调用启动一个 python 进程**（进程启动+import+http 请求占主导），不是 Bridge 本身慢 | 若要逼近毫秒级：让调用端**常驻**（同一进程复用 `httpx.Client`/连接池），或做批量/会话化 RPC；基准需区分 cold-start 与 warm 调用 |
 
 
 ---
