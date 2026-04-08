@@ -1,3 +1,104 @@
+# 蓝图查询工作流（决策树）
+
+本页回答一个核心问题：**当你想“像读代码一样”读/查蓝图时，应该用哪条链路？**
+
+- **在线（权威，当前编辑器内事实）**：`soft-ue-cli` 通过 SoftUEBridge（`check-setup` 成功）读取。
+- **离线（可 Grep/可提交证据，可能滞后）**：`BlueprintSnapshot/`、`.soft-ue-index/`、以及 `.soft-ue-blueprint-index/index.json`（Indexer 快照）。
+
+---
+
+## 0. 先判定：你要的是什么
+
+| 目标 | 默认推荐 | 回落/替代 |
+|------|----------|-----------|
+| **单个蓝图**：确认父类、变量、defaults、组件、某 callable 的完整图细节 | `query-blueprint` / `query-blueprint-graph` | 若图很大可先 `--search` 或先用 Indexer L2 粗定位，再按需 query |
+| **批处理 / 固定 scope**：从大量蓝图读取图结构、追踪调用/数据流、生成/分析结构化数据 | **Indexer L2**：`bp-index-refresh` → `bp-index-l2-list` → `bp-index-chunk-get` | 当 L2 契约不足（Anim 深层属性/字节级对齐等）再 `query-blueprint-graph` |
+| **全项目搜索（像 grep 一样搜函数/变量/注释/节点标题）** | 离线 `.soft-ue-index/`（导出后 grep） | 需要“当前编辑器内事实”时回到在线工具 |
+
+---
+
+## 1. 权威事实的前置条件（必须项）
+
+在断言「当前编辑器内」事实前，必须：
+
+```powershell
+cd <ProjectRoot>
+py -3 -m soft_ue_cli check-setup
+```
+
+失败（502/timeout）时：先按技能 `soft-ue-cli-ue-bridge` / `ue-editor-launch` 恢复 Editor+Bridge，再做任何“事实”断言。
+
+---
+
+## 1.1 单资产“读全图”路径（最权威）
+
+适合：排障、最终对齐、需要完整 defaults/pins/连线/可调用项等。
+
+```powershell
+# 资产结构（变量/函数/组件/defaults）
+py -3 -m soft_ue_cli query-blueprint /Game/Path/BP_Foo --include all
+
+# 图结构（可列出 callables 或取指定 callable）
+py -3 -m soft_ue_cli query-blueprint-graph /Game/Path/BP_Foo --list-callables
+py -3 -m soft_ue_cli query-blueprint-graph /Game/Path/BP_Foo --callable-name EventGraph
+```
+
+**特点**：
+
+- 优点：字段更全、最接近“编辑器所见”。  
+- 代价：对大量资产循环调用会很慢，且遇到加载失败会直接失败。
+
+---
+
+## 1.1.2 批处理默认路径：Indexer L2（推荐）
+
+适合：在固定 scope 内反复读图结构/追踪数据流/调用链/做迁移分析。
+
+### Step A：先刷新索引（一次性成本，可复用）
+
+```powershell
+py -3 -m soft_ue_cli bp-index-refresh `
+  --scope-path /Game `
+  --levels L0L1L2 `
+  --l2-projection connections `
+  --l2-semantic-level minimal
+```
+
+### Step B：枚举 chunk 并分页读取
+
+```powershell
+# 列出某资产（object_path）或某 scope 下的 chunk_id
+py -3 -m soft_ue_cli bp-index-l2-list --scope-path "/Game/Path/BP_Foo.BP_Foo" --limit 500
+
+# 拉一个 chunk（注意 chunk_id 含 | 需要 quoting）
+py -3 -m soft_ue_cli bp-index-chunk-get --chunk-id "/Game/Path/BP_Foo.BP_Foo|event|EventGraph" --node-limit 64
+```
+
+### 回落条件（何时必须用 query-blueprint-graph）
+
+- 需要与全图工具 **字节级一致** 的序列化选项
+- 需要 Anim 节点内嵌属性等 L2 未覆盖字段
+- 发现 Indexer 覆盖不足（`bp-index-stats` 显示 staleness/coverage 不满足）且刷新后仍缺
+
+---
+
+## 2. 离线产物怎么用（Search/Grep 与证据）
+
+| 产物 | 生成方式 | 用途 |
+|------|----------|------|
+| `.soft-ue-index/` | Kit 脚本 `Export-BlueprintTextIndex*.ps1` | 全项目 grep（函数/变量/callables/节点标题等） |
+| `BlueprintSnapshot/` | Kit 脚本 `Export-AssetSnapshot.ps1` / `Export-BlueprintDeepIndex.ps1` | 可提交证据、离线复盘、逐 callable 全图 JSON |
+| `.soft-ue-blueprint-index/index.json` | Indexer `SaveSnapshot` / 自动保存 | Indexer 只读复盘（注意常为 UTF-16 LE） |
+
+**原则**：离线用于搜索/旁证；涉及“当前编辑器内事实”的结论必须在线工具确认或明确标注“可能滞后”。  
+
+---
+
+## 3. 常见坑（必须记住）
+
+- **Windows `chunk_id` 含 `|`**：`bp-index-chunk-get --chunk-id` 必须保证参数作为单一 argv（加引号或变量承载）。详见 `content/dev/soft-ue-cli.md` 与技能 `soft-ue-cli-ue-bridge` §1.2。
+- **Index 快照编码**：`.soft-ue-blueprint-index/index.json` 可能是 UTF-16 LE；脚本读取要显式指定编码。
+
 # 蓝图查询工作流（在线权威 vs 离线快照）
 
 本文件用于统一“查询蓝图/行为树/StateTree”的入口选择，避免在 **soft-ue-cli（在线）** 与 **BlueprintSnapshot（离线）** 之间口径冲突。
