@@ -31,7 +31,7 @@ description: >-
 ### A. 交互式 Editor + SoftUEBridge（soft-ue-cli）
 
 适合：查询/导出编辑器内资产数据、**蓝图/AnimBP 图结构（事实）**、PIE、截图、关卡 Actor 查询等。\
-入口参考：技能 `soft-ue-cli-ue-bridge` 与 `content/dev/soft-ue-cli.md`。蓝图事实**仅**在 `check-setup` 成功后成立；桥不可达时先 **`Start-UnrealEditor.ps1`** 或 **ue-editor-launch** 恢复连接。
+入口参考：技能 `soft-ue-cli-ue-bridge` 与 `content/dev/soft-ue-cli.md`；**单图全 JSON vs 批量图结构/语义**的分流见 **`content/knowledge/07-blueprint-query-workflow.md`**（§1.1.2：优先 `bp-index-refresh` + L2 chunk，避免脚本内对 `query-blueprint-graph` 逐资产循环）。蓝图事实**仅**在 `check-setup` 成功后成立；桥不可达时先 **`Start-UnrealEditor.ps1`** 或 **ue-editor-launch** 恢复连接。
 
 ### B. 无人值守 UnrealEditor-Cmd（Commandlet）
 

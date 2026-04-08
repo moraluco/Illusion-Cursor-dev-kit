@@ -4,7 +4,10 @@
 
 ## 0. Agent 取证原则（事实 vs 搜索）
 
-- **事实（「当前编辑器里」）**：凡向用户**断言**「某蓝图此刻的父类、变量、节点、连线、pins、默认值、引用」等，**必须**来自 **`py -3 -m soft_ue_cli check-setup` 成功**之后的 `query-blueprint` / `query-blueprint-graph` / `find-references` 等。
+- **事实（「当前编辑器里」）**：凡向用户**断言**「某蓝图此刻的父类、变量、节点、连线、pins、默认值、引用」等，**必须**来自 **`py -3 -m soft_ue_cli check-setup` 成功**之后的 Bridge 工具，并按场景选择入口（**不是**只有 `query-blueprint-graph` 一条路）：
+  - **单资产全图 JSON、与既有导出/工具链字节级对齐、排障**：`query-blueprint` / `query-blueprint-graph` / `find-references` 等（大图**落地文件**，见 §2.2.1）。
+  - **固定 scope 内批量读图结构、语义（`semantic` / `pin_type` / `edge_kind`）**：在 **`bp-index-refresh`**（含 `L0L1L2`、按需 `l2_projection` / `l2_semantic_level`）**成功**后，用 **`bp-index-l2-list`** → **`bp-index-chunk-get`**；断言前用 **`bp-index-stats`** 看新鲜度/stale（同一会话内 **refresh → chunk** 可视为编辑器侧事实）。实现与设计见 ManteumTower `Docs/Blueprint-Indexer-L2-Semantic-Code-Equivalence.md` §6；脚本侧审计见 `Docs/Blueprint-Indexer-L2-Semantic-Workflow-Audit.md`。
+  - **磁盘上的 `.soft-ue-blueprint-index/index.json`**：常为 **UTF-16 LE**，脚本需按 UTF-16 读取；且仅作**离线复盘/辅助搜索**，**未**与本次 refresh 对齐时**不得**单独终裁「当前编辑器事实」。
 - **禁止与离线快照混为一谈**：**禁止**用对**原始 `.uasset` 文件**的二进制/ASCII 启发式扫描、或未解析 UObject 就猜结构，作为上述断言的**唯一依据**。这与 **`BlueprintSnapshot/`、`.soft-ue-index/`、脚本导出的 `graphs/*.json`** 无关——后者是**正规离线工作流，应当使用**。
 - **桥不可达**：**先**恢复交互式 UE 与 **SoftUEBridge**（技能 **ue-editor-launch**、Kit **`content/dev/scripts/Start-UnrealEditor.ps1`**，见 `content/dev/soft-ue-cli.md`），再重试 `check-setup`。在等待或无法立即在线时，**仍可使用**已有离线索引/快照推进搜索，并**标注**可能滞后。
 - **离线索引/快照**：用于**全项目搜索、候选定位、复盘、PR 旁证**；可能滞后，在需要「**最新**编辑器状态」时不能**单独**终裁，但**不是**禁用项。
@@ -37,10 +40,21 @@
   - `query-blueprint-symbols-fast` / `query-blueprint-callables-fast`：轻量投影（可能加载 Blueprint，但不导出 nodes/pins/connections）
 - **Full（结构/默认值/图）**：需要 nodes/pins/连线/默认值时用，最权威但更慢。
   - `query-blueprint` / `query-blueprint-graph`
-- **Index（全量/增量可续跑）**：需要“范围刷新 + 分页查询 + 可解释的新鲜度”时用（由编辑器插件维护）。
-  - `bp-index-refresh` / `bp-index-query` / `bp-index-get`
+- **Index（全量/增量可续跑 + L2 chunk）**：需要“范围刷新 + 分页查询 + 可解释的新鲜度”，或**批量/重复读图结构**时用（由编辑器插件维护；**勿**对大量资产循环 `query-blueprint-graph` 当默认批处理）。
+  - `bp-index-refresh` / `bp-index-stats` / `bp-index-query` / `bp-index-get`
+  - L2：`bp-index-l2-list` / `bp-index-chunk-get`（依赖 refresh 将索引写入内存；`l2_semantic_level`：`off` → `minimal` → `standard` → `full`，档位越高 chunk 越大）
+  - **门禁/冒烟（ManteumTower）**：Bridge 可达时可选 `Scripts/Test-BpIndexL2.ps1`（含 `connections` + 语义、`stats` staleness 等断言）
 
-> 注意：若“毫秒级”目标指端到端交互，需区分 Bridge 处理时间与调用端进程启动时间；常驻 client 能显著降低端到端延迟（见 gotchas）。
+#### 1.1.2 何时优先 Index（L2）vs 全图 `query-*`
+
+| 场景 | 优先入口 |
+|------|----------|
+| 全项目搜名字/候选、离线复盘 | `.soft-ue-index` / `BlueprintSnapshot`（§1.2） |
+| **同一 scope 内多次读图结构、语义、自动化批处理** | `bp-index-refresh` → `bp-index-l2-list` → `bp-index-chunk-get` |
+| **单蓝图、要完整图 JSON、与既有导出格式一致** | `query-blueprint-graph`（输出落地文件） |
+| 对齐/排障、桥侧单次探针 | `query-blueprint` / Fast 工具 |
+
+> 注意：若“毫秒级”目标指端到端交互，需区分 Bridge 处理时间与调用端进程启动时间；常驻 client 能显著降低端到端延迟（见 [05-gotchas.md](05-gotchas.md)）。
 
 ### 1.2 离线快照：`BlueprintSnapshot/`、`.soft-ue-index/`（Search/Grep 与复盘）
 
@@ -70,7 +84,8 @@
 
 ### 2.2 需要“精确图细节”（pins/连线/default_value）
 
-- **优先**：soft-ue-cli 在线 `query-blueprint-graph`（桥须先可用；不可用则先恢复 UE + Bridge，见 §0）。
+- **单资产、要整图 JSON**：soft-ue-cli 在线 `query-blueprint-graph`（桥须先可用；不可用则先恢复 UE + Bridge，见 §0）。
+- **多资产或脚本内反复读图**：优先 §1.1.2 的 **bp-index 链**（refresh 后再 chunk-get），避免对 `query-blueprint-graph` **逐资产循环**成为默认策略（性能与桥负载）；需要与既有全图导出格式完全一致时再回落 `query-blueprint-graph`。
 - **若暂时无法恢复桥且已有层次化快照**：可从 `BlueprintSnapshot/assets/<asset>/graphs/*.graph.json` 离线读取（**必须标注**可能不是最新，且**不是**首选事实源）。
 
 ### 2.2.1 取证输出必须落地（避免终端截断）
@@ -115,8 +130,9 @@
 
 ## 5. 交叉引用
 
-- 技能：`soft-ue-cli-ue-bridge`
+- 技能：`soft-ue-cli-ue-bridge`、`ue-editor-automation-workflow`
 - 文档：`content/dev/soft-ue-cli.md`
 - 规则：`.cursor/rules/blueprint-snapshot-search.mdc`
-- 复盘（CLI 输出落地、避免终端截断）：`content/knowledge/15-retro-automation-workflow.md`
+- 复盘（CLI 输出落地、避免终端截断、L2 索引会话提要）：`content/knowledge/15-retro-automation-workflow.md`
+- 易错点（UTF-16 索引、`nodes_only` vs 语义）：`content/knowledge/05-gotchas.md`
 

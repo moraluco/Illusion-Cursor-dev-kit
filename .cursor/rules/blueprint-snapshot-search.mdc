@@ -8,7 +8,7 @@ alwaysApply: true
 ## 本规则管什么、不管什么
 
 - **管**：在**全项目范围**用 `.soft-ue-index/`、`BlueprintSnapshot/` **搜名字、找候选、离线复盘**（函数/变量/callables、谁可能引用谁）。
-- **不管**：**不**替代 **SoftUEBridge + soft-ue-cli** 对编辑器内蓝图**当前事实**的查询。凡要向用户断言「某蓝图父类、某图节点与连线、默认值、精确引用」等，**必须**在 `py -3 -m soft_ue_cli check-setup` **成功**后使用 `query-blueprint` / `query-blueprint-graph` 等（技能 **soft-ue-cli-ue-bridge**）。
+- **不管**：**不**替代 **SoftUEBridge + soft-ue-cli** 对编辑器内蓝图**当前事实**的查询。凡要向用户断言「某蓝图父类、某图节点与连线、默认值、精确引用」等，**必须**在 `py -3 -m soft_ue_cli check-setup` **成功**后使用 Bridge 工具：单资产/全图 JSON 用 `query-blueprint` / `query-blueprint-graph` 等；**固定 scope 内批量读图结构/语义**优先 **`bp-index-refresh`** → **`bp-index-l2-list`** → **`bp-index-chunk-get`**（技能 **soft-ue-cli-ue-bridge**；决策树 **`content/knowledge/07-blueprint-query-workflow.md`**）。
 - **桥不可达（502 / timeout / check-setup 失败）**：**502 且 UE 已开时先提醒用户检查系统代理**（技能 **soft-ue-cli-ue-bridge** §1.1）；否则 **先**按技能 **ue-editor-launch** 或 Kit **`content/dev/scripts/Start-UnrealEditor.ps1`** 启动/复用交互式 UE 并重试 `check-setup`。在此之前/同时，**仍可使用**已有 `.soft-ue-index/`、`BlueprintSnapshot/` 推进搜索（标注可能滞后）。**禁止**的是：对**原始 `.uasset`** 做二进制扫字符串冒充「已核实编辑器事实」— **不是**禁止离线索引本身。
 
 ## 大范围搜索时的推荐顺序
@@ -17,6 +17,6 @@ alwaysApply: true
 2. 优先搜：`.soft-ue-index/blueprints.rollup.txt`、`.soft-ue-index/assets/**/summary.txt|ndjson`。
 3. 需要可提交证据或层次化快照：`Ensure-BlueprintSnapshot.ps1`、`Export-AssetSnapshot.ps1`（见 `content/knowledge/07-blueprint-query-workflow.md`）。
 4. 调用关系离线分析：依赖 `graphs/*.graph.json`（`Export-BlueprintDeepIndex.ps1` 或快照产物）。
-5. **精确结构或最新状态**：**必须** soft-ue-cli 在线查询。
+5. **精确结构或最新状态**：**必须** soft-ue-cli 在线查询（`query-*` 或 **bp-index / L2 chunk**，见 `07-blueprint-query-workflow.md` §0 / §1.1.2）。
 
 完整决策树：`content/knowledge/07-blueprint-query-workflow.md`。

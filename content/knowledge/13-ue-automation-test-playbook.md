@@ -24,6 +24,7 @@
 ### A. 交互式 Editor + Bridge（soft-ue-cli / SoftUEBridge）
 
 - **适用**：读编辑器内资产/关卡/Actor、截图、PIE、在线查询 Blueprint 图等。
+- **蓝图图结构自动化**：区分「单资产整图 JSON」与「批量/重复读图」——优先按 **`content/knowledge/07-blueprint-query-workflow.md`**（`bp-index` / L2 chunk vs `query-blueprint-graph`），减轻桥负载与脚本耗时。
 - **前置**：必须启动 `UnrealEditor.exe`（交互式），并且桥可达。
 - **典型风险**：并发请求导致桥端 502/timeout；编辑器状态可能被多个任务互相影响。
 

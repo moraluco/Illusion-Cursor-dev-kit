@@ -20,7 +20,7 @@
 | [04-decisions.md](04-decisions.md)           | 项目/技术决策记录（架构、选型、约定）                          |
 | [05-gotchas.md](05-gotchas.md)               | 易错点、排错备忘与常见问题                                |
 | [06-lessons-blueprint-serializer.md](06-lessons-blueprint-serializer.md) | 经验总结：BlueprintSerializer 插件、编译修复；可选 JSON 导出管线（非 Agent 读图主路径） |
-| [07-blueprint-query-workflow.md](07-blueprint-query-workflow.md) | 蓝图查询工作流：在线权威（soft-ue-cli）与离线快照（BlueprintSnapshot/.soft-ue-index）的入口选择与决策树 |
+| [07-blueprint-query-workflow.md](07-blueprint-query-workflow.md) | 蓝图查询工作流：在线权威（soft-ue-cli；含 `query-*` 与 **bp-index / L2 chunk** 分流）与离线快照（BlueprintSnapshot/.soft-ue-index）的决策树 |
 | [08-player-3c-animation-system.md](08-player-3c-animation-system.md) | 经验总结：玩家 3C 动画系统（ALS/Linked Anim Graph/AS），扩展模式与调试清单 |
 | [09-player-animation-system.md](09-player-animation-system.md) | 玩家动画系统（ALS + AB_Als_Lin + LinkedGraphs + Montage/Notify）：资产结构、刷新链路、曲线与蒙太奇 |
 | [10-als-data-config.md](10-als-data-config.md) | ALS 数据配置（移动）：加速度、阻尼、制动 — 配置入口、数据流向、速查表（Lin_MovementSettings_Default / 曲线 X/Y/Z） |
