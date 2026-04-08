@@ -15,7 +15,7 @@ description: >-
 - `content/knowledge/15-retro-automation-workflow.md`（套路 + **Mermaid 总览图**）
 - `content/knowledge/05-gotchas.md`、`content/knowledge/13-ue-automation-test-playbook.md`、`content/knowledge/07-blueprint-query-workflow.md`
 - `content/dev/git-automation.md`、`content/dev/pitfalls-inbox.md`
-- 与 **summarize-to-knowledge**、**git-local-p4-workflow**、**ue-automation-test-harness** 互补（本技能侧重「自动化闭环 + 取证 + 提交」的复盘）
+- 与 **summarize-to-knowledge**、**git-local-p4-workflow**、**ue-editor-automation-workflow** 互补（本技能侧重「自动化闭环 + 取证 + 提交」的复盘）
 
 ---
 
@@ -140,4 +140,4 @@ description: >-
 ## 交叉引用
 
 - 入口不变的 subagents 增效：技能 **subagents-workflow-augmentation**
-- **C++（ManteumTower）编译工作流**：VS 只编 Games/ManteumTower、勿以 Live Coding 为唯一验收、UBT 与 LC 冲突处理 — 技能 **ue-automation-test-harness** §2.2；易错表 **content/knowledge/05-gotchas.md**
+- **C++（ManteumTower）编译工作流**：VS 只编 Games/ManteumTower、勿以 Live Coding 为唯一验收、UBT 与 LC 冲突处理 — 技能 **ue-editor-automation-workflow** §2.2；易错表 **content/knowledge/05-gotchas.md**

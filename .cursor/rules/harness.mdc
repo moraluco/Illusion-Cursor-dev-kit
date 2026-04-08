@@ -1,0 +1,10 @@
+---
+description: 术语 Harness：本工作区内用于约束 Agent 行为的整体环境（非 UE 专用）
+alwaysApply: true
+---
+
+# Harness（术语）
+
+在本 Kit 与多根工作区语境下，**Harness** 指：**用于规范约束 Agent 行为的一整套工作区环境**（`.cursor/rules`、`.cursor/skills`、`content/` 知识库与 METHODOLOGY、与项目根协作方式等）。
+
+- **不要**用「Harness」指代「进 UE 做自动化测试/验证」那一套流程；后者请称 **UE 编辑器自动化工作流**，技能名为 **`ue-editor-automation-workflow`**（Rule `ue-automation-testing`）。

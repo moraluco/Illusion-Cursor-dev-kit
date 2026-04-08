@@ -1,5 +1,5 @@
 ---
-description: 进 UE 做自动化测试/验证时按 ue-automation-test-harness 与相关 knowledge
+description: 进 UE 做自动化测试/验证时按 ue-editor-automation-workflow 与相关 knowledge
 alwaysApply: true
 ---
 
@@ -7,11 +7,11 @@ alwaysApply: true
 
 当用户要「进 UE 自动化测试」「并发跑 UE」「soft-ue-cli / Bridge」「Editor-Cmd / CI」时：
 
-- **主流程**：技能 **ue-automation-test-harness**（先选 Editor+Bridge vs Editor-Cmd，再谈脚本/并发/证据）。
+- **主流程**：技能 **ue-editor-automation-workflow**（先选 Editor+Bridge vs Editor-Cmd，再谈脚本/并发/证据）。
 - **能不进 UE 就不进 UE**：本机优先用 `content/dev/scripts/Run-LocalTests.ps1`（Lint/Pester Unit/纯 C++），只有需要资产/编辑器能力时才走 UE E2E。
 - **复盘与门禁口径**：`content/knowledge/13-ue-automation-test-playbook.md`、`content/knowledge/15-retro-automation-workflow.md`。
-- **硬约定（摘要）**：统一用 `content/dev/scripts/Start-UnrealEditor.ps1` 管理 UE 启动；并发隔离 **OutDir**；PowerShell 避免用 `$pid` 作变量名。细节以 harness 技能为准。
+- **硬约定（摘要）**：统一用 `content/dev/scripts/Start-UnrealEditor.ps1` 管理 UE 启动；并发隔离 **OutDir**；PowerShell 避免用 `$pid` 作变量名。细节以 **ue-editor-automation-workflow** 技能为准。
 
 - **硬门禁：写资产必须保存**：只要通过 soft-ue-cli / UE Python 对 `.uasset` 做了任何写操作（reparent、改图、删变量、改 defaults 等），就必须在同一段操作里 `Save`（并在关键里程碑重复 Save）。默认 UE 可能闪退，未保存改动视为不存在。
 
-- **C++ 编译**：改 `.cpp/.h/Build.cs` 后须 **正式编译**（VS 或 `Build.bat` + **ManteumTowerEditor**），**不要**把 **Live Coding** 当唯一验收；UBT 在 Live Coding 占用时常报 `Unable to build while Live Coding is active` —— **关 UE 或 Ctrl+Alt+F11** 后再编。**VS 只生成 Games/ManteumTower**，勿默认整解决方案。细节见技能 **ue-automation-test-harness** §2.2。
+- **C++ 编译**：改 `.cpp/.h/Build.cs` 后须 **正式编译**（VS 或 `Build.bat` + **ManteumTowerEditor**），**不要**把 **Live Coding** 当唯一验收；UBT 在 Live Coding 占用时常报 `Unable to build while Live Coding is active` —— **关 UE 或 Ctrl+Alt+F11** 后再编。**VS 只生成 Games/ManteumTower**，勿默认整解决方案。细节见技能 **ue-editor-automation-workflow** §2.2。

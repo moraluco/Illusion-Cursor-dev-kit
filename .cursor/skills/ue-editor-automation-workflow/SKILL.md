@@ -1,10 +1,10 @@
 ---
-name: ue-automation-test-harness
+name: ue-editor-automation-workflow
 description: >-
-  通用“进 UE 做自动化测试”工作流：选择 Editor+Bridge vs Editor-Cmd，启动与等待、并发/资源治理、证据采集与清理；并提供 Pester Unit/E2E 测试入口。
+  通用“进 UE 做自动化测试/验证”工作流：选择 Editor+Bridge vs Editor-Cmd，启动与等待、并发/资源治理、证据采集与清理；并提供 Pester Unit/E2E 测试入口。（术语「Harness」在本 Kit 中专指工作区约束 Agent 的整体环境，见规则 harness。）
 ---
 
-# UE 自动化测试 Harness（通用）
+# UE 编辑器自动化工作流（通用）
 
 本技能用于任何“进 UE 做自动化测试/自动化验证”的任务，目标是：**稳定、可复盘、可并发控制、可清理**。
 
@@ -121,7 +121,7 @@ description: >-
 
 ## 6) 复盘与工作流进化（可选）
 
-一段自动化 harness / Editor-Cmd / 证据采集任务结束后，若要把「坑」与改进**写回 Kit**并形成可重复套路：
+一段自动化验证 / Editor-Cmd / 证据采集任务结束后，若要把「坑」与改进**写回 Kit**并形成可重复套路：
 
 - 技能 **retro-automation-workflow**
 - 文档 `content/knowledge/15-retro-automation-workflow.md`（含 Mermaid：取证 → 门禁 → 提交）
