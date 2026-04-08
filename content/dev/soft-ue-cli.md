@@ -187,6 +187,27 @@ Remove-Item -LiteralPath $tmp -Force
 
 > 注意：PowerShell 5.1 的 `Set-Content -Encoding utf8` 可能带 BOM；若脚本对 BOM 敏感，改用 `[System.IO.File]::WriteAllText()` + `UTF8Encoding($false)`（参考 `content/dev/git-automation.md` 的写法）。
 
+### 1.1) `bp-index-chunk-get --chunk-id`：chunk_id 含 `|` 时必须保证 quoting
+
+`bp-index-chunk-get` 的 `chunk_id` 形如：
+
+- `"/Game/BP_A.BP_A|uber_graph|EventGraph"`
+
+其中 `|` 在 **cmd.exe** 语义中是“管道符”。当你的调用链经过 cmd（例如：某些测试里用 `py.cmd` stub、或其它 cmd 包装器），不加引号会导致参数被拆分、命令行为异常。
+
+稳写法（PowerShell）：
+
+```powershell
+$chunkId = "/Game/BP_A.BP_A|uber_graph|EventGraph"
+py -3 -m soft_ue_cli bp-index-chunk-get --chunk-id $chunkId --node-offset 0 --node-limit 200
+```
+
+稳写法（显式引号，跨 cmd 兼容）：
+
+```powershell
+py -3 -m soft_ue_cli bp-index-chunk-get --chunk-id "/Game/BP_A.BP_A|uber_graph|EventGraph" --node-offset 0 --node-limit 200
+```
+
 ### 2) 需要 JSON 的参数（例如 `--properties`）：用变量承载成“单一 argv”
 
 当某子命令需要 `--properties <json>` 一类参数时：
