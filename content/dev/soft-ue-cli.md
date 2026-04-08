@@ -38,7 +38,9 @@ py -3 -m soft_ue_cli check-setup
 
 ## Agent：蓝图事实与桥不可达
 
-- **向用户断言「当前编辑器内」**蓝图父类、图结构、节点/连线、默认值等，**仅**以 `check-setup` **成功**后的 `query-blueprint` / `query-blueprint-graph` 等为准（技能 **soft-ue-cli-ue-bridge**）。
+- **向用户断言「当前编辑器内」**蓝图父类、图结构、节点/连线、默认值等，**仅**以 `check-setup` **成功**后的 Bridge 工具为准（技能 **soft-ue-cli-ue-bridge**）。
+- **批处理 / 固定 scope 内重复读图结构**：优先 **`bp-index-refresh`**（`L0L1L2`，`--l2-projection connections`，`--l2-semantic-level minimal|standard|full`）→ **`bp-index-l2-list`** → **`bp-index-chunk-get`**（见 ManteumTower `Docs/Blueprint-Indexer-L2-Semantic-Code-Equivalence.md` §6）。**`query-blueprint` / `query-blueprint-graph`** 用于全图对齐、排障或与全图工具字节级一致场景。
+- **单资产 / 快速元数据**：仍可用 `query-blueprint-fast` 等 Fast 工具。
 - **`check-setup` 失败**（含 502）：**先**用 **`content/dev/scripts/Start-UnrealEditor.ps1`** 或技能 **ue-editor-launch** 启动/复用交互式 UE，再重试。
 - **禁止**用对**原始 `.uasset`** 的二进制扫字符串冒充上述断言的**唯一依据**。**不**禁止 **`BlueprintSnapshot/`、`.soft-ue-index/`** 等脚本导出的正规离线索引与快照（用于搜索/复盘时标注可能滞后即可）。
 
