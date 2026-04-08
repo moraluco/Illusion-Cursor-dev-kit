@@ -29,6 +29,12 @@ if %ERRORLEVEL%==0 (
   exit /b 0
 )
 
+echo %ARGS% | findstr /I /C:"bp-index-l2-list" >nul
+if %ERRORLEVEL%==0 (
+  echo {"chunk_ids":["/Game/Test/BP_A.BP_A|uber_graph|EventGraph","/Game/Test/BP_A.BP_A|function|DoThing"]}
+  exit /b 0
+)
+
 echo %ARGS% | findstr /I /C:"query-blueprint-graph" >nul
 if %ERRORLEVEL%==0 (
   echo %ARGS% | findstr /I /C:"--list-callables" >nul

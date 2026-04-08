@@ -8,7 +8,11 @@
     - blueprints.ndjson : one JSON object per line (easy to grep + machine-process)
     - blueprints.txt    : compact human/grep-friendly lines
 
-  By default this exports names (fast). Optional -IncludeGraphNodes will also dump node titles/comments (slow).
+  By default this exports names (fast).
+
+  For batch workflows, this script prefers the Blueprint Indexer toolchain:
+    bp-index-refresh -> bp-index-l2-list -> bp-index-chunk-get
+  Full graph query (query-blueprint-graph) is a fallback only, and must be observable via reason code.
 
 .REQUIREMENTS
   - Interactive UnrealEditor.exe running with SoftUEBridge enabled.
@@ -50,6 +54,16 @@ param(
 
     # Export graph nodes (slow; enables comment/title searching)
     [switch] $IncludeGraphNodes,
+
+    # Prefer Indexer L2 (bp-index-*) over query-blueprint-graph for batch extraction.
+    [switch] $UseIndexer = $true,
+
+    # Indexer settings (only used when -UseIndexer)
+    [ValidateSet('nodes_only','pins','connections')]
+    [string] $L2Projection = 'connections',
+
+    [ValidateSet('off','minimal','standard','full')]
+    [string] $L2SemanticLevel = 'minimal',
 
     # Output base name (default writes blueprints.txt / blueprints.ndjson)
     [string] $OutBaseName = 'blueprints',
@@ -156,6 +170,68 @@ function Invoke-SoftUEJson {
     return $obj
 }
 
+function Write-FallbackNotice {
+    param(
+        [Parameter(Mandatory = $true)] [string] $ReasonCode,
+        [Parameter(Mandatory = $true)] [string] $AssetPath,
+        [string] $Evidence
+    )
+    $ev = $Evidence
+    if (-not $ev) { $ev = "" }
+    $line = ("FALLBACK_QUERY_BLUEPRINT_GRAPH reason={0} asset={1} evidence={2}" -f $ReasonCode, $AssetPath, $ev)
+    Write-Host $line
+}
+
+function Parse-ChunkIdParts([string] $ChunkId) {
+    # Format example: /Game/A.BP_A|uber_graph|EventGraph
+    $parts = $ChunkId -split '\|', 3
+    if ($parts.Count -lt 3) { return $null }
+    return [pscustomobject]@{ asset_path = $parts[0]; graph_kind = $parts[1]; graph_name = $parts[2] }
+}
+
+function Get-IndexerCallablesAndNodes {
+    param(
+        [Parameter(Mandatory = $true)] [string] $AssetPath,
+        [switch] $NeedNodes
+    )
+    $list = Invoke-SoftUEJson -CliArgs @('bp-index-l2-list', '--scope-path', $AssetPath, '--limit', '50000')
+    $ids = @()
+    if ($list -and ($list.PSObject.Properties.Name -contains 'chunk_ids')) { $ids = @($list.chunk_ids) }
+    if ($ids.Count -lt 1) { return $null }
+
+    $callables = @()
+    $nodesOut = @()
+
+    foreach ($cid in $ids) {
+        $p = Parse-ChunkIdParts -ChunkId ([string]$cid)
+        if (-not $p) { continue }
+        $callables += [pscustomobject]@{ name = $p.graph_name; type = $p.graph_kind; graph = $p.graph_name; chunk_id = [string]$cid }
+    }
+
+    if ($NeedNodes) {
+        foreach ($c in $callables) {
+            # chunk_id contains '|' which must be quoted for cmd.exe based launchers (e.g. py.cmd) to avoid piping.
+            $quotedChunkId = ('"{0}"' -f $c.chunk_id)
+            $cj = Invoke-SoftUEJson -CliArgs @('bp-index-chunk-get', '--chunk-id', $quotedChunkId, '--node-offset', '0', '--node-limit', '200')
+            if (-not $cj -or -not ($cj.PSObject.Properties.Name -contains 'nodes')) { continue }
+            foreach ($n in @($cj.nodes)) {
+                $title = $null
+                if ($n.PSObject.Properties.Name -contains 'title') { $title = $n.title }
+                $cls = $null
+                if ($n.PSObject.Properties.Name -contains 'class') { $cls = $n.class }
+                if (-not $title -and -not $cls) { continue }
+                $nodesOut += [pscustomobject]@{
+                    callable = [string]$c.name
+                    node_class = $cls
+                    title = $title
+                }
+            }
+        }
+    }
+
+    return [pscustomobject]@{ callables = $callables; nodes = $nodesOut }
+}
+
 function Get-AssetPathFromItem {
     param([Parameter(Mandatory = $true)] $Item)
     foreach ($k in @('asset_path', 'object_path', 'path', 'AssetPath', 'ObjectPath')) {
@@ -211,6 +287,21 @@ Write-Host ("OutBaseName: {0}" -f $OutBaseName)
 
 # Quick health check (gives a clear error when UE isn't running / bridge not reachable)
 $null = Invoke-SoftUEJson -CliArgs @('status')
+
+if ($UseIndexer -and ($IncludeCallables -or $IncludeGraphNodes)) {
+    Write-Host "Indexer warm-up: bp-index-refresh (L0L1L2 + L2 connections + semantic)"
+    foreach ($root in $ContentPaths) {
+        if (-not $root) { continue }
+        $null = Invoke-SoftUEJson -CliArgs @(
+            'bp-index-refresh',
+            '--scope-path', $root,
+            '--levels', 'L0L1L2',
+            '--batch-size', '50',
+            '--l2-projection', $L2Projection,
+            '--l2-semantic-level', $L2SemanticLevel
+        )
+    }
+}
 
 $assetPaths = @()
 foreach ($root in $ContentPaths) {
@@ -303,7 +394,19 @@ foreach ($bp in $assetPaths) {
             $bpVarsInfo = Invoke-SoftUEJson -CliArgs @('query-blueprint', $bp, '--include', 'variables', '--no-detail')
             $bpFnsInfo = Invoke-SoftUEJson -CliArgs @('query-blueprint', $bp, '--include', 'functions', '--no-detail')
             if ($IncludeCallables -or $IncludeGraphNodes) {
-                $callables = Invoke-SoftUEJson -CliArgs @('query-blueprint-graph', $bp, '--list-callables')
+                if ($UseIndexer) {
+                    $idx = Get-IndexerCallablesAndNodes -AssetPath $bp -NeedNodes:$IncludeGraphNodes
+                    if (-not $idx) { throw "Indexer returned no chunks" }
+                    $callables = [pscustomobject]@{
+                        events = @()
+                        functions = @($idx.callables)
+                        macros = @()
+                        _indexer_nodes = @($idx.nodes)
+                    }
+                } else {
+                    Write-FallbackNotice -ReasonCode "need_field_not_in_l2_schema" -AssetPath $bp -Evidence "UseIndexer=false"
+                    $callables = Invoke-SoftUEJson -CliArgs @('query-blueprint-graph', $bp, '--list-callables')
+                }
             }
             break
         }
@@ -384,51 +487,36 @@ foreach ($bp in $assetPaths) {
             Append-TextLine ("{0} | callable | {1} | {2} | {3}" -f $bp, $cname, $ctype, $cgraph)
 
             if ($IncludeGraphNodes) {
-                # Slow path: pull nodes for each callable; enables searching comment boxes and node titles.
-                $g = $null
-                for ($na = 1; $na -le 3; $na++) {
-                    try {
-                        $g = Invoke-SoftUEJson -CliArgs @('query-blueprint-graph', $bp, '--callable-name', $cname)
-                        break
-                    }
-                    catch {
-                        $msg = $_.Exception.Message
-                        $isTransient = $msg -match '502|Bad Gateway|503|timed out|timeout'
-                        if ($isTransient -and $na -lt 3) {
-                            $sleepSec = 3 * $na
-                            Write-Host ("Transient node query error on {0}::{1} (attempt {2}/3), retry in {3}s" -f $bp, $cname, $na, $sleepSec)
-                            Start-Sleep -Seconds $sleepSec
-                            continue
+                if ($UseIndexer -and ($callables.PSObject.Properties.Name -contains '_indexer_nodes')) {
+                    foreach ($n in @($callables._indexer_nodes | Where-Object { $_.callable -eq $cname })) {
+                        Append-NDJsonLine @{
+                            kind = 'blueprint.node'
+                            asset_path = $bp
+                            callable = [string]$cname
+                            node_class = $n.node_class
+                            title = $n.title
                         }
-                        throw
+                        if ($n.title) { Append-TextLine ("{0} | node | {1} | {2}" -f $bp, $cname, $n.title) }
+                        elseif ($n.node_class) { Append-TextLine ("{0} | node | {1} | class={2}" -f $bp, $cname, $n.node_class) }
                     }
-                }
-                $nodes = @()
-                if ((Has-Prop -Obj $g -Name 'nodes') -and $g.nodes) { $nodes = @($g.nodes) }
-                elseif ((Has-Prop -Obj $g -Name 'graph') -and $g.graph -and (Has-Prop -Obj $g.graph -Name 'nodes') -and $g.graph.nodes) { $nodes = @($g.graph.nodes) }
-
-                foreach ($n in $nodes) {
-                    $title = $null
-                    if (Has-Prop -Obj $n -Name 'title') { $title = $n.title }
-                    if (-not $title -and (Has-Prop -Obj $n -Name 'node_title')) { $title = $n.node_title }
-
-                    $cls = $null
-                    if (Has-Prop -Obj $n -Name 'node_class') { $cls = $n.node_class }
-                    if (-not $cls -and (Has-Prop -Obj $n -Name 'class')) { $cls = $n.class }
-                    if (-not $title -and -not $cls) { continue }
-
-                    Append-NDJsonLine @{
-                        kind = 'blueprint.node'
-                        asset_path = $bp
-                        callable = [string]$cname
-                        node_class = $cls
-                        title = $title
-                    }
-                    if ($title) {
-                        Append-TextLine ("{0} | node | {1} | {2}" -f $bp, $cname, $title)
-                    }
-                    elseif ($cls) {
-                        Append-TextLine ("{0} | node | {1} | class={2}" -f $bp, $cname, $cls)
+                } else {
+                    Write-FallbackNotice -ReasonCode "need_field_not_in_l2_schema" -AssetPath $bp -Evidence "IncludeGraphNodes requires full graph nodes"
+                    # Fallback: full graph node titles/comments
+                    $g = Invoke-SoftUEJson -CliArgs @('query-blueprint-graph', $bp, '--callable-name', $cname)
+                    $nodes = @()
+                    if ((Has-Prop -Obj $g -Name 'nodes') -and $g.nodes) { $nodes = @($g.nodes) }
+                    elseif ((Has-Prop -Obj $g -Name 'graph') -and $g.graph -and (Has-Prop -Obj $g.graph -Name 'nodes') -and $g.graph.nodes) { $nodes = @($g.graph.nodes) }
+                    foreach ($n in $nodes) {
+                        $title = $null
+                        if (Has-Prop -Obj $n -Name 'title') { $title = $n.title }
+                        if (-not $title -and (Has-Prop -Obj $n -Name 'node_title')) { $title = $n.node_title }
+                        $cls = $null
+                        if (Has-Prop -Obj $n -Name 'node_class') { $cls = $n.node_class }
+                        if (-not $cls -and (Has-Prop -Obj $n -Name 'class')) { $cls = $n.class }
+                        if (-not $title -and -not $cls) { continue }
+                        Append-NDJsonLine @{ kind='blueprint.node'; asset_path=$bp; callable=[string]$cname; node_class=$cls; title=$title }
+                        if ($title) { Append-TextLine ("{0} | node | {1} | {2}" -f $bp, $cname, $title) }
+                        elseif ($cls) { Append-TextLine ("{0} | node | {1} | class={2}" -f $bp, $cname, $cls) }
                     }
                 }
             }

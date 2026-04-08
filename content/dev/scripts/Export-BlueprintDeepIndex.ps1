@@ -25,6 +25,16 @@ param(
     # Also dump node titles to .nodes.txt for grep
     [switch] $IncludeNodeTitles,
 
+    # Prefer Indexer L2 (bp-index-*) export over full graph query.
+    # When enabled, writes *.l2chunk.json (chunk JSON) instead of *.graph.json (full graph JSON).
+    [switch] $UseIndexer = $true,
+
+    [ValidateSet('nodes_only','pins','connections')]
+    [string] $L2Projection = 'connections',
+
+    [ValidateSet('off','minimal','standard','full')]
+    [string] $L2SemanticLevel = 'minimal',
+
     [string] $ServerUrl,
     [int] $TimeoutSec = 300
 )
@@ -94,53 +104,89 @@ Write-Host "Export-BlueprintDeepIndex: start"
 Write-Host "AssetPath: $AssetPath"
 Write-Host "GraphsDir: $graphsDir"
 Write-Host "IncludeNodeTitles: $([bool]$IncludeNodeTitles)"
+Write-Host "UseIndexer: $([bool]$UseIndexer)"
+
+function Parse-ChunkIdParts([string] $ChunkId) {
+    $parts = $ChunkId -split '\|', 3
+    if ($parts.Count -lt 3) { return $null }
+    return [pscustomobject]@{ asset_path = $parts[0]; graph_kind = $parts[1]; graph_name = $parts[2] }
+}
 
 $callables = @()
-if ($CallableName) {
-    $callables = @($CallableName)
-}
-else {
-    $list = Invoke-SoftUEJson -CliArgs @('query-blueprint-graph', $AssetPath, '--list-callables')
-    foreach ($k in @('events','functions','macros')) {
-        if ($list.PSObject.Properties.Name -contains $k) {
-            foreach ($c in @($list.$k)) {
-                if ($c -and $c.name) {
-                    $callables += [string]$c.name
+if ($UseIndexer) {
+    $null = Invoke-SoftUEJson -CliArgs @(
+        'bp-index-refresh',
+        '--scope-path', $AssetPath,
+        '--levels', 'L0L1L2',
+        '--batch-size', '1',
+        '--l2-projection', $L2Projection,
+        '--l2-semantic-level', $L2SemanticLevel
+    )
+    $list = Invoke-SoftUEJson -CliArgs @('bp-index-l2-list', '--scope-path', $AssetPath, '--limit', '50000')
+    $ids = @()
+    if ($list -and ($list.PSObject.Properties.Name -contains 'chunk_ids')) { $ids = @($list.chunk_ids) }
+    foreach ($cid in $ids) {
+        $p = Parse-ChunkIdParts -ChunkId ([string]$cid)
+        if (-not $p) { continue }
+        if ($CallableName -and $p.graph_name -ne $CallableName) { continue }
+        $callables += [pscustomobject]@{ name = $p.graph_name; chunk_id = [string]$cid }
+    }
+} else {
+    if ($CallableName) { $callables = @([pscustomobject]@{ name = $CallableName }) }
+    else {
+        $list = Invoke-SoftUEJson -CliArgs @('query-blueprint-graph', $AssetPath, '--list-callables')
+        foreach ($k in @('events','functions','macros')) {
+            if ($list.PSObject.Properties.Name -contains $k) {
+                foreach ($c in @($list.$k)) {
+                    if ($c -and $c.name) { $callables += [pscustomobject]@{ name = [string]$c.name } }
                 }
             }
         }
+        $callables = @($callables | Where-Object { $_ -and $_.name } | Sort-Object -Property name -Unique)
     }
-    $callables = @($callables | Where-Object { $_ } | Sort-Object -Unique)
 }
 
 Write-Host ("Callables: {0}" -f $callables.Count)
 
-foreach ($cname in $callables) {
+foreach ($c in $callables) {
+    $cname = [string]$c.name
     Write-Host ("Graph: {0}::{1}" -f $AssetPath, $cname)
-    $g = Invoke-SoftUEJson -CliArgs @('query-blueprint-graph', $AssetPath, '--callable-name', $cname)
-
     $safe = ($cname -replace '[<>:\"/\\\\|?*]', '_')
-    $graphPath = Join-Path $graphsDir ($safe + '.graph.json')
-    Write-JsonFileAtomic -Path $graphPath -Obj $g -Depth 200
 
-    if ($IncludeNodeTitles) {
-        $nodesTxt = Join-Path $graphsDir ($safe + '.nodes.txt')
-        $titles = @()
-        $nodes = @()
-        if ($g) {
-            if (($g.PSObject.Properties.Name -contains 'nodes') -and $g.nodes) {
-                $nodes = @($g.nodes)
+    if ($UseIndexer) {
+        # chunk_id contains '|' which must be quoted for cmd.exe based launchers (e.g. py.cmd) to avoid piping.
+        $quotedChunkId = ('"{0}"' -f $c.chunk_id)
+        $cj = Invoke-SoftUEJson -CliArgs @('bp-index-chunk-get', '--chunk-id', $quotedChunkId, '--node-offset', '0', '--node-limit', '2000')
+        $outPath = Join-Path $graphsDir ($safe + '.l2chunk.json')
+        Write-JsonFileAtomic -Path $outPath -Obj $cj -Depth 120
+
+        if ($IncludeNodeTitles) {
+            $nodesTxt = Join-Path $graphsDir ($safe + '.nodes.txt')
+            $titles = @()
+            foreach ($n in @($cj.nodes)) {
+                if ($n -and ($n.PSObject.Properties.Name -contains 'title') -and $n.title) { $titles += [string]$n.title }
             }
-            elseif (($g.PSObject.Properties.Name -contains 'graph') -and $g.graph -and ($g.graph.PSObject.Properties.Name -contains 'nodes') -and $g.graph.nodes) {
-                $nodes = @($g.graph.nodes)
-            }
+            $titles | Set-Content -LiteralPath $nodesTxt -Encoding UTF8
         }
-        foreach ($n in $nodes) {
-            if ($n -and ($n.PSObject.Properties.Name -contains 'title') -and $n.title) {
-                $titles += [string]$n.title
+    }
+    else {
+        $g = Invoke-SoftUEJson -CliArgs @('query-blueprint-graph', $AssetPath, '--callable-name', $cname)
+        $graphPath = Join-Path $graphsDir ($safe + '.graph.json')
+        Write-JsonFileAtomic -Path $graphPath -Obj $g -Depth 200
+
+        if ($IncludeNodeTitles) {
+            $nodesTxt = Join-Path $graphsDir ($safe + '.nodes.txt')
+            $titles = @()
+            $nodes = @()
+            if ($g) {
+                if (($g.PSObject.Properties.Name -contains 'nodes') -and $g.nodes) { $nodes = @($g.nodes) }
+                elseif (($g.PSObject.Properties.Name -contains 'graph') -and $g.graph -and ($g.graph.PSObject.Properties.Name -contains 'nodes') -and $g.graph.nodes) { $nodes = @($g.graph.nodes) }
             }
+            foreach ($n in $nodes) {
+                if ($n -and ($n.PSObject.Properties.Name -contains 'title') -and $n.title) { $titles += [string]$n.title }
+            }
+            $titles | Set-Content -LiteralPath $nodesTxt -Encoding UTF8
         }
-        $titles | Set-Content -LiteralPath $nodesTxt -Encoding UTF8
     }
 }
 

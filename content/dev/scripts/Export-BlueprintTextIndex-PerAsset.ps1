@@ -10,7 +10,7 @@
   Fast path exports:
     - variables (query-blueprint --include variables --no-detail)
     - functions (query-blueprint --include functions --no-detail)
-    - callables list (query-blueprint-graph --list-callables) when -IncludeCallables is set
+    - callables list (prefer bp-index-l2-list; fallback to query-blueprint-graph --list-callables) when -IncludeCallables is set
 
   Node titles/comments are NOT exported here; use the on-demand deep indexer for that.
 #>
@@ -36,6 +36,9 @@ param(
 
     # Export callable list (recommended; still fast)
     [switch] $IncludeCallables = $true,
+
+    # Prefer Indexer L2 (bp-index-*) over query-blueprint-graph for batch extraction.
+    [switch] $UseIndexer = $true,
 
     # SoftUEBridge server override (optional)
     [string] $ServerUrl,
@@ -116,6 +119,38 @@ function Get-AssetPathFromItem {
         }
     }
     return $null
+}
+
+function Write-FallbackNotice {
+    param(
+        [Parameter(Mandatory = $true)] [string] $ReasonCode,
+        [Parameter(Mandatory = $true)] [string] $AssetPath,
+        [string] $Evidence
+    )
+    $ev = $Evidence
+    if (-not $ev) { $ev = "" }
+    Write-Host ("FALLBACK_QUERY_BLUEPRINT_GRAPH reason={0} asset={1} evidence={2}" -f $ReasonCode, $AssetPath, $ev)
+}
+
+function Parse-ChunkIdParts([string] $ChunkId) {
+    $parts = $ChunkId -split '\|', 3
+    if ($parts.Count -lt 3) { return $null }
+    return [pscustomobject]@{ asset_path = $parts[0]; graph_kind = $parts[1]; graph_name = $parts[2] }
+}
+
+function Get-IndexerCallables {
+    param([Parameter(Mandatory = $true)] [string] $AssetPath)
+    $list = Invoke-SoftUEJson -CliArgs @('bp-index-l2-list', '--scope-path', $AssetPath, '--limit', '50000')
+    $ids = @()
+    if ($list -and ($list.PSObject.Properties.Name -contains 'chunk_ids')) { $ids = @($list.chunk_ids) }
+    if ($ids.Count -lt 1) { return @() }
+    $out = @()
+    foreach ($cid in $ids) {
+        $p = Parse-ChunkIdParts -ChunkId ([string]$cid)
+        if (-not $p) { continue }
+        $out += [pscustomobject]@{ name = $p.graph_name; type = $p.graph_kind; graph = $p.graph_name }
+    }
+    return $out
 }
 
 function Ensure-Dir([string] $Path) {
@@ -223,7 +258,17 @@ foreach ($bp in $assetPaths) {
             $bpVarsInfo = Invoke-SoftUEJson -CliArgs @('query-blueprint', $bp, '--include', 'variables', '--no-detail')
             $bpFnsInfo = Invoke-SoftUEJson -CliArgs @('query-blueprint', $bp, '--include', 'functions', '--no-detail')
             if ($IncludeCallables) {
-                $callables = Invoke-SoftUEJson -CliArgs @('query-blueprint-graph', $bp, '--list-callables')
+                if ($UseIndexer) {
+                    $idxCallables = Get-IndexerCallables -AssetPath $bp
+                    $callables = [pscustomobject]@{ events=@(); functions=@($idxCallables); macros=@() }
+                    if (@($idxCallables).Count -lt 1) {
+                        Write-FallbackNotice -ReasonCode "index_stale_or_missing" -AssetPath $bp -Evidence "bp-index-l2-list returned no chunk_ids"
+                        $callables = Invoke-SoftUEJson -CliArgs @('query-blueprint-graph', $bp, '--list-callables')
+                    }
+                } else {
+                    Write-FallbackNotice -ReasonCode "need_field_not_in_l2_schema" -AssetPath $bp -Evidence "UseIndexer=false"
+                    $callables = Invoke-SoftUEJson -CliArgs @('query-blueprint-graph', $bp, '--list-callables')
+                }
             }
             break
         }

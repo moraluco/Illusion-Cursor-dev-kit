@@ -27,6 +27,24 @@ if %ERRORLEVEL%==0 (
   exit /b 0
 )
 
+echo %ARGS% | findstr /I /C:"bp-index-l2-list" >nul
+if %ERRORLEVEL%==0 (
+  echo {"chunk_ids":["/Game/Test/BP_A.BP_A|uber_graph|EventGraph","/Game/Test/BP_A.BP_A|function|DoThing"]}
+  exit /b 0
+)
+
+echo %ARGS% | findstr /I /C:"bp-index-refresh" >nul
+if %ERRORLEVEL%==0 (
+  echo {"done":true,"processed":1,"resume_token":""}
+  exit /b 0
+)
+
+echo %ARGS% | findstr /I /C:"bp-index-chunk-get" >nul
+if %ERRORLEVEL%==0 (
+  echo {"chunk_id":"/Game/Test/BP_A.BP_A|uber_graph|EventGraph","projection":"connections","nodes":[{"title":"Call ApplyDamage","class":"K2Node_CallFunction"},{"title":"Print","class":"K2Node_PrintString"}]}
+  exit /b 0
+)
+
 echo %ARGS% | findstr /I /C:"query-blueprint-graph" >nul
 if %ERRORLEVEL%==0 (
   echo %ARGS% | findstr /I /C:"--list-callables" >nul
@@ -57,7 +75,7 @@ exit /b 0
             $san = $asset.TrimStart('/') -replace ':','_' -replace '[<>\"/\\\\|?*]','_'
             $graphsDir = Join-Path (Join-Path (Join-Path $outDir "assets") $san) "graphs"
 
-            @(Get-ChildItem -LiteralPath $graphsDir -Filter '*.graph.json' -ErrorAction SilentlyContinue).Count | Should BeGreaterThan 0
+            @(Get-ChildItem -LiteralPath $graphsDir -Filter '*.l2chunk.json' -ErrorAction SilentlyContinue).Count | Should BeGreaterThan 0
 
             # If nodes dumps exist, they should be readable (best-effort; may be empty depending on exporter output).
             $nodesFiles = @(Get-ChildItem -LiteralPath $graphsDir -Filter '*.nodes.txt' -ErrorAction SilentlyContinue)
