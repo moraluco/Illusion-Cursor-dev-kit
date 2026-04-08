@@ -35,6 +35,16 @@ py -3 -m soft_ue_cli check-setup
 
 期望：插件文件存在、`.uproject` 已启用 SoftUEBridge、桥可访问。若 **失败（含 502 / timeout）**：**先恢复桥再查图**——按技能 **ue-editor-launch**（优先使用 Kit 的 `content/dev/scripts/Start-UnrealEditor.ps1` 复用或启动交互式编辑器），待工程加载后再次 `check-setup`；仍失败再排查端口、`SOFT_UE_BRIDGE_URL` / `SOFT_UE_BRIDGE_PORT`、或查看 `Saved/Logs`（见 `content/dev/soft-ue-cli.md`）。**502** 在 UE 已打开时常见原因见 **§1.1（系统代理）**。**不要**用**原始 `.uasset` 启发式扫描**冒充“已核实”的编辑器内事实；**正规离线索引/快照**仍可用于搜索与复盘（见 §5）。
 
+### 1.2 Windows：`chunk_id` 含 `|` 的 quoting（bp-index-chunk-get）
+
+L2 chunk 的 `chunk_id` 形如：
+
+- `"/Game/BP_A.BP_A|uber_graph|EventGraph"`
+
+当调用链经过 **cmd.exe**（例如某些测试 harness 用 `py.cmd` stub、或其它 cmd 包装器），`|` 会被当作**管道符**，导致参数被拆分、命令行为异常。
+
+**硬约束**：任何脚本/测试里调用 `bp-index-chunk-get --chunk-id ...` 时，必须保证 chunk_id 作为 **单一 argv** 传入（加引号或变量承载）。稳写法见 `content/dev/soft-ue-cli.md` §1.1。
+
 ### 1.1 502 与系统代理（Windows）
 
 `soft-ue-cli` 使用 **httpx**，默认会信任**系统代理**。若 Windows 或 Clash 等工具使用**全局代理**，访问 `http://127.0.0.1:<端口>/bridge` 可能被错误转发，表现为 **502 Bad Gateway** 或超时，而编辑器内 **SoftUEBridge 实际正常**。
@@ -89,6 +99,16 @@ py -3 -m soft_ue_cli check-setup
 - **C++ / AngelScript 源码**仍以项目树与 `content/reference/` 为准。
 - 本技能解决 **编辑器内 .uasset 状态**（蓝图图、关卡实例等），与 `.as`/`.cpp` 互补。
 - **改了 C++（含 SoftUEBridge 等编辑器插件）**：须按 **ue-editor-automation-workflow §2.2** 用 VS 或 UBT 编 **ManteumTowerEditor**，避免依赖 Live Coding；编完常需 **重启 UE** 再 `check-setup`。
+
+### 4.1 UBT 退出码 6：先分流根因（不要猜）
+
+当用户/Agent 反馈 `Build.bat` / UBT **退出码 6** 时，退出码本身不够信息量。按优先级处理：
+
+1. **读 UBT 日志尾部**：`<EngineRoot>\Engine\Programs\UnrealBuildTool\Log.txt`（看最后几十行）。
+2. **若出现 Live Coding mutex**（典型：`Unable to build while Live Coding is active`）：必须 **关 UE** 或 **Ctrl+Alt+F11** 结束 Live Coding 会话后再编。
+3. **若是 C++ 编译错误/链接错误**：按 `error Cxxxx`/链接信息修复后再编。
+
+注意：**删除 `Log-backup-*.txt` 只在日志 I/O/磁盘/权限/文件占用**等问题时可能有帮助，不能解决 Live Coding mutex 或编译错误本身。
 
 ---
 
