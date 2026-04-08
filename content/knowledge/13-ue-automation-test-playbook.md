@@ -21,6 +21,16 @@
 
 只有 L3 才进入下述 “进 UE” 两条主线。
 
+### 0.1 Kit 门禁建议：入口引用断链检测（Unit）
+
+为避免 Skill/Rule/文档入口引用到不存在的 `content/knowledge/*.md`（曾出现“关键决策树文档缺失但被多处引用”的断链），Kit 增加一个 **Pester Unit 门禁**：
+
+- `content/dev/scripts/tests/KnowledgeReferences.Tests.ps1`
+  - 扫描 `.cursor/rules`、`.cursor/skills`、`content/dev`、`content/knowledge` 中对 `content/knowledge/*.md` 的引用
+  - 断言目标文件存在；缺失时直接失败并列出文件名
+
+本机运行入口不变：`content/dev/scripts/Invoke-UEAutomationTests.ps1`（默认只跑 Unit）。
+
 ### A. 交互式 Editor + Bridge（soft-ue-cli / SoftUEBridge）
 
 - **适用**：读编辑器内资产/关卡/Actor、截图、PIE、在线查询 Blueprint 图等。

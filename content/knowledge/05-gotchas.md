@@ -43,6 +43,7 @@
 | 通过 soft-ue-cli / UE Python 改了 `.uasset`，但 UE 闪退后改动消失 | 写资产后未保存；UE 默认随时可能闪退 | **硬门禁**：任何写操作（reparent、删变量、改图/连线、改 defaults 等）后 **立刻 Save**，并在关键里程碑重复 Save（至少 reparent 后、compile 通过后各保存一次）；详见 `ue-automation-testing.mdc` 与技能 `soft-ue-cli-ue-bridge` §3.1 |
 | `.soft-ue-index/`、`Script/Binds.Cache*` 被 `git status` 列出 | 本地生成物未忽略或误 `git add` | 确认 `.gitignore`；勿提交生成缓存；复盘时记入 gotchas |
 | `Invoke-Pester -CI` 等参数报错 | 本机为 **Pester 3.x**，与 Pester 5 参数不兼容 | 使用 `content/dev/scripts/Invoke-UEAutomationTests.ps1` 的调用方式；或升级到 Pester 5+ 再统一参数 |
+| Skill/Rule/文档里引用了 `content/knowledge/xx-*.md` 但文件不存在（断链） | 新增文档时漏创建/漏提交；或重命名后未同步引用 | 先跑 `content/dev/scripts/Invoke-UEAutomationTests.ps1`（Unit），它包含 `KnowledgeReferences.Tests.ps1` 会扫描并直接报缺失清单；修复后再提交，避免断链进入主分支 |
 | `ConvertTo-Json -Depth` 报「序列化深度最大为 100」 | **Windows PowerShell 5.1** 将深度硬限制为 100 | 导出前将 depth **钳制到 ≤100**（蓝图图 JSON 仍可能截断深层嵌套，需知悉）；见 `Export-BlueprintDeepIndex.ps1` |
 | Pester Unit 里把 `py.cmd` 放进 `PATH` 仍调用到真 `py` | Windows 常优先解析 **Python Launcher 的 `py.exe`**，不一定用 PATH 里靠前的 `py.cmd` | 在测试块内 `Set-Alias py <stub.cmd>` 并 finally 恢复；或让 stub 文件名不与 launcher 冲突且脚本显式调用 |
 | `soft-ue-cli run-python-script --script "多行..."` 报 unrecognized arguments | 多行/引号经 shell 传参后 **argparse 收到碎参数** | 将脚本写入临时 `.py`，使用 `--script-path` |
