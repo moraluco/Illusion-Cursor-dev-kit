@@ -98,3 +98,10 @@ flowchart TB
   Per --> R[rollup + assets/**/summary.*]
 ```
 
+**附录：L2 语义索引会话（提要）**
+
+- **取证顺序**：先读 `BlueprintIndexerL2Builder` / `L2Types` + 磁盘 `index.json` 抽查，再下结论；**UTF-16** 索引文件与 **nodes_only** 边界见 [05-gotchas.md](05-gotchas.md)。
+- **门禁**：`npm run compile:editor`（`ManteumTowerEditor`）+ `Scripts/Test-BpIndexL2.ps1`（Bridge 可达）；PreSave 不绑重语义。
+- **工作流**：批处理 `bp-index-refresh` → `l2-list` → `chunk-get`；全图 `query-blueprint-graph` 作回落；Kit `content/dev/soft-ue-cli.md` 与技能 **soft-ue-cli-ue-bridge** 已与该策略对齐。
+- **边界**：引擎头未纳入工程时，部分 `UK2Node` 专用语义可降级为 `unknown_k2` + `property_snapshot`（full），验收文档需写明。
+

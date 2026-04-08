@@ -52,6 +52,8 @@
 | 回调签名里 **`FObjectPreSaveContext`** 报 **C2027 使用了未定义类型** | `UObjectGlobals.h` 只有前向声明，按值使用需要完整类型 | `#include "UObject/ObjectSaveContext.h"`（定义见该头） |
 | PowerShell 脚本在本机直接报 ParserError（看似“`- xxx` 需要值”“L2 解析成 token”） | 脚本里混入了**智能引号/全角标点**（例如 `“ ”`、`（ ）`），或依赖反引号/转义在 **Windows PowerShell 5.1** 下表现不稳定 | 在脚本中**只用 ASCII 标点**与普通引号；避免把说明文字复制进可执行行；出现 ParserError 先检查最近改动行是否含非 ASCII 符号 |
 | Blueprint fast 工具端到端耗时远高于“毫秒级” | 当前基准是**每次调用启动一个 python 进程**（进程启动+import+http 请求占主导），不是 Bridge 本身慢 | 若要逼近毫秒级：让调用端**常驻**（同一进程复用 `httpx.Client`/连接池），或做批量/会话化 RPC；基准需区分 cold-start 与 warm 调用 |
+| `.soft-ue-blueprint-index/index.json` 抽查/脚本解析失败或乱码 | 工程内索引快照常为 **UTF-16 LE**，按 UTF-8 读会错 | Python：`open(..., encoding='utf-16')`；PowerShell：`Get-Content -Encoding Unicode`；抽查 chunk 前确认编码 |
+| L2 仅 `projection=nodes_only` 时断言「代码等效」或完整数据流 | 节点只有 guid/class/title，**无 pin、连线、字面量** | 需要拓扑+语义时用 `pins`/`connections` + `l2_semantic_level`（`minimal` 起）；PreSave/UI 异步刷新仍宜 **`nodes_only` + `off`**，重语义走 `bp-index-refresh` 批处理，避免保存风暴 |
 
 
 ---
