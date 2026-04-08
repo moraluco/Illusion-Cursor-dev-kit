@@ -137,12 +137,49 @@ function Wait-ForGateOk {
     return $false
 }
 
+function Resolve-BridgeServerUrlForUProject {
+    param([Parameter(Mandatory = $true)] [string] $UProjectPath)
+    if ($env:SOFT_UE_BRIDGE_URL) { return $env:SOFT_UE_BRIDGE_URL }
+    $root = Split-Path -Parent $UProjectPath
+    $inst = Join-Path $root '.soft-ue-bridge\instance.json'
+    if (Test-Path -LiteralPath $inst) {
+        try {
+            $j = Get-Content -LiteralPath $inst -Raw | ConvertFrom-Json
+            $h = if ($j.host) { [string]$j.host } else { '127.0.0.1' }
+            if ($j.port) { return ('http://{0}:{1}' -f $h, $j.port) }
+        }
+        catch { }
+    }
+    if ($env:SOFT_UE_BRIDGE_PORT) {
+        return ('http://127.0.0.1:{0}' -f $env:SOFT_UE_BRIDGE_PORT)
+    }
+    return $null
+}
+
 function Wait-ForBridgeRunning {
-    param([int] $WaitTimeoutSec)
+    param(
+        [int] $WaitTimeoutSec,
+        [Parameter(Mandatory = $true)] [string] $UProjectPath
+    )
+    $serverUrl = Resolve-BridgeServerUrlForUProject -UProjectPath $UProjectPath
     $deadline = (Get-Date).AddSeconds($WaitTimeoutSec)
     while ((Get-Date) -lt $deadline) {
         try {
-            $out = (py -3 -m soft_ue_cli status 2>&1 | Out-String).Trim()
+            $prev = (Get-Location).Path
+            $out = $null
+            try {
+                # Project may contain ./soft_ue_cli that shadows pip; run full CLI from a neutral cwd when URL is known.
+                if ($serverUrl) {
+                    Set-Location -LiteralPath $env:SystemRoot
+                }
+                $base = @('py', '-3', '-m', 'soft_ue_cli')
+                if ($serverUrl) { $base += @('--server', $serverUrl) }
+                $cmd = $base + @('status')
+                $out = (& $cmd[0] $cmd[1..($cmd.Length - 1)] 2>&1 | Out-String).Trim()
+            }
+            finally {
+                Set-Location -LiteralPath $prev
+            }
             if ($out -match '"running"\s*:\s*true') {
                 return $true
             }
@@ -192,7 +229,7 @@ try {
             Write-Output $info
 
             if ($WaitForBridge) {
-                if (Wait-ForBridgeRunning -WaitTimeoutSec $WaitTimeoutSec) {
+                if (Wait-ForBridgeRunning -WaitTimeoutSec $WaitTimeoutSec -UProjectPath $UProjectPath) {
                     Write-Host "SoftUEBridge: OK"
                     exit 0
                 }
@@ -218,7 +255,7 @@ try {
             Write-Output $info
 
             if ($WaitForBridge) {
-                if (Wait-ForBridgeRunning -WaitTimeoutSec $WaitTimeoutSec) {
+                if (Wait-ForBridgeRunning -WaitTimeoutSec $WaitTimeoutSec -UProjectPath $UProjectPath) {
                     Write-Host "SoftUEBridge: OK"
                     exit 0
                 }
@@ -245,7 +282,7 @@ catch {
 }
 
 if ($WaitForBridge) {
-    if (Wait-ForBridgeRunning -WaitTimeoutSec $WaitTimeoutSec) {
+    if (Wait-ForBridgeRunning -WaitTimeoutSec $WaitTimeoutSec -UProjectPath $UProjectPath) {
         Write-Host "SoftUEBridge: OK"
         exit 0
     }

@@ -68,6 +68,13 @@ Remove-Item -LiteralPath $msgPath -Force
 - **避免混杂**：不要把多主题改动（规则+脚本+知识库+大量无关格式化）塞进同一次提交；应拆成可回滚、可复盘的小步。
 - **与仓库边界一致**：改项目提交项目；改 Kit 提交 Kit；不要跨仓“打包提交”，否则 Step1 的收敛与复盘会失真。
 
+### C++ / 插件自动化（提高提交触发可靠性）
+
+- **小步优先**：每完成一个独立意图（单文件/单模块/单 bug）即 **`git add` 相关路径 + `git commit`**（中文 UTF-8，见上文与 **git-commit-zh**），再开始下一意图；避免长会话末尾才一次性提交。
+- **与编译门禁串联**：改 `Source/`、`Plugins/` 下 C++ 后，按 **vs-ue-build-manteumtower** 跑 `ManteumTowerEditor`；**编译通过后的检查点提交**尤其重要（二进制与蓝图反射依赖该步）。
+- **编不过仍提交源码**：若 UBT 被 Live Coding 等挡住，只要当前源码是自洽的一小步，仍应提交并注明待验证，避免进度只在工作区未入库。
+- **Agent 自检**：结束 C++ 相关任务前自问：与本任务相关的改动是否已至少一次 **原子提交**？若否，优先补提交再收工。
+
 ### TDD / AS 项目（ManteumTower）时的强约定
 
 - **顺序**：写或改最小单测（Red）→ 实现到绿 → **先跑** `Scripts\Run-UnattendedTests-Min.ps1 -Mode AS`（项目根）→ **再** `git commit`。

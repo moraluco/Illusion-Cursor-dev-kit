@@ -63,20 +63,53 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+function Resolve-SoftUEServerUrl {
+    param(
+        [Parameter(Mandatory = $true)] [string] $ProjectRoot,
+        [string] $ExplicitServerUrl
+    )
+    if ($ExplicitServerUrl) { return $ExplicitServerUrl }
+    if ($env:SOFT_UE_BRIDGE_URL) { return $env:SOFT_UE_BRIDGE_URL }
+    $inst = Join-Path $ProjectRoot '.soft-ue-bridge\instance.json'
+    if (Test-Path -LiteralPath $inst) {
+        try {
+            $j = Get-Content -LiteralPath $inst -Raw | ConvertFrom-Json
+            $h = if ($j.host) { [string]$j.host } else { '127.0.0.1' }
+            if ($j.port) { return ('http://{0}:{1}' -f $h, $j.port) }
+        }
+        catch { }
+    }
+    if ($env:SOFT_UE_BRIDGE_PORT) {
+        return ('http://127.0.0.1:{0}' -f $env:SOFT_UE_BRIDGE_PORT)
+    }
+    return $null
+}
+
 function Invoke-SoftUEJson {
     param(
         [Parameter(Mandatory = $true)] [string[]] $CliArgs
     )
 
     $base = @('py', '-3', '-m', 'soft_ue_cli')
-    if ($ServerUrl) { $base += @('--server', $ServerUrl) }
+    if ($script:SoftUEBridgeResolvedUrl) { $base += @('--server', $script:SoftUEBridgeResolvedUrl) }
     if ($TimeoutSec -gt 0) { $base += @('--timeout', "$TimeoutSec") }
 
     $cmd = ($base + $CliArgs)
 
     $attempts = 10
     for ($i = 1; $i -le $attempts; $i++) {
-        $raw = & $cmd[0] $cmd[1..($cmd.Length - 1)] 2>&1 | Out-String
+        $prevLoc = (Get-Location).Path
+        $raw = $null
+        try {
+            # UE projects may ship a minimal ./soft_ue_cli that shadows pip; cwd must not be ProjectRoot when using full CLI.
+            if ($script:SoftUEBridgeResolvedUrl) {
+                Set-Location -LiteralPath $env:SystemRoot
+            }
+            $raw = & $cmd[0] $cmd[1..($cmd.Length - 1)] 2>&1 | Out-String
+        }
+        finally {
+            Set-Location -LiteralPath $prevLoc
+        }
         $exit = $LASTEXITCODE
 
         if ($exit -eq 0) {
@@ -159,6 +192,11 @@ function Ensure-OutDir {
 
 Set-Location -LiteralPath $ProjectRoot
 Ensure-OutDir
+
+$script:SoftUEBridgeResolvedUrl = Resolve-SoftUEServerUrl -ProjectRoot (Get-Location).Path -ExplicitServerUrl $ServerUrl
+if ($script:SoftUEBridgeResolvedUrl) {
+    Write-Host ("SoftUE bridge URL (for full soft_ue_cli): {0}" -f $script:SoftUEBridgeResolvedUrl)
+}
 
 Write-Host "Export-BlueprintTextIndex: start"
 Write-Host ("ProjectRoot: {0}" -f (Get-Location).Path)
@@ -259,6 +297,7 @@ foreach ($bp in $assetPaths) {
     $bpVarsInfo = $null
     $bpFnsInfo = $null
     $callables = $null
+    $skipAsset = $false
     for ($a = 1; $a -le $perAssetAttempts; $a++) {
         try {
             $bpVarsInfo = Invoke-SoftUEJson -CliArgs @('query-blueprint', $bp, '--include', 'variables', '--no-detail')
@@ -277,9 +316,12 @@ foreach ($bp in $assetPaths) {
                 Start-Sleep -Seconds $sleepSec
                 continue
             }
-            throw
+            Write-Warning ("Skipping asset (soft_ue_cli): {0}`n{1}" -f $bp, $msg)
+            $skipAsset = $true
+            break
         }
     }
+    if ($skipAsset) { continue }
 
     $variables = Normalize-Items $bpVarsInfo.variables
     $functions = Normalize-Items $bpFnsInfo.functions
