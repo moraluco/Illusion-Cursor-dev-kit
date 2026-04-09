@@ -77,6 +77,10 @@
 10. **编辑器专用 API**：必须用 `#if EDITOR` … `#endif`，否则打包失败。
 11. **调试（日志）**：`Print`/`Log`/`LogInfo`；可用 Unreal AngelScript 扩展下断点；`GetAngelscriptCallstack`/`FormatAngelscriptCallstack` 可打脚本栈。
 12. **调试（屏显，避免刷屏）**：需要 **PIE/屏幕上** 的调试信息时，使用 **`System::PrintString`** 或 **`System::PrintText`**，并传入**非空**的 **`FName Key`**（最后一参）。同 Key 的消息会被**替换**，不会每一帧叠一行；**禁止**在 Tick 里反复 `PrintString` 且**不传 Key**（默认 `NAME_None`）——会刷屏。签名与参数说明见 `content/reference/AS_API/API_Docs/System.md`（`PrintString` / `PrintText`）。**不要**为此新增 C++ `UE_LOG` 包装或改引擎 Logging；AS 侧足够。
+13. **调试（世界空间绘制）**：**不要**使用不存在的 **`Debug::`** 命名空间；箭头/线段等用 **`System::DrawDebugArrow`**（及 `System.md` 中其它 `DrawDebug*`，以本地签名为准）。
+14. **`FInputActionValue`**：不要用 **`[]` 下标**（通常未绑定）。在带 **`AngelscriptEnhancedInput`** 的工程里用 **`GetAxis2D()` / `GetAxis1D()` / `GetBool()`**（见引擎插件 `Bind_FInputActionValue` 与 `EnhancedInputExamples`）。
+15. **`GetComponentsByClass`**：弃用「往 out `TArray` 填」的旧重载；用 **返回 `TArray<UActorComponent>`** 的版本再 `Cast`。
+16. **Enhanced Input 无响应（回调存在、按键无效果）**：若 **PlayerController** 侧 **`UPlayerInputComponent`** 在切换模式时 **`ClearAllMappings()`**，仅在角色 **`BeginPlay` 里加一次 `InputMappingContext`** 可能被清掉。需 **延后/在 `OnPlayerInputModeChanged` 再 `AddMappingContext`**，**`HasMappingContext`** 去重，并注意 **IMC 优先级**。详见 **`content/knowledge/05-gotchas.md`**、`03-angelscript-ue.md`。
 
 ---
 

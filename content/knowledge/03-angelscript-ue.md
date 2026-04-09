@@ -40,6 +40,11 @@
 - **父类调用**：若需先执行父类输入设置，在 AS 里对 `SetupPlayerInputComponent` 可调用 `Super::SetupPlayerInputComponent(Input)`；注意在部分 override（如 Tick）中 `Super::` 可能不可用，见 [05-gotchas.md](05-gotchas.md)。
 - **Print**：调试输出可用 `Print("字符串")` 或 `Print(f"格式化", 5.f, FLinearColor::Red)` 等重载（项目内多处示例）。
 
+### Enhanced Input（`FInputActionValue`、`InputMappingContext`）
+
+- **`FInputActionValue` 在 AS 中的取值**：不要假设可用 C++ 的模板 `Get<>()` 或 **`operator[]`**；以引擎 **`AngelscriptEnhancedInput`** 插件对 `FInputActionValue` 的绑定为准（如 **`GetAxis2D()`**、**`GetAxis1D()`**、**`GetBool()`**）。范例见引擎 **`Script-Examples/EnhancedInputExamples/`**；易错表见 [05-gotchas.md](05-gotchas.md)。
+- **`InputMappingContext` 被清空导致无输入**：若 **PlayerController** 使用自定义 **`UPlayerInputComponent`**，其在 **`BeginPlay`/`SwitchPlayerInputMode`** 等路径中可能调用 **`UEnhancedInputLocalPlayerSubsystem::ClearAllMappings()`**，再只加回项目默认的 Gameplay IMC。此时仅在 **Pawn/角色 `BeginPlay`** 里执行一次 **`AddMappingContext`**，可能被**后续**清掉，表现为 **`BindAction` 仍在但按键无响应**。处理方式：将 **`AddMappingContext` 封装为可重复调用**；在 **短延迟**（如 `System::SetTimer`）与 **`OnPlayerInputModeChanged`** 等事件中**再次添加**；用 **`HasMappingContext`** 避免重复；**优先级（Priority）** 与默认层错开，以免被完全覆盖。详见技能 **write-angelscript** § Enhanced Input。
+
 ## 扩展
 
 易错点与排错见 [05-gotchas.md](05-gotchas.md)；新决策见 [04-decisions.md](04-decisions.md)。

@@ -77,6 +77,8 @@ flowchart LR
 
 8. **ThreadSafe 的边界（AS vs 蓝图）**：蓝图里某些节点看似“线程安全可用”，在 AngelScript 绑定/调用路径中可能触发跨线程/锁等待（本轮命中：`GetCurveValue()` 导致 ThreadSafe Call Parent 卡死）。复盘时应把这类“ThreadSafe 禁区 API + 迁移模板（曲线采样挪到 GameThread）”沉淀到 `05-gotchas.md`，避免重复踩坑。
 
+9. **蓝图迁 AS + Enhanced Input**：用 **soft-ue-cli** 导出事件图后，在 AS 里 **`UEnhancedInputComponent::BindAction`** 与 **`AddMappingContext`** 都接上，仍可能出现 **PIE 无移动**——根因常是 **PlayerController 侧 `SwitchPlayerInputMode` → `ClearAllMappings()`** 把角色早先加的 IMC 清掉，而非 `FInputActionValue` 读法错误。复盘落盘：**重复 `AddMappingContext`、订阅输入模式变更、`HasMappingContext`、IMC 优先级**；AS API 层面 **`FInputActionValue` 用 `GetAxis2D()` 等 mixin**，**不要用 `[]`**；调试绘制用 **`System::DrawDebug*`** 而非 `Debug::`。见 [05-gotchas.md](05-gotchas.md)、[03-angelscript-ue.md](03-angelscript-ue.md)、技能 **write-angelscript**。
+
 ```mermaid
 flowchart TB
   UE[UnrealEditor + SoftUEBridge]

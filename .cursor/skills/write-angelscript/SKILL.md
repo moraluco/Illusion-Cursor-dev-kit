@@ -43,6 +43,7 @@ description: 编写或编辑 AngelScript(.as) 的单一入口：写前查阅 Kit
 - **保存即生效**：AS 脚本保存后即热重载生效，无需单独「编译」。编辑器中保存 .as 后改动会立即反映（Immediate Hot Reload）；非结构性改动可在运行中热重载。不要建议用户「先编译再运行」；修改 .as 并保存即可验证。仅改 C++ 或引擎/插件时才需编译。
 - **Blueprint**：用于资产/数据与父类选择（AS 暴露的类）；核心逻辑不放在 Blueprint 事件图里。需要**读**现有蓝图/图结构时：断言「**当前编辑器内**」状态用技能 **soft-ue-cli-ue-bridge**（`check-setup` 成功后 `query-blueprint` / `query-blueprint-graph`）；桥不可达时先 **ue-editor-launch** 或 **`Start-UnrealEditor.ps1`**。**大范围搜索/复盘**继续使用 `BlueprintSnapshot/`、`.soft-ue-index/`（rule **blueprint-snapshot-search**）。**不要**用**原始 `.uasset` 扫字符串**冒充已确认的编辑器事实。
 - **多文件与引用**：**不要使用 `#include`**。UE-AS 会将 `Script/` 下所有 `.as` 一并编译，类型在同一编译单元内自动可见；写 `#include` 会触发 "Unexpected token" 等错误。
+- **重命名/删除仍被蓝图引用的 AS 类**：**勿**在蓝图未迁父类前单独删源文件，否则 `.uasset` 指向缺失类，蓝图可能无法打开。流程：**先在 UE** 将蓝图 **Parent Class** 改为新类并 **Compile & Save**，再删旧 `.as`；或**保留**旧文件为薄子类 `class AOld : ANew {}` 作桥接。详见 Kit `content/knowledge/05-gotchas.md` 表首行。
 
 更多写法速查与常见坑见本技能目录下的 **reference.md**。
 
@@ -53,6 +54,13 @@ description: 编写或编辑 AngelScript(.as) 的单一入口：写前查阅 Kit
 - **每个逻辑条目使用稳定、互不相同的 `FName` Key**（如 `n"MTAnim|Speed"`、`n"BPC|Locomotion"`）：文档说明——若 Key **非空**，同 Key 的屏显消息会被**替换**而非无限堆叠，便于总开关 + 分条目开关的调试 UX。
 - 需要时再配合**节流**（如累计 `DeltaTime` 后每 N 秒刷新一次），与 Key 策略一起避免噪声。
 - 历史上若文档提到 `PrintToScreenKeyed` 等**插件专用** API，实现屏显时应**优先对齐**上述 `System::PrintString(..., Key)` 语义，避免依赖额外重编 AngelScript 插件的路径，除非需求明确且已纳入构建流程。
+
+### Enhanced Input（`FInputActionValue`、IMC、调试绘制）
+
+- **调试绘制**：不要用不存在的 **`Debug::`** 命名空间；世界空间箭头/线等优先 **`System::DrawDebugArrow`** 等（见 `content/reference/AS_API/API_Docs/System.md`），签名以本地文档为准。
+- **`FInputActionValue` 取值**：不要用 **`V[0]` / `[]`**（常未绑定）；在启用了 **`AngelscriptEnhancedInput`** 的项目里用 mixin 提供的 **`GetAxis2D()`**、**`GetAxis1D()`**、**`GetBool()`** 等，与 `Bind_FInputActionValue` 一致。若编译器报错，对照引擎插件 `AngelscriptEnhancedInput` 与 Script-Examples 的 `EnhancedInputExamples`。
+- **`GetComponentsByClass`**：避免已弃用的 out 重载；使用**返回 `TArray<UActorComponent>`** 的版本再 `Cast`。
+- **`InputMappingContext` 被清掉导致「绑了回调但没输入」**：若项目在 **PlayerController** 上用 **`UPlayerInputComponent`** 在 **`BeginPlay`/`SwitchPlayerInputMode`** 里 **`ClearAllMappings()`**，则仅在角色 **`BeginPlay` 里执行一次 `AddMappingContext`** 可能被后续清掉。应 **重复应用**（如短延迟 **`SetTimer`**、订阅 **`OnPlayerInputModeChanged`**），并用子系统 **`HasMappingContext`** 避免重复添加；**优先级**与默认 Gameplay IMC 错开。详见 Kit **`content/knowledge/03-angelscript-ue.md`** 与 **`content/knowledge/05-gotchas.md`**。
 
 ### UAnimInstance 与 AnimBP / 组件协作
 

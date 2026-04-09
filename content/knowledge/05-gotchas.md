@@ -11,6 +11,7 @@
 
 | 现象/错误            | 可能原因                                               | 处理方式                                     |
 | ---------------- | -------------------------------------------------- | ---------------------------------------- |
+| 删掉/重命名 `.as` 里的 AngelScript 角色类后，**蓝图打不开**或父类报错，无法再改 Parent | 蓝图 `.uasset` 仍引用旧 **Script 类名**；磁盘上类已不存在时编辑器难以自愈 | **二选一**：(1) **先**在 UE 打开蓝图，把 **Parent Class** 改为新 AS 类并 **Compile & Save**，再删/改名旧 `.as`；(2) **保留**旧文件为**薄子类**（仅 `class AOld : ANew {}`），让旧蓝图继续可加载，再分批迁父类。勿在未迁蓝图前单独删除仍被引用的 AS 类文件 |
 | PIE 屏显被 `PrintString` 刷满、无法读数 | Tick/高频路径里调用 **`System::PrintString` 且未传 `Key`**（`NAME_None`），每条叠加一行 | 每条逻辑调试线使用**稳定且互不相同**的 `FName Key`（最后一参），同 Key **替换**而非堆叠；必要时加节流。见技能 **write-angelscript** §「调试与屏显打印」、`content/reference/AS_API/API_Docs/System.md` |
 | 找不到 AS API 或用法不对 | 未查阅 content/reference/AS_API 或 Docs-UE-Angelscript | 先查 reference 下对应文档；AI 回答时 @ 引用 reference |
 | 文档写在了项目根         | 与 Kit 约定不符                                         | 文档与知识库统一放在 Kit 的 content/                |
@@ -57,6 +58,11 @@
 | Blueprint fast 工具端到端耗时远高于“毫秒级” | 当前基准是**每次调用启动一个 python 进程**（进程启动+import+http 请求占主导），不是 Bridge 本身慢 | 若要逼近毫秒级：让调用端**常驻**（同一进程复用 `httpx.Client`/连接池），或做批量/会话化 RPC；基准需区分 cold-start 与 warm 调用 |
 | `.soft-ue-blueprint-index/index.json` 抽查/脚本解析失败或乱码 | 工程内索引快照常为 **UTF-16 LE**，按 UTF-8 读会错 | Python：`open(..., encoding='utf-16')`；PowerShell：`Get-Content -Encoding Unicode`；抽查 chunk 前确认编码 |
 | L2 仅 `projection=nodes_only` 时断言「代码等效」或完整数据流 | 节点只有 guid/class/title，**无 pin、连线、字面量** | 需要拓扑+语义时用 `pins`/`connections` + `l2_semantic_level`（`minimal` 起）；PreSave/UI 异步刷新仍宜 **`nodes_only` + `off`**，重语义走 `bp-index-refresh` 批处理，避免保存风暴 |
+| AS 里写 `Debug::DrawDebugArrow` 等报 **Namespace 'Debug' doesn't exist** | UE/AS 绑定里调试绘制通常在 **`System::`** 下（与 `UKismetSystemLibrary` 风格一致），不存在独立 `Debug::` 命名空间 | 查 `content/reference/AS_API/API_Docs/System.md`；屏上箭头/线用 **`System::DrawDebugArrow`**（及同类 `DrawDebug*`），参数以本地 API 文档为准 |
+| `AActor::GetComponentsByClass` 用「填充 `TArray` 的 out 重载」报 **deprecated** | 旧重载被标记弃用；应使用**返回 `TArray<UActorComponent>`** 的版本 | `TArray<UActorComponent> Raw = GetComponentsByClass(UCameraComponent);` 再 `Cast` 筛选；勿依赖已弃用签名 |
+| `FInputActionValue` 用 **`V[0]` / `V[1]`** 报 **doesn't support the indexing operator** | AngelScript 未绑定 `operator[]`；取值走 **Enhanced Input 插件 mixin**（如 `AngelscriptEnhancedInput` 的 `Bind_FInputActionValue`） | 用 **`GetAxis2D()`**（移动/视角）、**`GetAxis1D()`** / **`GetBool()`**（按 Action 类型）；勿臆造 `GetVector()`/`BreakInputActionValue` 除非 AS_API 或引擎范例已确认 |
+| PIE 里 **BindAction 正常但 WASD 无移动、视角无响应**（Enhanced Input） | 角色 **`BeginPlay` 里 `AddMappingContext`** 后，若 **`UPlayerInputComponent`** 较晚执行 **`SwitchPlayerInputMode`**，内部可能 **`ClearAllMappings()`** 再只加回默认 Gameplay IMC，**把 Puppet/自定义 IMC 清掉** | 将 **`AddMappingContext` 抽成可重复调用**；在 **定时器延后**、**`OnPlayerInputModeChanged`** 等处**再次** `AddMappingContext`；用 **`HasMappingContext`** 避免重复；**优先级**与默认 IMC 错开（如自定义为 1、默认 0）。详见技能 **write-angelscript** 与 [03-angelscript-ue.md](03-angelscript-ue.md) § Enhanced Input |
+| 蓝图 **`Delta (Rotator)`** 迁 AS 时用错减法 | 蓝图 Delta 等价于规范化后的旋转差，不是未规范化的裸减 | 用 **`(RotA - RotB).GetNormalized()`**，再取 **`Yaw`** 等；与 **`FRotator::MakeFromX(Dir)`** 配合时先 **`GetSafeNormal()`** 处理零向量 |
 
 
 ---
