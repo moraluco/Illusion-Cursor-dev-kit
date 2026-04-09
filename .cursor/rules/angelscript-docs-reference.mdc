@@ -9,6 +9,7 @@ alwaysApply: true
 编写或修改 **AngelScript**、或涉及 AS 与 UE 交互的 C++ 时：
 
 - **流程、文档路径**（`content/reference/AS_API/`、`Docs-UE-Angelscript/`）、API 查阅顺序、写法约定：技能 **write-angelscript** 为唯一权威。
+- **Hazelight 线上 API 站**：对应**外站/另一工程**的绑定，**非**本项目事实；许多符号在本工程不可用。**必须**在当前工程内核查（编译、Script-Examples、插件绑定）；见 **angelscript-api-query** 首节与 **write-angelscript** § 文档与 API。
 - **保存即生效**：AS 保存后热重载，无需单独编译；细节见 **write-angelscript**。
 - **屏显调试**：用 **`System::PrintString` / `PrintText` + 分条目 `Key`**，勿用无 Key 调用在 Tick 里刷屏；勿为打印改引擎。见 **write-angelscript** §「调试与屏显打印」与 rule **angelscript-primary-cpp-fallback**。
 - **Enhanced Input / 世界调试绘制 / `FInputActionValue`**：IMC 生命周期、`System::DrawDebug*`、插件 mixin 取值等，见 **write-angelscript** §「Enhanced Input（`FInputActionValue`、IMC、调试绘制）」与 **`content/knowledge/05-gotchas.md`**；本 Rule 不展开步骤。

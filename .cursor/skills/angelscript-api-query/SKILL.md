@@ -1,6 +1,7 @@
 ---
 name: angelscript-api-query
-description: AngelScript API lookup from Kit content/reference/AS_API first, then https://angelscript.hazelight.se/api/; write back to API_Docs and API_Index. Use when looking up AS/UE-AngelScript API or when write-angelscript needs API/signature verification.
+description: >-
+  AS API：先 Kit AS_API，再 https://angelscript.hazelight.se/api/ 作外站参考；Hazelight 对应**另一套工程/分支**的绑定，与本项目**非一一对应**，写代码前必须在当前工程内核查（编译/插件/Script-Examples）。写回 API_Docs 与 API_Index。
 ---
 
 # AngelScript API 查询
@@ -9,12 +10,21 @@ description: AngelScript API lookup from Kit content/reference/AS_API first, the
 
 所有路径均相对于 **Kit 根目录**（含本技能与 `content/` 的仓库）。
 
+## Hazelight 站点与「当前工程」的关系（必读）
+
+- **https://angelscript.hazelight.se/api/** 文档的是 **Hazelight 侧 Unreal AngelScript 工程**里暴露的 API，与**本工作区项目**（引擎版本、启用插件、AngelScript 绑定、NotInAngelscript 裁剪等）**不是同一份代码**。
+- **很多线上列出的类/方法在本项目里不存在、未绑定或签名不同**；反之本项目也可能有额外插件 mixin（如 **`AngelscriptEnhancedInput`**）而线上不全。
+- **因此：Hazelight 仅作「AS 用法与命名」的参考线索，绝不是「在本项目必可用」的事实。**  
+  从线上或 Kit 里抄签名后，**必须在当前工程内核查**：实际 **`.as` 编译**、项目 **`Script-Examples`**、相关 **C++ 绑定/插件**（如 `Engine/.../Plugins/Angelscript*`）、必要时技能 **as-api-dynamic-query**（编辑器会话内符号）。未核查前**禁止**向用户断言「照 Hazelight 一定可编译」。
+
+写回 `API_Docs` 时，可在文档中注明来源为 Hazelight 摘录，并提醒「以本工程编译与绑定为准」。
+
 ## 查询顺序（必须遵守）
 
 1. **优先本地**  
    按 **`content/reference/AS_API/API_Index.md`** 索引查：在索引中搜类名/符号，或对 **`content/reference/AS_API/API_Docs/`** 用 grep 搜关键词（如 `LineTrace`、`System::`、类名）。索引项格式为 `- [ClassName](API_Docs/ClassName.md)`，按字母序排列；根据链接打开对应 `content/reference/AS_API/API_Docs/<ClassName>.md` 查看详情。
-2. **本地未命中再查线上**  
-   若在 API_Index 与 API_Docs 中均未找到，再用浏览器访问 https://angelscript.hazelight.se/api/ 按下方「线上查询」流程操作。
+2. **本地未命中再查线上（仅作参考）**  
+   若在 API_Index 与 API_Docs 中均未找到，再用浏览器访问 https://angelscript.hazelight.se/api/ 按下方「线上查询」流程操作。**查到的条目仍须按上文「Hazelight 与当前工程」在项目中核验**，不可直接当生产代码依据。
 3. **写回并维护索引**  
    凡从线上新获得的类/枚举/重要 API，须写入 **`content/reference/AS_API/API_Docs/`** 并更新 **`content/reference/AS_API/API_Index.md`**（见下方「写回本地与维护索引」），以便下次优先本地查到。
 
@@ -87,5 +97,5 @@ description: AngelScript API lookup from Kit content/reference/AS_API first, the
 ## 与 write-angelscript 的协作
 
 - **write-angelscript** 负责：写代码前的本地 reference 查阅（AS_API、Docs-UE-Angelscript）、书写约定、写法速查、常见坑、输出要求。  
-- **本技能** 负责：按「先本地（Kit 的 AS_API）后线上（hazelight）」查 API；若从线上查到则写回 `content/reference/AS_API/API_Docs/` 并维护 `API_Index.md`。  
-- 写 AS 时若提示「使用技能 angelscript-api-query」或「查 API」，即执行本技能（先查本地，未命中再查线上并写回），把结果用于后续编写。
+- **本技能** 负责：按「先本地（Kit 的 AS_API）后线上（Hazelight **参考**）」查 API；若从线上查到则写回 `content/reference/AS_API/API_Docs/` 并维护 `API_Index.md`。  
+- 写 AS 时若提示「使用技能 angelscript-api-query」或「查 API」，即执行本技能（先查本地，未命中再查线上并写回），把结果用于后续编写；**落地代码前仍以当前工程可编译、与插件绑定一致为准**。

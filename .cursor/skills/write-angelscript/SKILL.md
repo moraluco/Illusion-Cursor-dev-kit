@@ -1,6 +1,7 @@
 ---
 name: write-angelscript
-description: 编写或编辑 AngelScript(.as) 的单一入口：写前查阅 Kit 的 content/reference 与 Script-Examples，遵循 AS 优先与保存即生效；需测试时见 skill angelscript-tdd-agent-iteration；本地无 API/签名时使用 skill angelscript-api-query。
+description: >-
+  编写或编辑 AngelScript(.as)：写前查 Kit content/reference 与工程 Script-Examples；Hazelight 线上 API 为外站参考须在本工程核查。angelscript-api-query 辅助查 API；tdd 见 angelscript-tdd-agent-iteration。
 ---
 
 # 编写 AngelScript 脚本
@@ -15,16 +16,17 @@ description: 编写或编辑 AngelScript(.as) 的单一入口：写前查阅 Kit
 
 ### 1. 文档与 API
 
-- 查阅 **Kit** `content/reference/AS_API/`：类、函数、枚举等 API 定义。
+- 查阅 **Kit** `content/reference/AS_API/`：类、函数、枚举等 API 定义（**优先以本仓库/本机工程可验证的文档与编译为准**）。
 - 查阅 **Kit** `content/reference/Docs-UE-Angelscript/`：UE–AS 用法、子系统、组件、委托、网络等。
 - 路径与用法见 rule **angelscript-docs-reference**。
+- **关于 https://angelscript.hazelight.se/api/**：该站对应 **Hazelight 另一套工程**的 AngelScript 暴露面，**仅作**命名与用法的**参考**；**大量 API 在本项目中不存在、未绑定或行为不同**。从线上或 Kit 摘录签名后，**必须在当前工程内核查**（`.as` 实际编译、项目 `Script/` 与 `Script-Examples`、启用插件绑定）。详见技能 **angelscript-api-query** 首节约束。
 
 ### 2. API 未找到时
 
 若在 `content/reference/AS_API` 中未找到某类/函数，或需核对线上签名：
 
-- **使用技能 angelscript-api-query**：先查 Kit 本地 AS_API，未命中再查 https://angelscript.hazelight.se/api/，并将线上新查到的内容写回 `content/reference/AS_API/API_Docs/` 并更新 `API_Index.md`。
-- 写 AS 时若提示「使用技能 angelscript-api-query」或「查 API」，即执行该技能，再将结果用于后续编写。不要臆造签名。
+- **使用技能 angelscript-api-query**：先查 Kit 本地 AS_API，未命中再查 https://angelscript.hazelight.se/api/（**参考**），并将线上新查到的内容写回 `content/reference/AS_API/API_Docs/` 并更新 `API_Index.md`；**写回或引用后仍须在项目中编译验证**。
+- 写 AS 时若提示「使用技能 angelscript-api-query」或「查 API」，即执行该技能，再将结果用于后续编写。不要臆造签名；**也不要把 Hazelight 当作本项目的权威运行时契约**。
 
 ### 3. 范例
 

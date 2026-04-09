@@ -63,6 +63,7 @@
 | `FInputActionValue` 用 **`V[0]` / `V[1]`** 报 **doesn't support the indexing operator** | AngelScript 未绑定 `operator[]`；取值走 **Enhanced Input 插件 mixin**（如 `AngelscriptEnhancedInput` 的 `Bind_FInputActionValue`） | 用 **`GetAxis2D()`**（移动/视角）、**`GetAxis1D()`** / **`GetBool()`**（按 Action 类型）；勿臆造 `GetVector()`/`BreakInputActionValue` 除非 AS_API 或引擎范例已确认 |
 | PIE 里 **BindAction 正常但 WASD 无移动、视角无响应**（Enhanced Input） | 角色 **`BeginPlay` 里 `AddMappingContext`** 后，若 **`UPlayerInputComponent`** 较晚执行 **`SwitchPlayerInputMode`**，内部可能 **`ClearAllMappings()`** 再只加回默认 Gameplay IMC，**把 Puppet/自定义 IMC 清掉** | 将 **`AddMappingContext` 抽成可重复调用**；在 **定时器延后**、**`OnPlayerInputModeChanged`** 等处**再次** `AddMappingContext`；用 **`HasMappingContext`** 避免重复；**优先级**与默认 IMC 错开（如自定义为 1、默认 0）。详见技能 **write-angelscript** 与 [03-angelscript-ue.md](03-angelscript-ue.md) § Enhanced Input |
 | 蓝图 **`Delta (Rotator)`** 迁 AS 时用错减法 | 蓝图 Delta 等价于规范化后的旋转差，不是未规范化的裸减 | 用 **`(RotA - RotB).GetNormalized()`**，再取 **`Yaw`** 等；与 **`FRotator::MakeFromX(Dir)`** 配合时先 **`GetSafeNormal()`** 处理零向量 |
+| 照 **https://angelscript.hazelight.se/api/** 写 AS 却编译失败或运行无此 API | 该站基于 **Hazelight 工程**的绑定快照，与本项目引擎/插件/裁剪（NotInAngelscript 等）**不一致** | **勿**把线上当唯一真理：先 **Kit `AS_API`** 与 **本工程 `Script-Examples`**，再 **实际编译**；线上仅作线索，用技能 **angelscript-api-query** 写回本地时注明来源并以本工程为准 |
 
 
 ---

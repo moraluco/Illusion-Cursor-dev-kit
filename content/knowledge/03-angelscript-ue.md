@@ -4,7 +4,8 @@
 
 ## 文档位置（优先查阅）
 
-- **API 定义**：`content/reference/AS_API/` — 类、函数、枚举等官方 API 说明；查签名与用法时优先用此处。
+- **API 定义**：`content/reference/AS_API/` — Kit 整理的类、函数、枚举等；查签名与用法时**优先**此处，并以**本工程**实际编译与绑定为准。
+- **Hazelight 线上文档**（`https://angelscript.hazelight.se/api/`）：对应**另一套 AngelScript 工程**的暴露面，**仅作参考**；大量 API 与本项目**不一致或不存在**。使用前必须在当前工程中**核查**（见技能 **angelscript-api-query**、**write-angelscript**）。
 - **集成与用法**：`content/reference/Docs-UE-Angelscript/` — 在 UE 中写 AS、脚本绑定、C++ 绑定、最佳实践等。
 - **示例代码**：`content/reference/AS_Example/` — 归档的 AS 示例与参考脚本；查写法、风格与用法时在优先查阅范围内。
 

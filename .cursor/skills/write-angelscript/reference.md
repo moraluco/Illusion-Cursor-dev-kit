@@ -68,7 +68,7 @@
 1. **不要用 #include**：UE-AS 不支持；所有 `Script/*.as` 统一编译，类型全局可见。写 `#include` 会报 "Unexpected token"。
 2. **脚本类中引擎类型用值类型**：写 `AActor OwnerActor`，勿写 `AActor@ Owner`；避免成员名与引擎常用名（如 `Owner`）冲突。
 3. **interface 中勿用 &out**：会触发解析错误；改用返回值或结构体表示输出。
-4. **API 找不到**：先查 Kit `content/reference/AS_API`；若仍无或需核对签名，**使用技能 angelscript-api-query**。C++ 的 `NotInAngelscript` 不暴露；弃用函数不绑定且无弃用警告。
+4. **API 找不到 / 照搬线上报错**：先查 Kit `content/reference/AS_API`；若仍无或需核对签名，**使用技能 angelscript-api-query**。**https://angelscript.hazelight.se/api/** 对应**另一工程**的绑定，**大量 API 本项目没有或签名不同**；仅作线索，**必须在当前工程内编译/对照 Script-Examples 与插件绑定后**再采用。C++ 的 `NotInAngelscript` 不暴露；弃用函数不绑定且无弃用警告。
 5. **仅 Edit 无 Read 的属性**：在 AS 里**只能在 `default` 语句中访问**，运行时不可读写。
 6. **热重载后异常**：避免依赖构造函数或静态初始化顺序；默认值用类内初始化或 `default`。
 7. **Blueprint 拿不到脚本函数/属性**：检查是否加了 `UFUNCTION()`/`UPROPERTY()`，以及是否用了 BlueprintHidden/NotBlueprintCallable。
