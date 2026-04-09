@@ -66,6 +66,7 @@ description: AngelScript API lookup from Kit content/reference/AS_API first, the
 - 侧栏列表很长，优先用 Search 或 `browser_search` 缩小范围，避免盲目滚动。
 - 方法可能挂在「父类」下（如 LineTrace 相关在 `UKismetSystemLibrary`），若搜函数名无结果可改搜类名（如 Kismet、System）。
 - 站点主要提供类/枚举入口；具体静态方法签名有时需结合 Kit 内 `content/reference/AS_API/API_Docs/System.md` 等查看。
+- **`FInputActionValue` / Enhanced Input 扩展**：Hazelight 站点可能**不全**或与项目启用的 **`AngelscriptEnhancedInput`** 插件 mixin（如 `GetAxis2D()`）不一致。本地 AS_API 未命中时：**对照**引擎插件目录下 `AngelscriptEnhancedInput` 的绑定源码、`Engine/Engine/Script-Examples/EnhancedInputExamples/`，并查技能 **write-angelscript** § Enhanced Input；仍缺再线上补充写回。
 - 查询结束后若曾 `browser_lock`，记得 `browser_unlock`。
 
 ## 常见 AS API 与站点对应

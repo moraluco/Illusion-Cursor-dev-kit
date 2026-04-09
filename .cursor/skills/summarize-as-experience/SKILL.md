@@ -48,6 +48,7 @@ description: 当用户说「总结 AS 经验」时，根据对话与项目上下
 
 - **必查文档**：Kit 的 content/reference/AS_API、Docs-UE-Angelscript；及在规则/技能中写清路径与用途。
 - **写前确认**：在本地 reference 中确认 API 用法、反射规则、书写约定后再写或改 AS。
+- **与 sync-rules-and-skills 对齐**：具体步骤、长表、示例代码**优先进** **write-angelscript**（及 `reference.md`）与 **`content/knowledge/05-gotchas.md`**；**Rule（`.mdc`）只保留触发语 + 指向**，避免与 Skill 双写。涉及 **Enhanced Input / `FInputActionValue` / IMC 生命周期** 时以 **write-angelscript** § Enhanced Input 为权威。
 - **基础写法**：类声明、UPROPERTY/UFUNCTION、BlueprintOverride/BlueprintEvent、实例/静态/全局调用等。
 - **API 反射**：哪些 C++ 类型/属性/函数会出现在 AS 中（可引用 cpp-bindings/automatic-bindings 等）。
 - **语言选择**：AS 优先、C++ 补充；脚本位置、`.as` 扩展名。
@@ -135,4 +136,5 @@ description: 当用户说「总结 AS 经验」时，根据对话与项目上下
 - [ ] 新 knowledge 文件使用 NN-主题.md；内容为可复用经验
 - [ ] 已更新 content/knowledge/README.md（以及 dev README 如需要）
 - [ ] 已**必做**更新 write-angelscript（SKILL.md 或 reference.md/gotchas.md）
+- [ ] 若改动了 `.cursor/rules/*.mdc`：正文保持**短触发 + 指向 Skill**，长文只在 **write-angelscript** / knowledge；与 **sync-rules-and-skills** 一致
 - [ ] 回复中引用了新增/修改的文档路径，并注明「供 write-angelscript 使用」处

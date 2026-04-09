@@ -94,6 +94,7 @@ description: >-
 - **by-ref 断线诊断**：by-ref pin 断线退化为常量导致编译失败；对照旧资产把 pin 接回 inherited 变量。
 - **ThreadSafe 迁移模板**：ThreadSafe 只做“读 Cache_ + 纯算术/赋值”；曲线采样/可能触发 UObject 访问的 API 挪到 GameThread（`BlueprintUpdateAnimation`）。
 - **写资产 Save 门禁**：任何写 `.uasset` 的步骤后立刻 Save；按里程碑重复 Save；失败回滚并 Save（默认 UE 随时闪退）。
+- **Enhanced Input IMC 被清空**：角色/Pawn 早先 `AddMappingContext`，若 PlayerController 侧随后 `SwitchPlayerInputMode` → `ClearAllMappings()`，表现为 **BindAction 仍在但无输入**；归因时先查 IMC 是否仍在，再查 `FInputActionValue` 读法。沉淀：**`05-gotchas.md`** + 技能 **write-angelscript** § Enhanced Input；**勿**在 `.mdc` Rule 里堆长教程（与 **sync-rules-and-skills** 一致）。
 
 ### 3) 工作流升级动作（最小集）
 
@@ -141,3 +142,4 @@ description: >-
 
 - 入口不变的 subagents 增效：技能 **subagents-workflow-augmentation**
 - **C++（ManteumTower）编译工作流**：VS 只编 Games/ManteumTower、勿以 Live Coding 为唯一验收、UBT 与 LC 冲突处理 — 技能 **ue-editor-automation-workflow** §2.2；易错表 **content/knowledge/05-gotchas.md**
+- **Rule 与 Skill 边界**（避免复盘内容重复进 Rule）：技能 **sync-rules-and-skills**；AS 细节权威：**write-angelscript**

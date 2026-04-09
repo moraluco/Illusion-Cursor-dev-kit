@@ -11,3 +11,4 @@ alwaysApply: true
 - **流程、文档路径**（`content/reference/AS_API/`、`Docs-UE-Angelscript/`）、API 查阅顺序、写法约定：技能 **write-angelscript** 为唯一权威。
 - **保存即生效**：AS 保存后热重载，无需单独编译；细节见 **write-angelscript**。
 - **屏显调试**：用 **`System::PrintString` / `PrintText` + 分条目 `Key`**，勿用无 Key 调用在 Tick 里刷屏；勿为打印改引擎。见 **write-angelscript** §「调试与屏显打印」与 rule **angelscript-primary-cpp-fallback**。
+- **Enhanced Input / 世界调试绘制 / `FInputActionValue`**：IMC 生命周期、`System::DrawDebug*`、插件 mixin 取值等，见 **write-angelscript** §「Enhanced Input（`FInputActionValue`、IMC、调试绘制）」与 **`content/knowledge/05-gotchas.md`**；本 Rule 不展开步骤。

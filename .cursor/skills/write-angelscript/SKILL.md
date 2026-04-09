@@ -84,6 +84,7 @@ description: 编写或编辑 AngelScript(.as) 的单一入口：写前查阅 Kit
 - **本技能**负责：写代码前查 Kit 本地 reference（AS_API、Docs-UE-Angelscript）、书写约定、写法速查、常见坑、输出要求。  
 - **angelscript-api-query** 负责：按「先本地后线上（hazelight）」查 API；若从线上查到则写回 `content/reference/AS_API/API_Docs/` 并维护 `API_Index.md`。  
 - 写 AS 时若本地无某 API 或需核对签名，即使用技能 **angelscript-api-query**，再将结果用于本技能的编写步骤。
+- **Enhanced Input / `FInputActionValue`**：取值以 **`AngelscriptEnhancedInput`** 插件 mixin 为准（见上文 § Enhanced Input）；Hazelight 可能未列全。先 **Script-Examples** 与插件绑定，再 **angelscript-api-query** 补 AS_API。
 
 ---
 
@@ -105,3 +106,4 @@ description: 编写或编辑 AngelScript(.as) 的单一入口：写前查阅 Kit
 - [ ] 已告知用户保存并验证，未要求对仅 AS 改动做「编译」
 - [ ] 若需测试，已按技能 angelscript-tdd-agent-iteration 执行
 - [ ] 若在 Tick/高频路径做屏显调试：已用 `System::PrintString`/`PrintText` 并为每条逻辑线传入**非空 `Key`**，未用无 Key 调用刷屏
+- [ ] 若涉及 **Enhanced Input**：已按 § Enhanced Input 处理 IMC 生命周期与 `FInputActionValue` 取值，并已对照 **Script-Examples/EnhancedInputExamples** 或 **`AngelscriptEnhancedInput`** 绑定
