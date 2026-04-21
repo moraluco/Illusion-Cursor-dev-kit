@@ -10,12 +10,16 @@ description: >-
 
 ## Agent 执行顺序（强制，防「先 grep 本地 AS_API」）
 
-1. **Shell 优先**：在 Kit 根执行（路径按你工作区调整）  
-   `powershell -NoProfile -ExecutionPolicy Bypass -File "content/dev/scripts/Invoke-ASApiQuery.ps1" -ProjectRoot "<工程根含 .uproject>" -Filter "<关键词或 System::>"`  
-   例（ManteumTower）：`-ProjectRoot "D:\Workspace\MT\Engine\ManteumTower" -Filter "DrawDebug"`  
+1. **Shell 优先**：  
+   - **仅打开 MT、未打开 Kit**：在 **ManteumTower 工程根**（与 `ManteumTower.uproject` 同级）执行  
+     `powershell -NoProfile -ExecutionPolicy Bypass -File "tools/as-api-query/Invoke-ASApiQuery.ps1" -Filter "<关键词>"`  
+     （全路径示例：`D:\Workspace\MT\Engine\ManteumTower\tools\as-api-query\Invoke-ASApiQuery.ps1`；见 MT 仓库 `.cursor/rules/as-api-dynamic-query-first.mdc`。）  
+   - **含 Kit 根**：在 Kit 根执行  
+     `powershell -NoProfile -ExecutionPolicy Bypass -File "content/dev/scripts/Invoke-ASApiQuery.ps1" -ProjectRoot "<工程根含 .uproject>" -Filter "<关键词或 System::>"`  
+     例：`-ProjectRoot "D:\Workspace\MT\Engine\ManteumTower" -Filter "DrawDebug"`  
 2. **成功**：根据返回的 JSON 回答「当前工程已注册符号」；需要签名时再配合编译器 / Script-Examples / 绑定源码。  
 3. **失败（退出码 1）**：**才**允许按 **angelscript-api-query** Read/grep `content/reference/AS_API/`，且须说明 ASApiQuery 不可用。  
-4. **禁止**：在未执行步骤 1 的情况下，用 **Read** 打开 `content/reference/AS_API/API_Docs/*.md` 作为**第一步**。
+4. **禁止**：在未执行步骤 1 的情况下，用 **Read** 打开 `content/reference/AS_API/API_Docs/*.md` 或 **Glob** `**/AS_API/**` 作为**第一步**。
 
 脚本也可手写等价 HTTP（见下文 PowerShell 示例）；**与 SoftUEBridge 无关**。
 

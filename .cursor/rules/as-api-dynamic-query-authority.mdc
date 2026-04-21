@@ -10,7 +10,7 @@ alwaysApply: true
 ## 1. 第一优先（运行时权威）
 
 - 技能 **as-api-dynamic-query**：对**已启动且加载目标工程**的 UE 调用 **ASApiQuery**（`GET /as-api/health` → `POST /as-api/v1/query`，`list_types` / `list_symbols` 等）。
-- **Agent 工具顺序（与「禁止先读本地」配套）**：在检索「某 AS API / 符号是否存在、有哪些重载名」时，**必须先**用 **Shell** 执行 Kit 脚本 **`content/dev/scripts/Invoke-ASApiQuery.ps1`**（传入 `-ProjectRoot` 指向目标 `.uproject` 所在目录，`-Filter` 填关键词如 `DrawDebug`），**或**等价的手写 `Invoke-RestMethod`；**仅当 Shell 非零退出 / 连接失败**时，才允许 Read/grep **`content/reference/AS_API/`** 并**在回复中注明「ASApiQuery 不可用，以下为离线归档」**。
+- **Agent 工具顺序（与「禁止先读本地」配套）**：在检索「某 AS API / 符号是否存在、有哪些重载名」时，**必须先**用 **Shell** 调 ASApiQuery：**仅打开 MT 工作区**时用 `ManteumTower/tools/as-api-query/Invoke-ASApiQuery.ps1`（见 MT `.cursor/rules/as-api-dynamic-query-first.mdc`）；**含 Kit 根**时用 **`content/dev/scripts/Invoke-ASApiQuery.ps1`**（`-ProjectRoot` 指向 `.uproject` 目录）；**或**等价 `Invoke-RestMethod`。**仅当 Shell 非零退出 / 连接失败**时，才允许 Read/grep **`content/reference/AS_API/`** 并**注明「ASApiQuery 不可用」**。
 - **若用户环境能开 UE**（本机有工程、非纯 CI 无头）：**必须先尝试**上述 HTTP 路径；**禁止**把 Read/grep **`content/reference/AS_API/`**（含 `API_Index.md`、`API_Docs/`）或 **Hazelight 外站**作为**第一步**取证。
 
 ## 2. 第二优先（实现与签名）
