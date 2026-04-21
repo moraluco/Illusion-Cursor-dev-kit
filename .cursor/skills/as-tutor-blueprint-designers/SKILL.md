@@ -29,7 +29,7 @@ description: >-
 
 | 事项 | 处理方式 |
 |------|----------|
-| 查 Kit `AS_API` / `Docs-UE-Angelscript`、Script-Examples、API 未命中走 **angelscript-api-query** | 按 **write-angelscript** |
+| 查 `Docs-UE-Angelscript`、Script-Examples；**能开 UE** 时 API 符号走 **as-api-dynamic-query**；**不能开 UE** 时走 **angelscript-api-query** | 按 **write-angelscript** |
 | 屏显调试 `PrintString`/`PrintText` + `Key`、AnimInstance 线程安全等工程约定 | 按 **write-angelscript** |
 | 用用户能懂的话解释「这段代码在干什么」「和蓝图哪块像」 | 本技能 |
 | 先教 `if`/`for`/变量声明再贴完整类 | 本技能（可与写代码穿插） |
@@ -82,4 +82,4 @@ description: >-
 ## 可选扩展阅读（按需）
 
 - Kit `content/knowledge/05-gotchas.md`：线程安全、动画等易错点（用通俗话转述给用户）。
-- 技能 **angelscript-api-query**：仅当 **write-angelscript** 要求查签名或本地无 API 时链式使用。
+- 技能 **as-api-dynamic-query**：查「有没有这个 AS 符号」时**默认**使用（UE 内 ASApiQuery）。技能 **angelscript-api-query**：**仅当无法开 UE** 时的离线链式使用。

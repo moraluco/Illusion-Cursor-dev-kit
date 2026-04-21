@@ -46,8 +46,8 @@ description: 当用户说「总结 AS 经验」时，根据对话与项目上下
 
 从上下文归纳为可写入 Rule 或 Skill 的要点，例如：
 
-- **必查文档**：Kit 的 content/reference/AS_API、Docs-UE-Angelscript；及在规则/技能中写清路径与用途。
-- **写前确认**：在本地 reference 中确认 API 用法、反射规则、书写约定后再写或改 AS。
+- **必查文档**：Docs-UE-Angelscript、Script-Examples；**核对 AS 符号**时**能开 UE 优先 as-api-dynamic-query**，**不能开 UE** 才依赖 content/reference/AS_API。
+- **写前确认**：以 UE 内动态查询（若可用）+ 编译 + 本地叙事文档确认用法后再写或改 AS。
 - **与 sync-rules-and-skills 对齐**：具体步骤、长表、示例代码**优先进** **write-angelscript**（及 `reference.md`）与 **`content/knowledge/05-gotchas.md`**；**Rule（`.mdc`）只保留触发语 + 指向**，避免与 Skill 双写。涉及 **Enhanced Input / `FInputActionValue` / IMC 生命周期** 时以 **write-angelscript** § Enhanced Input 为权威。
 - **基础写法**：类声明、UPROPERTY/UFUNCTION、BlueprintOverride/BlueprintEvent、实例/静态/全局调用等。
 - **API 反射**：哪些 C++ 类型/属性/函数会出现在 AS 中（可引用 cpp-bindings/automatic-bindings 等）。
@@ -104,8 +104,9 @@ description: 当用户说「总结 AS 经验」时，根据对话与项目上下
 
 | 用途         | 路径 |
 |--------------|------|
-| API 索引     | `content/reference/AS_API/API_Index.md` |
-| 单类 API 文档 | `content/reference/AS_API/API_Docs/<ClassName>.md` |
+| **AS 符号（首选）** | 技能 **as-api-dynamic-query**（UE 内 ASApiQuery） |
+| API 索引（离线） | `content/reference/AS_API/API_Index.md` |
+| 单类 API 文档（离线） | `content/reference/AS_API/API_Docs/<ClassName>.md` |
 | AS 与 UE 文档 | `content/reference/Docs-UE-Angelscript/`（入门、脚本、cpp-bindings） |
 | 现有规则示例 | `.cursor/rules/angelscript-docs-reference.mdc`、`angelscript-primary-cpp-fallback.mdc` |
 | **总结沉淀目标** | `.cursor/skills/write-angelscript/SKILL.md`、`reference.md`（所有总结内容最终更新到此技能） |

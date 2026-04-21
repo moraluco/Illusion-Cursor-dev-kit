@@ -57,5 +57,5 @@
 
 - **读图**：**soft-ue-cli-ue-bridge**；修改行为在 AS 或编辑器内 `.uasset`。
 - **AS 优先**：新逻辑一律在 AS；仅当 AS 无法满足时用 C++ 扩展，再由 AS 调用（rule angelscript-primary-cpp-fallback）。
-- **写 AS**：按技能 **write-angelscript**；需 API/签名时用 **angelscript-api-query**。
+- **写 AS**：按技能 **write-angelscript**；需核对「有哪些 AS API」时**能开 UE 用 as-api-dynamic-query**，**不能开 UE 用 angelscript-api-query**。
 - **测试与沉淀**：跑测试用 **angelscript-tdd-agent-iteration**；迁移阶段结束后用 **summarize-as-experience** / **summarize-to-knowledge** 把 BP→AS 的坑与约定写入知识库。

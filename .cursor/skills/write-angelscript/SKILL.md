@@ -1,7 +1,7 @@
 ---
 name: write-angelscript
 description: >-
-  编写或编辑 AngelScript(.as)：写前查 Kit content/reference 与工程 Script-Examples；Hazelight 线上 API 为外站参考须在本工程核查。angelscript-api-query 辅助查 API；tdd 见 angelscript-tdd-agent-iteration。
+  编写或编辑 AngelScript(.as)：查「有哪些 AS API」默认用 as-api-dynamic-query（UE 内 ASApiQuery）；无法开 UE 时才用 angelscript-api-query（Kit AS_API / Hazelight）。Docs-UE-Angelscript 与 Script-Examples 仍必读。tdd 见 angelscript-tdd-agent-iteration。
 ---
 
 # 编写 AngelScript 脚本
@@ -16,17 +16,16 @@ description: >-
 
 ### 1. 文档与 API
 
-- 查阅 **Kit** `content/reference/AS_API/`：类、函数、枚举等 API 定义（**优先以本仓库/本机工程可验证的文档与编译为准**）。
-- 查阅 **Kit** `content/reference/Docs-UE-Angelscript/`：UE–AS 用法、子系统、组件、委托、网络等。
-- 路径与用法见 rule **angelscript-docs-reference**。
-- **关于 https://angelscript.hazelight.se/api/**：该站对应 **Hazelight 另一套工程**的 AngelScript 暴露面，**仅作**命名与用法的**参考**；**大量 API 在本项目中不存在、未绑定或行为不同**。从线上或 Kit 摘录签名后，**必须在当前工程内核查**（`.as` 实际编译、项目 `Script/` 与 `Script-Examples`、启用插件绑定）。详见技能 **angelscript-api-query** 首节约束。
+- **查「当前工程暴露了哪些 AS 类型/符号」**：**默认**使用技能 **as-api-dynamic-query**（UE 编辑器内 ASApiQuery HTTP，`list_types` / `list_symbols`）。**禁止**在能开 UE 时先 Read/grep **`content/reference/AS_API/`** 代替动态查询（见该技能「硬规则」）。
+- 查阅 **Kit** `content/reference/Docs-UE-Angelscript/`：UE–AS 用法、子系统、组件、委托、网络等（叙事与模式，不替代「是否绑定」的事实）。
+- **Kit** `content/reference/AS_API/`：**仅当无法使用 ASApiQuery**（无编辑器、服务不可用等）时作为离线回退；或用于已有摘录的签名说明。路径与用法见 rule **angelscript-docs-reference**。
+- **https://angelscript.hazelight.se/api/**：对应 **Hazelight 另一套工程**，**仅作**线索；**大量 API 在本项目中不存在或签名不同**。能开 UE 时以 **as-api-dynamic-query** + 编译为准；不能开 UE 时见 **angelscript-api-query**。
 
-### 2. API 未找到时
+### 2. API 未找到或需核对时
 
-若在 `content/reference/AS_API` 中未找到某类/函数，或需核对线上签名：
-
-- **使用技能 angelscript-api-query**：先查 Kit 本地 AS_API，未命中再查 https://angelscript.hazelight.se/api/（**参考**），并将线上新查到的内容写回 `content/reference/AS_API/API_Docs/` 并更新 `API_Index.md`；**写回或引用后仍须在项目中编译验证**。
-- 写 AS 时若提示「使用技能 angelscript-api-query」或「查 API」，即执行该技能，再将结果用于后续编写。不要臆造签名；**也不要把 Hazelight 当作本项目的权威运行时契约**。
+- **能开 UE**：**as-api-dynamic-query** → 仍缺则 **`.as` 编译**、**Script-Examples**、相关插件绑定源码。
+- **不能开 UE**：**angelscript-api-query**（Kit AS_API → Hazelight → 可选写回）；回复中注明「待 UE 内 ASApiQuery/编译复核」。
+- 不要臆造签名；**不要把 Hazelight 或离线 AS_API 当作运行时唯一权威**。
 
 ### 3. 范例
 
@@ -51,7 +50,7 @@ description: >-
 
 ### 调试与屏显打印（`System::PrintString` / `PrintText`）
 
-- **默认用引擎已绑定的 `System::PrintString` 或 `System::PrintText`**（见 Kit `content/reference/AS_API/API_Docs/System.md`），**不要**为「打一行字」去写 C++ 宏、改 Logging 模块或改引擎源码；rule **no-edit-engine-source** 禁止动 `Engine/Engine/`。
+- **默认用引擎已绑定的 `System::PrintString` 或 `System::PrintText`**（存在性以 **as-api-dynamic-query** 或编译为准；离线时可查 Kit `API_Docs/System.md`），**不要**为「打一行字」去写 C++ 宏、改 Logging 模块或改引擎源码；rule **no-edit-engine-source** 禁止动 `Engine/Engine/`。
 - **禁止**在 Tick/高频路径里用**无 Key** 的屏显调用刷屏：未传有效 `Key`（`NAME_None`）时，每次调用都会在屏幕上**叠加**新行，极易淹没视口与日志。
 - **每个逻辑条目使用稳定、互不相同的 `FName` Key**（如 `n"MTAnim|Speed"`、`n"BPC|Locomotion"`）：文档说明——若 Key **非空**，同 Key 的屏显消息会被**替换**而非无限堆叠，便于总开关 + 分条目开关的调试 UX。
 - 需要时再配合**节流**（如累计 `DeltaTime` 后每 N 秒刷新一次），与 Key 策略一起避免噪声。
@@ -59,7 +58,7 @@ description: >-
 
 ### Enhanced Input（`FInputActionValue`、IMC、调试绘制）
 
-- **调试绘制**：不要用不存在的 **`Debug::`** 命名空间；世界空间箭头/线等优先 **`System::DrawDebugArrow`** 等（见 `content/reference/AS_API/API_Docs/System.md`），签名以本地文档为准。
+- **调试绘制**：不要用不存在的 **`Debug::`** 命名空间；世界空间箭头/线等优先 **`System::DrawDebug*`**（以 **as-api-dynamic-query** 列出的 `System::` 符号为准；离线时参考 Kit `System.md`）。
 - **`FInputActionValue` 取值**：不要用 **`V[0]` / `[]`**（常未绑定）；在启用了 **`AngelscriptEnhancedInput`** 的项目里用 mixin 提供的 **`GetAxis2D()`**、**`GetAxis1D()`**、**`GetBool()`** 等，与 `Bind_FInputActionValue` 一致。若编译器报错，对照引擎插件 `AngelscriptEnhancedInput` 与 Script-Examples 的 `EnhancedInputExamples`。
 - **`GetComponentsByClass`**：避免已弃用的 out 重载；使用**返回 `TArray<UActorComponent>`** 的版本再 `Cast`。
 - **`InputMappingContext` 被清掉导致「绑了回调但没输入」**：若项目在 **PlayerController** 上用 **`UPlayerInputComponent`** 在 **`BeginPlay`/`SwitchPlayerInputMode`** 里 **`ClearAllMappings()`**，则仅在角色 **`BeginPlay` 里执行一次 `AddMappingContext`** 可能被后续清掉。应 **重复应用**（如短延迟 **`SetTimer`**、订阅 **`OnPlayerInputModeChanged`**），并用子系统 **`HasMappingContext`** 避免重复添加；**优先级**与默认 Gameplay IMC 错开。详见 Kit **`content/knowledge/03-angelscript-ue.md`** 与 **`content/knowledge/05-gotchas.md`**。
@@ -74,34 +73,34 @@ description: >-
 
 ## 工作流
 
-1. 按上文查阅文档与范例（含 API 未找到时调用 angelscript-api-query）。  
+1. 按上文查阅文档与范例（查符号优先 **as-api-dynamic-query**；不能开 UE 时用 **angelscript-api-query**）。  
 2. 编写或编辑 `.as` 并**保存**。  
 3. 在编辑器或 PIE 中验证；仅改 AS 时无需单独编译步骤。  
 4. 若用户需要测试或 TDD：按技能 **angelscript-tdd-agent-iteration** 执行（如 RunAngelscriptTests.ps1、退出码、失败迭代）。
 
 ---
 
-## 与 angelscript-api-query 的协作
+## 与 as-api-dynamic-query / angelscript-api-query 的协作
 
-- **本技能**负责：写代码前查 Kit 本地 reference（AS_API、Docs-UE-Angelscript）、书写约定、写法速查、常见坑、输出要求。  
-- **angelscript-api-query** 负责：按「先本地后线上（hazelight）」查 API；若从线上查到则写回 `content/reference/AS_API/API_Docs/` 并维护 `API_Index.md`。  
-- 写 AS 时若本地无某 API 或需核对签名，即使用技能 **angelscript-api-query**，再将结果用于本技能的编写步骤。
-- **Enhanced Input / `FInputActionValue`**：取值以 **`AngelscriptEnhancedInput`** 插件 mixin 为准（见上文 § Enhanced Input）；Hazelight 可能未列全。先 **Script-Examples** 与插件绑定，再 **angelscript-api-query** 补 AS_API。
+- **as-api-dynamic-query**：**查 AS 符号/类型的默认入口**（UE 内 ASApiQuery）；**能开 UE 时必须优先**。
+- **angelscript-api-query**：**仅当无法使用 ASApiQuery** 时的离线链（Kit AS_API → Hazelight）+ 可选写回；**不是**能开 UE 时的首选。
+- **本技能**负责：Docs-UE-Angelscript、Script-Examples、书写约定、写法速查、常见坑；核对「有没有这个 API」时指向 **as-api-dynamic-query**。
+- **Enhanced Input / `FInputActionValue`**：以 **`AngelscriptEnhancedInput`** 与 **Script-Examples** 为准；方法名可用 **as-api-dynamic-query** `filter` 相关类名验证。
 
 ---
 
 ## 输出要求
 
 - 生成的 AS 代码应可直接放在项目的 `Script/` 下使用，类型与函数名与 reference/API 一致。  
-- 若某 API 在本地 reference 中未找到，先使用技能 **angelscript-api-query** 查本地与线上；若仍无法确认，在代码或回复中注明「需在 reference 或线上 API 确认」，避免臆造签名。  
+- 若某 API 未确认：优先 **as-api-dynamic-query**；不能开 UE 时用 **angelscript-api-query**；若仍无法确认，注明「待 UE 内查询或编译验证」，避免臆造签名。  
 - 涉及新文件时，给出完整路径（如 `Script/MyActor.as`）。
 
 ---
 
 ## 清单（供 Agent 自检）
 
-- [ ] 已查阅 `content/reference/AS_API` 与 `content/reference/Docs-UE-Angelscript`（或 rule angelscript-docs-reference）
-- [ ] API 未找到或需核对签名时，已使用或提示使用技能 **angelscript-api-query**
+- [ ] 已查阅 `content/reference/Docs-UE-Angelscript`（与 rule angelscript-docs-reference）；**能开 UE 时已用或提示 as-api-dynamic-query** 核对符号，**未**用 grep Kit AS_API 代替
+- [ ] 无法开 UE 时，已使用或提示 **angelscript-api-query**（离线）；能开 UE 时**不**把离线文档当唯一依据
 - [ ] 已查阅 Script-Examples（如 `Engine/Engine/Script-Examples/`）
 - [ ] 已读 write-angelscript/reference.md 或 gotchas.md（若存在）
 - [ ] 在 `.as` 中编写/修改，无正当理由不把游戏逻辑放在 C++/Blueprint

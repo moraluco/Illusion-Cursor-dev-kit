@@ -6,7 +6,7 @@
 
 ## 写前自检清单
 
-- [ ] 已查阅 Kit `content/reference/AS_API` 与 `content/reference/Docs-UE-Angelscript`
+- [ ] 已查阅 `content/reference/Docs-UE-Angelscript`；**能开 UE 时已用 as-api-dynamic-query（或等价）核对符号**，未仅用 grep Kit AS_API
 - [ ] 已查阅 Script-Examples（如 `Engine/Engine/Script-Examples/`）中的类似用法
 - [ ] 保存 → 在编辑器/PIE 中验证；仅 AS 改动无需编译
 - [ ] 若需测试：见技能 **angelscript-tdd-agent-iteration**（如 RunAngelscriptTests.ps1）
@@ -68,7 +68,7 @@
 1. **不要用 #include**：UE-AS 不支持；所有 `Script/*.as` 统一编译，类型全局可见。写 `#include` 会报 "Unexpected token"。
 2. **脚本类中引擎类型用值类型**：写 `AActor OwnerActor`，勿写 `AActor@ Owner`；避免成员名与引擎常用名（如 `Owner`）冲突。
 3. **interface 中勿用 &out**：会触发解析错误；改用返回值或结构体表示输出。
-4. **API 找不到 / 照搬线上报错**：先查 Kit `content/reference/AS_API`；若仍无或需核对签名，**使用技能 angelscript-api-query**。**https://angelscript.hazelight.se/api/** 对应**另一工程**的绑定，**大量 API 本项目没有或签名不同**；仅作线索，**必须在当前工程内编译/对照 Script-Examples 与插件绑定后**再采用。C++ 的 `NotInAngelscript` 不暴露；弃用函数不绑定且无弃用警告。
+4. **API 找不到 / 照搬线上报错**：**能开 UE** 时先用技能 **as-api-dynamic-query**（ASApiQuery）；**不能开 UE** 时用 **angelscript-api-query**（Kit AS_API → Hazelight）。**https://angelscript.hazelight.se/api/** 对应**另一工程**；仅作离线线索。**必须在当前工程内**（优先动态查询 +）**编译/对照 Script-Examples 与插件绑定**后再采用。C++ 的 `NotInAngelscript` 不暴露；弃用函数不绑定且无弃用警告。
 5. **仅 Edit 无 Read 的属性**：在 AS 里**只能在 `default` 语句中访问**，运行时不可读写。
 6. **热重载后异常**：避免依赖构造函数或静态初始化顺序；默认值用类内初始化或 `default`。
 7. **Blueprint 拿不到脚本函数/属性**：检查是否加了 `UFUNCTION()`/`UPROPERTY()`，以及是否用了 BlueprintHidden/NotBlueprintCallable。
@@ -76,8 +76,8 @@
 9. **C++ BlueprintNativeEvent 在 AS 中重写**：重写后**不能调用 C++ Super**；倾向用 BlueprintImplementableEvent 或把基础逻辑放到单独可调用函数。
 10. **编辑器专用 API**：必须用 `#if EDITOR` … `#endif`，否则打包失败。
 11. **调试（日志）**：`Print`/`Log`/`LogInfo`；可用 Unreal AngelScript 扩展下断点；`GetAngelscriptCallstack`/`FormatAngelscriptCallstack` 可打脚本栈。
-12. **调试（屏显，避免刷屏）**：需要 **PIE/屏幕上** 的调试信息时，使用 **`System::PrintString`** 或 **`System::PrintText`**，并传入**非空**的 **`FName Key`**（最后一参）。同 Key 的消息会被**替换**，不会每一帧叠一行；**禁止**在 Tick 里反复 `PrintString` 且**不传 Key**（默认 `NAME_None`）——会刷屏。签名与参数说明见 `content/reference/AS_API/API_Docs/System.md`（`PrintString` / `PrintText`）。**不要**为此新增 C++ `UE_LOG` 包装或改引擎 Logging；AS 侧足够。
-13. **调试（世界空间绘制）**：**不要**使用不存在的 **`Debug::`** 命名空间；箭头/线段等用 **`System::DrawDebugArrow`**（及 `System.md` 中其它 `DrawDebug*`，以本地签名为准）。
+12. **调试（屏显，避免刷屏）**：需要 **PIE/屏幕上** 的调试信息时，使用 **`System::PrintString`** 或 **`System::PrintText`**，并传入**非空**的 **`FName Key`**（最后一参）。同 Key 的消息会被**替换**；**禁止**在 Tick 里反复 `PrintString` 且**不传 Key**。签名以 **as-api-dynamic-query** 列出的 `System::` 符号 + 编译器为准；离线可查 Kit `API_Docs/System.md`。**不要**为此新增 C++ `UE_LOG` 包装或改引擎 Logging；AS 侧足够。
+13. **调试（世界空间绘制）**：**不要**使用不存在的 **`Debug::`** 命名空间；箭头/线段等用 **`System::DrawDebug*`**（以动态查询 `filter`=`DrawDebug` 或 `System::` 为准）。
 14. **`FInputActionValue`**：不要用 **`[]` 下标**（通常未绑定）。在带 **`AngelscriptEnhancedInput`** 的工程里用 **`GetAxis2D()` / `GetAxis1D()` / `GetBool()`**（见引擎插件 `Bind_FInputActionValue` 与 `EnhancedInputExamples`）。
 15. **`GetComponentsByClass`**：弃用「往 out `TArray` 填」的旧重载；用 **返回 `TArray<UActorComponent>`** 的版本再 `Cast`。
 16. **Enhanced Input 无响应（回调存在、按键无效果）**：若 **PlayerController** 侧 **`UPlayerInputComponent`** 在切换模式时 **`ClearAllMappings()`**，仅在角色 **`BeginPlay` 里加一次 `InputMappingContext`** 可能被清掉。需 **延后/在 `OnPlayerInputModeChanged` 再 `AddMappingContext`**，**`HasMappingContext`** 去重，并注意 **IMC 优先级**。详见 **`content/knowledge/05-gotchas.md`**、`03-angelscript-ue.md`。
