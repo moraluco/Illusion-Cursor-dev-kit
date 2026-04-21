@@ -8,7 +8,7 @@ alwaysApply: true
 
 编写或修改 **AngelScript**、或涉及 AS 与 UE 交互的 C++ 时：
 
-- **API 是否存在 / 符号是否注册**：**必须先遵守** rule **as-api-dynamic-query-authority**（P0）；再按技能 **write-angelscript** 执行。
+- **API 是否存在 / 符号是否注册**：**必须先遵守** rule **as-api-dynamic-query-authority**（P0）：**先用 Shell 跑** `content/dev/scripts/Invoke-ASApiQuery.ps1`（见技能 **as-api-dynamic-query**），**失败后才**读本地 `AS_API/`；再按技能 **write-angelscript** 执行。
 - **流程、文档路径**（除「符号事实」外）、写法约定：技能 **write-angelscript** 为权威。
 - **查「有哪些 AS API / 符号」**：**能开 UE 时**技能 **as-api-dynamic-query**（ASApiQuery HTTP），**禁止**用 Read/grep **`content/reference/AS_API/`** 抢答。**无法开 UE** 时才用 **angelscript-api-query**（Kit AS_API → Hazelight）。叙事与用法仍查 **`Docs-UE-Angelscript/`**。
 - **Hazelight 线上 API 站**：**外站/另一工程**，**非**本项目事实；仅作离线线索；能开 UE 时以 **as-api-dynamic-query** + 编译为准。

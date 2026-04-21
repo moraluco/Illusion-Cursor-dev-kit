@@ -8,6 +8,17 @@ description: >-
 
 > **插件内副本**：游戏仓库 `Engine/ManteumTower/Plugins/ASApiQuery/.cursor/skills/as-api-dynamic-query/SKILL.md` 与上游 [UE5-AS-API-Query](https://github.com/moraluco/UE5-AS-API-Query) 同步；随插件分发说明见同目录 **`CursorSkill_分发说明.md`**（在 **ManteumTower** 插件文件夹内）。
 
+## Agent 执行顺序（强制，防「先 grep 本地 AS_API」）
+
+1. **Shell 优先**：在 Kit 根执行（路径按你工作区调整）  
+   `powershell -NoProfile -ExecutionPolicy Bypass -File "content/dev/scripts/Invoke-ASApiQuery.ps1" -ProjectRoot "<工程根含 .uproject>" -Filter "<关键词或 System::>"`  
+   例（ManteumTower）：`-ProjectRoot "D:\Workspace\MT\Engine\ManteumTower" -Filter "DrawDebug"`  
+2. **成功**：根据返回的 JSON 回答「当前工程已注册符号」；需要签名时再配合编译器 / Script-Examples / 绑定源码。  
+3. **失败（退出码 1）**：**才**允许按 **angelscript-api-query** Read/grep `content/reference/AS_API/`，且须说明 ASApiQuery 不可用。  
+4. **禁止**：在未执行步骤 1 的情况下，用 **Read** 打开 `content/reference/AS_API/API_Docs/*.md` 作为**第一步**。
+
+脚本也可手写等价 HTTP（见下文 PowerShell 示例）；**与 SoftUEBridge 无关**。
+
 ## 硬规则（与 angelscript-api-query 的分界）
 
 - **凡能启动 UE 并打开目标工程**：查「当前工程暴露了哪些 AS 类型/全局函数/成员名」时，**必须**使用本技能（HTTP 调 ASApiQuery），**禁止**用 Read/grep **`content/reference/AS_API/`** 或仅凭 Kit 静态文档当作事实来源。
