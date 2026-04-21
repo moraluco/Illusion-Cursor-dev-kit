@@ -16,7 +16,7 @@ description: >-
 
 ### 1. 文档与 API
 
-- **查「当前工程暴露了哪些 AS 类型/符号」**：**P0** — rule **as-api-dynamic-query-authority** → **先用 Shell** 跑 **`content/dev/scripts/Invoke-ASApiQuery.ps1`**（技能 **as-api-dynamic-query**）→ **禁止**在能开 UE 时先 Read/grep **`content/reference/AS_API/`** 代替动态查询。
+- **查「当前工程暴露了哪些 AS 类型/符号」**：**P0** — rule **as-api-dynamic-query-authority** → **先用 Shell** 跑 **`content/dev/scripts/Invoke-ASApiQuery.ps1`**（技能 **as-api-dynamic-query**；**默认单次、较宽 filter**，勿无必要多轮 Shell）→ **禁止**在能开 UE 时先 Read/grep **`content/reference/AS_API/`** 代替动态查询。
 - 查阅 **Kit** `content/reference/Docs-UE-Angelscript/`：UE–AS 用法、子系统、组件、委托、网络等（叙事与模式，不替代「是否绑定」的事实）。
 - **Kit** `content/reference/AS_API/`：**仅当无法使用 ASApiQuery**（无编辑器、服务不可用等）时作为离线回退；或用于已有摘录的签名说明。路径与用法见 rule **angelscript-docs-reference**。
 - **https://angelscript.hazelight.se/api/**：对应 **Hazelight 另一套工程**，**仅作**线索；**大量 API 在本项目中不存在或签名不同**。能开 UE 时以 **as-api-dynamic-query** + 编译为准；不能开 UE 时见 **angelscript-api-query**。

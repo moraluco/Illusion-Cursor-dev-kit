@@ -21,6 +21,12 @@ description: >-
 3. **失败（退出码 1）**：**才**允许按 **angelscript-api-query** Read/grep `content/reference/AS_API/`，且须说明 ASApiQuery 不可用。  
 4. **禁止**：在未执行步骤 1 的情况下，用 **Read** 打开 `content/reference/AS_API/API_Docs/*.md` 或 **Glob** `**/AS_API/**` 作为**第一步**。
 
+### 单次查询优先（效率）
+
+- **默认一次 Shell**：`-Filter` 用**较宽**主题词（如 `DrawDebug`）或类前缀（如 `System::DrawDebug`），从单次 JSON 作答。  
+- **不要**在已列出 `System::DrawDebug*` 等命中后，**再单独跑** `Debug::DrawDebug` 等「只为证明不存在」的查询；可在文字中说明「本次结果未含 `Debug::`」。  
+- **仅当**首轮 **symbols 为空/明显不全**，或用户**明确要求**多 filter / 多命名空间对比时，**才**追加第二次及以后的 `Invoke-ASApiQuery.ps1`。
+
 脚本也可手写等价 HTTP（见下文 PowerShell 示例）；**与 SoftUEBridge 无关**。
 
 ## 硬规则（与 angelscript-api-query 的分界）
