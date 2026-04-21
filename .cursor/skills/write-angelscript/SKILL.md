@@ -1,12 +1,12 @@
 ---
 name: write-angelscript
 description: >-
-  编写或编辑 AngelScript(.as)：查「有哪些 AS API」默认用 as-api-dynamic-query（UE 内 ASApiQuery）；无法开 UE 时才用 angelscript-api-query（Kit AS_API / Hazelight）。Docs-UE-Angelscript 与 Script-Examples 仍必读。tdd 见 angelscript-tdd-agent-iteration。
+  编写或编辑 AngelScript(.as)。核对符号/API 存在性：遵守 rule as-api-dynamic-query-authority → 技能 as-api-dynamic-query →（仅离线）angelscript-api-query。Docs-UE-Angelscript 与 Script-Examples 仍必读。tdd 见 angelscript-tdd-agent-iteration。
 ---
 
 # 编写 AngelScript 脚本
 
-在需要**编写或修改 AngelScript（.as）**时按本技能执行（如实现游戏逻辑、武器、UI 或任意 `.as` 文件）。「何时用 AS」由 rule **angelscript-primary-cpp-fallback** 定义；本技能负责**怎么写** AS。
+在需要**编写或修改 AngelScript（.as）**时按本技能执行（如实现游戏逻辑、武器、UI 或任意 `.as` 文件）。「何时用 AS」由 rule **angelscript-primary-cpp-fallback** 定义；**「某 API 在不在本工程」**由 rule **as-api-dynamic-query-authority** 与技能 **as-api-dynamic-query** 定义；本技能负责**怎么写** AS。
 
 所有路径均相对于 **Kit 根目录**（含本技能与 `content/`）。**项目根**为工作区中另一枚根（代码与资源所在）。
 
@@ -16,7 +16,7 @@ description: >-
 
 ### 1. 文档与 API
 
-- **查「当前工程暴露了哪些 AS 类型/符号」**：**默认**使用技能 **as-api-dynamic-query**（UE 编辑器内 ASApiQuery HTTP，`list_types` / `list_symbols`）。**禁止**在能开 UE 时先 Read/grep **`content/reference/AS_API/`** 代替动态查询（见该技能「硬规则」）。
+- **查「当前工程暴露了哪些 AS 类型/符号」**：**P0** — rule **as-api-dynamic-query-authority** → 技能 **as-api-dynamic-query**（ASApiQuery HTTP，`list_types` / `list_symbols`）。**禁止**在能开 UE 时先 Read/grep **`content/reference/AS_API/`** 代替动态查询（见该技能「硬规则」）。
 - 查阅 **Kit** `content/reference/Docs-UE-Angelscript/`：UE–AS 用法、子系统、组件、委托、网络等（叙事与模式，不替代「是否绑定」的事实）。
 - **Kit** `content/reference/AS_API/`：**仅当无法使用 ASApiQuery**（无编辑器、服务不可用等）时作为离线回退；或用于已有摘录的签名说明。路径与用法见 rule **angelscript-docs-reference**。
 - **https://angelscript.hazelight.se/api/**：对应 **Hazelight 另一套工程**，**仅作**线索；**大量 API 在本项目中不存在或签名不同**。能开 UE 时以 **as-api-dynamic-query** + 编译为准；不能开 UE 时见 **angelscript-api-query**。
@@ -52,8 +52,9 @@ description: >-
 
 - **默认用引擎已绑定的 `System::PrintString` 或 `System::PrintText`**（存在性以 **as-api-dynamic-query** 或编译为准；离线时可查 Kit `API_Docs/System.md`），**不要**为「打一行字」去写 C++ 宏、改 Logging 模块或改引擎源码；rule **no-edit-engine-source** 禁止动 `Engine/Engine/`。
 - **禁止**在 Tick/高频路径里用**无 Key** 的屏显调用刷屏：未传有效 `Key`（`NAME_None`）时，每次调用都会在屏幕上**叠加**新行，极易淹没视口与日志。
-- **每个逻辑条目使用稳定、互不相同的 `FName` Key**（如 `n"MTAnim|Speed"`、`n"BPC|Locomotion"`）：文档说明——若 Key **非空**，同 Key 的屏显消息会被**替换**而非无限堆叠，便于总开关 + 分条目开关的调试 UX。
-- 需要时再配合**节流**（如累计 `DeltaTime` 后每 N 秒刷新一次），与 Key 策略一起避免噪声。
+- **每个逻辑条目使用稳定、互不相同的 `FName` Key**（如 `n"MTAnim|Speed"`、`n"BPC|Locomotion"`、`n"PathPerturb|Dbg"`）：若 Key **非空**，同 Key 的屏显消息会被**替换**而非无限堆叠——**每一帧更新同一 Key 即可**，视口上始终只有**一行**该 Key 的最新内容。
+- **每帧调试（Tick 内核对数值）**：**必须**用「**带 Key 的 `PrintString`**」；**不要**再叠**时间节流**（如每 N 秒打一次）。节流会**漏掉帧间变化**，又与「同 Key 替换」的语义重复，容易造成信息不全或观感混乱——Key 已解决堆叠，无需节流。
+- **何时才用节流**：仅当需求是**刻意降低频率**（非 Tick、或只关心慢变化、或控制 `UE_LOG` 体积）且用户明确要求时；**不要**默认给 Tick 屏显调试加节流。
 - 历史上若文档提到 `PrintToScreenKeyed` 等**插件专用** API，实现屏显时应**优先对齐**上述 `System::PrintString(..., Key)` 语义，避免依赖额外重编 AngelScript 插件的路径，除非需求明确且已纳入构建流程。
 
 ### Enhanced Input（`FInputActionValue`、IMC、调试绘制）
@@ -106,5 +107,5 @@ description: >-
 - [ ] 在 `.as` 中编写/修改，无正当理由不把游戏逻辑放在 C++/Blueprint
 - [ ] 已告知用户保存并验证，未要求对仅 AS 改动做「编译」
 - [ ] 若需测试，已按技能 angelscript-tdd-agent-iteration 执行
-- [ ] 若在 Tick/高频路径做屏显调试：已用 `System::PrintString`/`PrintText` 并为每条逻辑线传入**非空 `Key`**，未用无 Key 调用刷屏
+- [ ] 若在 Tick/高频路径做屏显调试：已用 `System::PrintString`/`PrintText` 并为每条逻辑线传入**非空 `Key`**（同 Key 每帧替换一行）；**未**用无 Key 刷屏，**未**对「每帧核对类」调试再叠时间节流
 - [ ] 若涉及 **Enhanced Input**：已按 § Enhanced Input 处理 IMC 生命周期与 `FInputActionValue` 取值，并已对照 **Script-Examples/EnhancedInputExamples** 或 **`AngelscriptEnhancedInput`** 绑定

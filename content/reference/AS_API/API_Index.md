@@ -1,6 +1,8 @@
 # Unreal AngelScript API – Class Index
 
-Local scrape of [angelscript.hazelight.se/api](https://angelscript.hazelight.se/api/).
+> **Agent：** 本索引为 **Hazelight 外站离线快照**，**非**当前工程 AS 绑定事实。**能开 UE 时必须先 as-api-dynamic-query（ASApiQuery）**；勿用 Read/grep 本文件代替。见上级目录 `README.md` 与 rule **as-api-dynamic-query-authority**。
+
+Local scrape of [angelscript.hazelight.se/api](https://angelscript.hazelight.se/api/) — **另一工程**，仅作离线检索。
 
 - [AAIController](API_Docs/AAIController.md)
 - [AARActor](API_Docs/AARActor.md)

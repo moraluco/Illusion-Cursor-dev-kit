@@ -104,7 +104,7 @@ description: 当用户说「总结 AS 经验」时，根据对话与项目上下
 
 | 用途         | 路径 |
 |--------------|------|
-| **AS 符号（首选）** | 技能 **as-api-dynamic-query**（UE 内 ASApiQuery） |
+| **AS 符号（P0）** | rule **as-api-dynamic-query-authority** → 技能 **as-api-dynamic-query** |
 | API 索引（离线） | `content/reference/AS_API/API_Index.md` |
 | 单类 API 文档（离线） | `content/reference/AS_API/API_Docs/<ClassName>.md` |
 | AS 与 UE 文档 | `content/reference/Docs-UE-Angelscript/`（入门、脚本、cpp-bindings） |

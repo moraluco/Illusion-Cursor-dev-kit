@@ -1,12 +1,12 @@
 ---
 name: angelscript-api-query
 description: >-
-  AS API 离线回退：仅在无法使用 UE 内 ASApiQuery（as-api-dynamic-query）时，查 Kit AS_API 与 Hazelight 外站；可写回 API_Docs。能开 UE 时禁止用本技能代替动态查询。
+  仅离线：UE/ASApiQuery 不可用时的 AS API 回退（Kit AS_API → Hazelight）。非 P0；能开 UE 时勿启用本路径。写回 API_Docs 可选。禁止与 as-api-dynamic-query 平级竞争。
 ---
 
 # AngelScript API 查询（离线回退 + 写回 Kit）
 
-查找 UnrealEngine-AngelScript 的类、枚举、函数等 API。**默认入口不是本技能**：凡**能启动 UE 编辑器**并加载工程，须先用技能 **as-api-dynamic-query**（`GET/POST` ASApiQuery HTTP）查**当前会话已注册符号**，与运行时绑定一致。**不要**在能开 UE 时先 `grep` Kit `content/reference/AS_API/` 代替动态查询。
+查找 UnrealEngine-AngelScript 的类、枚举、函数等。**本技能 = 备胎**：rule **as-api-dynamic-query-authority** 规定，凡**能启动 UE**，**必须**先用 **as-api-dynamic-query**。**不要**在能开 UE 时先 Read/grep **`content/reference/AS_API/`** 代替 HTTP 查询。
 
 本技能用于：（1）**实在无法**使用 ASApiQuery（无编辑器、连接拒绝、`not_initialized` 长期不可用、CI 无头环境等）时的离线链；（2）从 Hazelight **摘录并写回** Kit，供无 UE 场景下检索。
 

@@ -1,0 +1,31 @@
+---
+description: AS API 事实来源强制层级：能开 UE 时必须先 ASApiQuery；禁止用 Kit AS_API/Hazelight 抢答
+alwaysApply: true
+---
+
+# AS API 动态查询优先（P0，强制）
+
+凡涉及 **「当前工程暴露了哪些 AngelScript 类型/符号」**、**「某 API 在不在 AS 里」**、或写 `.as` 需**核对绑定是否存在**时，按以下层级执行；**不得跳过第 1 层**（在条件允许时）。
+
+## 1. 第一优先（运行时权威）
+
+- 技能 **as-api-dynamic-query**：对**已启动且加载目标工程**的 UE 调用 **ASApiQuery**（`GET /as-api/health` → `POST /as-api/v1/query`，`list_types` / `list_symbols` 等）。
+- **若用户环境能开 UE**（本机有工程、非纯 CI 无头）：**必须先尝试**上述 HTTP 路径；**禁止**用 Read/grep **`content/reference/AS_API/`**（含 `API_Index.md`、`API_Docs/`）或仅凭 **Hazelight 外站**作为回答的**首要依据**。
+
+## 2. 第二优先（实现与签名）
+
+- `.as` **编译器报错/补全**、**Script-Examples**、相关 **C++/插件绑定源码**（用于完整参数与用法）。
+
+## 3. 仅当 UE / ASApiQuery 不可用
+
+- 技能 **angelscript-api-query**：Kit `AS_API` → Hazelight（**仅参考**）→ 可选写回。
+- 回复须标明**离线/非本工程运行时事实**；能开 UE 后应提示用 **as-api-dynamic-query** 复核。
+
+## 叙事与模式（不替代「是否绑定」）
+
+- **`content/reference/Docs-UE-Angelscript/`**：用法与集成说明，**不**证明某符号在本工程已注册。
+
+## 详见
+
+- 技能：**write-angelscript**、**as-api-dynamic-query**、**angelscript-api-query**
+- 与 **angelscript-docs-reference** 配合；本 Rule 专门拉高 **API 存在性** 查询的优先级。

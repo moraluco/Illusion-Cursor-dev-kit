@@ -1,10 +1,10 @@
 ---
 name: as-api-dynamic-query
 description: >-
-  AngelScript API 首选：UE 编辑器内 ASApiQuery HTTP（当前会话已注册类型/符号）。与 SoftUEBridge 无关。仅当无法开 UE 或服务不可用时回落 angelscript-api-query（Kit AS_API / Hazelight）。能开 UE 时禁止用读本地 AS_API 代替本技能。
+  P0 / AngelScript API 事实来源：UE 内 ASApiQuery HTTP（当前工程已注册类型/符号）。与 SoftUEBridge 无关。能开 UE 时禁止先用 Kit content/reference/AS_API 或 Hazelight 抢答。仅 UE 不可用时回落 angelscript-api-query。与 rule as-api-dynamic-query-authority 同级约束。
 ---
 
-# AS 动态 API 查询（ASApiQuery）— **查 AS API 的默认入口**
+# AS 动态 API 查询（ASApiQuery）— **查「有哪些 AS API」的唯一第一入口（P0）**
 
 > **插件内副本**：游戏仓库 `Engine/ManteumTower/Plugins/ASApiQuery/.cursor/skills/as-api-dynamic-query/SKILL.md` 与上游 [UE5-AS-API-Query](https://github.com/moraluco/UE5-AS-API-Query) 同步；随插件分发说明见同目录 **`CursorSkill_分发说明.md`**（在 **ManteumTower** 插件文件夹内）。
 

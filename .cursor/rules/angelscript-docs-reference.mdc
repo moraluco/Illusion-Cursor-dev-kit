@@ -1,5 +1,5 @@
 ---
-description: 编辑 .as 按 write-angelscript；保存即生效；文档/API 以该技能与 reference 为准
+description: 编辑 .as 按 write-angelscript；API 存在性以 as-api-dynamic-query-authority 为最高约束
 globs: "**/*.as,**/*.cpp,**/*.h"
 alwaysApply: true
 ---
@@ -8,8 +8,9 @@ alwaysApply: true
 
 编写或修改 **AngelScript**、或涉及 AS 与 UE 交互的 C++ 时：
 
-- **流程、文档路径**、API 查阅顺序、写法约定：技能 **write-angelscript** 为唯一权威。
-- **查「有哪些 AS API / 符号」**：**能开 UE 时默认**技能 **as-api-dynamic-query**（编辑器内 ASApiQuery HTTP），**禁止**用 Read/grep **`content/reference/AS_API/`** 代替。**无法开 UE** 时才用 **angelscript-api-query**（Kit AS_API → Hazelight）。叙事与用法仍查 **`Docs-UE-Angelscript/`**。
+- **API 是否存在 / 符号是否注册**：**必须先遵守** rule **as-api-dynamic-query-authority**（P0）；再按技能 **write-angelscript** 执行。
+- **流程、文档路径**（除「符号事实」外）、写法约定：技能 **write-angelscript** 为权威。
+- **查「有哪些 AS API / 符号」**：**能开 UE 时**技能 **as-api-dynamic-query**（ASApiQuery HTTP），**禁止**用 Read/grep **`content/reference/AS_API/`** 抢答。**无法开 UE** 时才用 **angelscript-api-query**（Kit AS_API → Hazelight）。叙事与用法仍查 **`Docs-UE-Angelscript/`**。
 - **Hazelight 线上 API 站**：**外站/另一工程**，**非**本项目事实；仅作离线线索；能开 UE 时以 **as-api-dynamic-query** + 编译为准。
 - **保存即生效**：AS 保存后热重载，无需单独编译；细节见 **write-angelscript**。
 - **屏显调试**：用 **`System::PrintString` / `PrintText` + 分条目 `Key`**，勿用无 Key 调用在 Tick 里刷屏；勿为打印改引擎。见 **write-angelscript** §「调试与屏显打印」与 rule **angelscript-primary-cpp-fallback**。
